@@ -13,6 +13,13 @@
     <script type="text/javascript" src="/static/js/bootstrap.js"></script>
     <script type="text/javascript" src="/static/js/common.js"></script>
     {% block scripts %}
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  $('#global-post-btn').click(function() {
+	      alert('Compose new post.');
+	  });
+      });
+    </script>
     {% endblock %}
   </head>
   <body>
@@ -81,7 +88,7 @@
 		  </li>
 		</ul>
 		<div class="topbar-post">
-		  <button type="button" class="btn primary-btn compose-btn topbar-post-btn" placeholder="Post">Compose</button>
+		  <button type="button" id="global-post-btn" class="btn primary-btn compose-btn topbar-post-btn" placeholder="Post">Compose</button>
 		</div>
 	      </div>
 	    </div>
@@ -101,5 +108,29 @@
 
     {% block page %}
     {% endblock %}
+
+    <div id="global-post-dialog" class="module-container">
+      <div class="close-model-background-target"></div>
+      <div class="modal draggable" style="top: 147px; left: 290px;">
+	<div class="modal-content">
+	  <button type="button" class="modal-btn modal-close">
+	    <i class="close-medium"></i>
+	  </button>
+	  <div class="modal-header">
+	    <h3 class="modal-title">What's to know or what's to tell?</h3>
+	  </div>
+	  <div class="modal-body">
+	    <form class="post-form" method="post" action="/post/new">
+	      <div class="post-content">
+		<textarea></textarea>
+	      </div>
+	    </form>
+	    <div class="post-button">
+	      <button type="button" class="btn primary-btn" placeholder="Post">Post</button>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
   </body>
 </html>
