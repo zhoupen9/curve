@@ -1,0 +1,105 @@
+
+<!DOCTYPE HTML>
+<html lang="en" class data-fouc-class-name="swift-loading">
+  <head>
+    <meta charset="utf-8"></meta>
+    <title>Curve</title>
+    <link rel="shortcut icon" href="/static/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/curve.css" />
+    {% block styles %}
+    {% endblock %}
+    <script type="text/javascript" src="/static/js/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/js/common.js"></script>
+    {% block scripts %}
+    {% endblock %}
+  </head>
+  <body>
+    <div id="doc" class="doc-main">
+      {% if user.is_authenticated %}
+      <div class="navbar navbar-inverse navbar-fixed-top">
+	<div class="navbar-inner">
+	  <div class="container">
+	    <a class="brand nav-brand" href="/about">Curve</a>
+	    <div class="nav-collapse collapse">
+	      <!-- navigation buttons. -->
+	      <ul class="nav">
+		<li class="active">
+		  <a href="/home">Home</a>
+		</li>
+		<li>
+		  <a href="/post/">Post</a>
+		</li>
+		<li>
+		  <a href="/announcements">Announcement</a>
+		</li>
+		<li>
+		  <a href="/live">Live!</a>
+		</li>
+		<li>
+		  <a href="/profile">Profile</a>
+		</li>
+	      </ul>
+
+	      <!-- put right form and dropdown menu. -->
+	      <div class="pull-right">
+		<ul class="nav">
+		  <li>
+		    <form action="/search" method="post" class="form-search">
+		      {% csrf_token %}
+		      <input id="search-query" type="text" class="search-input" placeholder="search"></input>
+		    </form>
+		  </li>
+		  <li class="me dropdown">
+		    <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+		      <span class="profile-icon-wrapper">
+			<i class="profile-icon"></i>
+		      </span>
+		      <span class="caret"></span>
+		    </a>
+		    <ul class="dropdown-menu">
+		      <li class="current-user" data-name="profile">
+			<a href="/zhoup3ng" class="account-summary" data-name="profile">
+			  <div class="profile-content">
+			    <div class="account-group">
+			      <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg"></img>
+			      <b class="fullname">ZhouP3ng</b>
+			      <small class="metadata">Edit profile</small>
+			    </div>
+			  </div>
+			</a>
+		      </li>
+		      <li class="divider"></li>
+		      <li>
+			<a class="" href="/member/setting">Settings</a>
+		      </li>
+		      <li>
+			<a class="" href="/signout">Sign out</a>
+		      </li>
+		    </ul>
+		  </li>
+		</ul>
+		<div class="topbar-post">
+		  <button type="button" class="btn primary-btn compose-btn topbar-post-btn" placeholder="Post">Compose</button>
+		</div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+    {% else %}
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+	<div class="container">
+	  <a class="brand nav-brand" href="/about">Curve</a>
+	</div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% block page %}
+    {% endblock %}
+  </body>
+</html>

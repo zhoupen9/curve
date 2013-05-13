@@ -1,0 +1,297 @@
+
+.signin-alert {
+    position: absolute;
+    top: 200px;
+    left: 200px;
+    margin: auto;
+    text-align: center;
+    width: 500px;
+    text-shadow: #000 0 -1px 1px rgba(0,0,0, .5);
+    -webkit-box-shadow: 0 2px 4px rgba(0,0,0, .3);
+    -moz-box-shadow: 0 2px 4px rgba(0,0,0, .3);
+    box-shadow: 0 2px 4px rgba(0,0,0, .3);
+}
+
+.front-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 328px;
+    width: 838px;
+    //margin: -154px 0 0 -418px;
+    margin: 0 0 0 -418px;
+}
+
+.front-welcome {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 520px;
+    height: 328px;
+}
+
+.front-welcome-text {
+    position: absolute;
+    top: 20%;
+    font-size: 20px;
+    font-weight: 300;
+    color: #eee;
+    margin: 0;
+    #line-height: 1;
+    text-align: left;
+    text-shadow: #000 0 1px 2px;
+    width: 470px;
+}
+
+.front-welcome-text h1 { 
+    margin-bottom: 3px;
+    font-weight: 700;
+    font-size: 20px;
+    color: #fff;
+}
+
+table.flex-table {
+    border-spacing: 0px;
+}
+
+.front-signin {
+    position: absolute;
+    top: 0px;
+    left: 536px;
+    width: 300px;
+    height: 108px;
+    background: -webkit-linear-gradient(top, #fff 0, #ddd 100%);
+    background: -moz-linear-gradient(top,#fff 0,#ddd 100%);
+    background: -ms-linear-gradient(top,#fff 0,#ddd 100%);
+    background: -0-linear-gradient(top,#fff 0,#ddd 100%);
+    filter:
+    progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff',endColorstr='#dddddd',GradientType=0);
+    #color: #fff;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 0 rgba(0,0,0, .1);
+    -moz-box-shadow: 0 1px 0 rgba(0,0,0, .1);
+    box-shadow: 0 1px 0 rgba(0,0,0, .1);
+    -moz-border-radius: 4px;
+    border-left: solid 1px #eee;
+    border-right: solid 1px #eee;
+    border-bottom: solid 1px #ccc;
+}
+
+.front-signup {
+}
+
+.front-signin .email-input {
+    position: absolute;
+    top: 0px;
+    width: 266px;
+}
+
+.front-signin .text-input, .front-signup .text-input {
+    border: 1px solid #ccc;
+    -webkit-box-shadow: inset 0 1px 0 #eee,#fff 0 1px 0;
+    -moz-box-shadow: inset 0 1px 0 #eee,#fff 0 1px 0;
+    padding: 4px;
+}
+
+.front-signin .password-signin {
+    position: absolute;
+    top: 48px;
+    left: 12px;
+    width: 276px;
+    height: 30px;
+}
+
+.front-signin .username {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 276px;
+    height: 30px;
+    color: #333;
+}
+
+.front-signin .password {
+    position: relative;
+    overflow: visible;
+    height: 30px;
+    width: 100%;
+}
+
+.front-signin .password .text-input {
+    height: 30px;
+}
+
+/*.front-signin .primary-btn {
+
+}
+*/
+
+.flex-table {
+    width: 100%;
+    border-spacing: 0px;
+}
+
+td.flex-table-primary {
+    width: 99%;
+    #padding-right: 5px;
+    padding: 0px 5px 0px 0px;
+    border-spacing: 0px;
+}
+
+.flex-table-form {
+    float: left;
+    width: 100%;
+}
+
+td.flex-table-secondary {
+    width: 1%;
+    max-width: 1%;
+    vertical-align: top;
+    padding: 0px;
+    border-spacing: 0px;
+}
+
+.flex-table-btn {
+    float: right;
+    width: auto;
+    white-space: nowrap;
+}
+
+.flex-table-input {
+    width: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.front-signin .remember-forgot {
+    position: absolute;
+    top: 82px;
+    left: 12px;
+    margin: 0;
+    width: 276px;
+}
+
+div.remember-forgot {
+    line-height: 18px;
+}
+
+.front-signin .remember, .front-signin .forgot {
+    display: inline;
+    font-size: 11px;
+    color: #999;
+    margin: 0;
+    text-shadow: 0 1px 0 rgba(255,255,255,.6);
+    line-height: 13px;
+}
+
+.signin .remember {
+    text-align: left;
+}
+
+.front-signin .separator {
+    font-size: 11px;
+    display: inline;
+    line-height: 13px;
+    #margin: 0 1px 0 2px;
+}
+
+.front-signin input[type=checkbox] {
+    margin: 0;
+    vertical-align: text-top;
+}
+
+.front-signup {
+    position: absolute;
+    top: 121px;
+    left: 536px;
+    width: 300px;
+    height: 206px;
+    background: -webkit-linear-gradient(top, #fff 0, #ddd 100%);
+    background: -moz-linear-gradient(top,#fff 0,#ddd 100%);
+    background: -ms-linear-gradient(top,#fff 0,#ddd 100%);
+    background: -0-linear-gradient(top,#fff 0,#ddd 100%);
+    filter:
+    progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff',endColorstr='#dddddd',GradientType=0);
+    #color: #fff;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 0 rgba(0,0,0, .1);
+    -moz-border-radius: 4px;
+    border-left: solid 1px #eee;
+    border-right: solid 1px #eee;
+    border-bottom: solid 1px #ccc;
+}
+
+.front-signup h2 {
+    margin: 0;
+    position: relative;
+    padding: 10px 12px;
+    display: block;
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 300;
+    color: #777;
+    line-height: 20px;
+    border-bottom: 1px solid #e2e2e2;
+    -webkit-box-shadow: 0 1px 0 #fff;
+    -moz-box-shadow: 0 1px 0 #fff;
+    box-shadow: 0 1px 0 #fff;
+    text-shadow: 0 1px 0 rgba(255,255,255,.6);
+    #font-family: Arial,sans-serif;
+}
+
+.front-signup h2 strong {
+    font-weight: 500;
+    color: #333;
+}
+
+.front-signup .placeholding-input {
+    width: 276px;
+    height: 30px;
+    margin: 6px auto;
+}
+
+.front-signup .text-input {
+    width: 266px;
+}
+
+.front-signup .btn {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    padding-left: 12px;
+    padding-right: 12px;
+    margin: 0;
+    -webkit-box-shadow: 0 1px 0 #fff;
+    -moz-box-shadow: 0 1px 0 #fff;
+    box-shadow: 0 1px 0 #fff;
+}
+
+.signup-btn {
+    background-color: #fd9512;
+    background-repeat: repeat-x;
+    background-image: -webkit-linear-gradient(top,#fee94f 0,#fd9a0f 100%);
+    background-image: -moz-linear-gradient(top,#fee94f 0,#fd9a0f 100%);
+    background-image: -ms-linear-gradient(top,#fee94f 0,#fd9a0f 100%);
+    background-image: -o-linear-gradient(top,#fee94f 0,#fd9a0f 100%);
+    background-image: linear-gradient(top,#fee94f 0,#fd9a0f 100%);
+    border-color: #fa2;
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: bold;
+    padding: 5px 10px;
+}
+
+.signup-btn:active, .signup-btn:focus {
+    background-image: none !important;
+    background-color: #ec8b11;
+    background-position: 0;
+}
+
+.signup-btn:hover {
+   background-position: 0;
+   background-image: -webkit-linear-gradient(top,#fedc4d 0,#fd9512 100%);
+   background-image: -moz-linear-gradient(top,#fedc4d 0,#fd9512 100%);
+   background-image: -ms-linear-gradient(top,#fedc4d 0,#fd9512 100%);
+   background-image: -o-linear-gradient(top,#fedc4d 0,#fd9512 100%);
+   background-image: linear-gradient(top,#fedc4d 0,#fd9512 100%);
+}
