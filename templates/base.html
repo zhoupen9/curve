@@ -11,72 +11,7 @@
         <script type="text/javascript" src="/static/js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="/static/js/bootstrap.js"></script>
         <script type="text/javascript" src="/static/js/common.js"></script>
-        <script type="text/javascript">
-            $(document).ready(function() {
-                // setup all draggable elements' event handlers.
-                $('.draggable').each(function(index, element) {
-                    $(this).mousedown(function(e) {
-                        $(this).attr('dragging', true);
-                        $(this).attr('posX', e.clientX - this.offsetLeft);
-                        $(this).attr('posY', e.clientY - this.offsetTop);
-                        //this.setCapture && this.setCapture();
-                        window.captureEvents(Event.MOUSEMOVE|Event.MOUSEUP); 
-                        return false;
-                    });
-                    
-                    $(this).parent().mousemove(function(e) {
-                        var dragging = $(this).attr('dragging');
-                        //$('#debug-output-panel').text($(this).text());
-                        if (dragging && dragging == 'true') {
-                            var e = e || window.event;
-                            //var oX = e.clientX - iX, oY = e.clientY - iY;
-                            var x = e.clientX - $(this).attr('posX'), y = e.clientY - $(this).attr('posY');
-                            $(this).css({"left":x + "px", "top":y + "px"});
-                            return false;
-                        }
-                        return true;
-                    });
-                    
-                    $(this).parent().mouseup(function(e) {
-                        $(this).attr('dragging', false);
-                        //window.releaseCapture();
-                        window.releaseEvents(Event.MOUSEMOVE|Event.MOUSEUP);
-                        e.cancelBubble = true;
-                    });
-                });
-                
-                $('#global-post-btn').click(function() {
-                    $('#global-post-dialog').show();
-                });
-                            
-//                var dragging = false;
-//                var iX, iY;
-//                // add drag support.
-//                $('.draggable').mousedown(function(e) {
-//                    dragging = true;
-//                    iX = e.clientX - this.offsetLeft;
-//                    iY = e.clientY - this.offsetTop;
-//                    this.setCapture && this.setCapture();
-//                    return false;
-//                });
-//                
-//                $('.draggable').mousemove(function(e) {
-//                    if (dragging) {
-//                        var e = e || window.event;
-//                        var oX = e.clientX - iX;
-//                        var oY = e.clientY - iY;
-//                        $(".draggable").css({"left":oX + "px", "top":oY + "px"});
-//                        return false;
-//                    }
-//                });
-//                
-//                $('.draggable').mouseup(function(e) {
-//                    dragging = false;
-//                    $(".draggable")[0].releaseCapture();
-//                    e.cancelBubble = true;
-//                });
-            });
-        </script>
+        <script type="text/javascript" src="/static/js/curve.js"></script>
         {% block scripts %}
         {% endblock %}
     </head>
