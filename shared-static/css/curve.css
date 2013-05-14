@@ -27,13 +27,30 @@ h3 {
     font-size: 14px;
     font-weight: normal;
     line-height: 1;
-    //display: block;
-    //font-size: 1.17em;
+/*    display: block;*/
+/*    font-size: 1.17em;*/
     -webkit-margin-before: 1em;
     -webkit-margin-after: 1em;
     -webkit-margin-start: 0px;
     -webkit-margin-end: 0px;
-    //font-weight: bold;
+/*  font-weight: bold;*/
+}
+
+button {
+    border: 0;
+    margin: 0;
+}
+
+i, .icon {
+    display: inline-block;
+    vertical-align: text-top;
+    background-image: url(../img/twitter_web_sprite_icons.png);
+    background-position: 0 0;
+    background-repeat: no-repeat;
+}
+
+i, cite, em, var, address, dfn {
+    font-style: italic;
 }
 
 .content-header {
@@ -177,7 +194,7 @@ h3 {
 .pull-right .nav {
     z-index: 5;
     position: relative;
-    //margin: 0 -12px;
+/*    margin: 0 -12px;*/
     float: left;
 }
 
@@ -254,9 +271,122 @@ h3 {
     padding: 3px 8px 5px 8px;
     font-size: 12px;
     line-height: 20px;
-    //color: #bbb;
+/*  color: #bbb;*/
     text-shadow: 0 -1px 1px rgba(0,0,0,.3);
     border-color: #111;
     -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+ .dialog-container {
+    display: none;
+    position: fixed;
+    overflow: auto;
+    overflow-x: hidden;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 5000;
+}
+
+.dialog {
+    position: relative;
+    top: 160px;
+    width: 520px;
+    margin: 0;
+    padding-bottom: 30px;
+    z-index: 6000;
+}
+
+.dialog-content {
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #999 9;
+    border-radius: 6px;
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding;
+    background-clip: padding-box;
+    -webkit-box-shadow: 0 4px 12px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.5);
+    box-shadow: 0 4px 12px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.5);
+}
+
+.dialog-title {
+    cursor: move;
+}
+
+.dialog-header, .dialog-footer, .dialog-body {
+    padding: 15px;
+/*    padding: 9px 15px;*/
+    border-bottom: 1px solid #eee;
+}
+
+.dialog-header {
+    cursor: move;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-color: #ececec;
+    background-repeat: repeat-x;
+    background-image: -moz-linear-gradient(top,#f5f5f5 0,#ececec 100%);
+    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#f5f5f5),color-stop(100%,#ececec));
+    background-image: -webkit-linear-gradient(top,#f5f5f5 0,#ececec 100%);
+    background-image: -ms-linear-gradient(top,#f5f5f5 0,#ececec 100%);
+    background-image: -o-linear-gradient(top,#f5f5f5 0,#ececec 100%);
+    background-image: linear-gradient(top,#f5f5f5 0,#ececec 100%);
+    border-bottom: 1px solid #ddd;
+    border-radius: 6px 6px 0 0;
+    -webkit-box-shadow: inset 0 1px 0 #fff;
+    box-shadow: inset 0 1px 0 #fff;
+}
+
+.dialog-header .dialog-title {
+    width: 75%;
+    margin: 0 auto;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 18px;
+    color: #555;
+    text-align: center;
+    text-shadow: 0 1px 0 #fff;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dialog-btn {
+    padding: 11px 12px;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.dialog-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-left: 1px solid #ddd;
+    border-radius: 0 6px 0 0;
+    -webkit-box-shadow: inset 1px 0 0 rgba(255,255,255,.5);
+    box-shadow: inset 1px 0 0 rgba(255,255,255,.5);
+}
+
+.dialog-close .close-medium {
+    float: left;
+}
+
+.close-medium {
+    background-position: -60px -510px;
+}
+
+.close-medium, .error-x, .dismiss-white {
+    width: 10px;
+    height: 12px;
+}
+
+.footer-wrapper {height: auto; min-height: 100%;}
+
+.debug-output {
+    clear: both;
+    height: auto;
+    position: relative;
+    margin-top: -50px;
 }

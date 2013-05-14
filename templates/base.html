@@ -1,136 +1,200 @@
-
 <!DOCTYPE HTML>
 <html lang="en" class data-fouc-class-name="swift-loading">
-  <head>
-    <meta charset="utf-8"></meta>
-    <title>Curve</title>
-    <link rel="shortcut icon" href="/static/favicon.ico" />
-    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css" />
-    <link rel="stylesheet" type="text/css" href="/static/css/curve.css" />
-    {% block styles %}
-    {% endblock %}
-    <script type="text/javascript" src="/static/js/jquery-1.9.1.js"></script>
-    <script type="text/javascript" src="/static/js/bootstrap.js"></script>
-    <script type="text/javascript" src="/static/js/common.js"></script>
-    {% block scripts %}
-    <script type="text/javascript">
-      $(document).ready(function() {
-	  $('#global-post-btn').click(function() {
-	      alert('Compose new post.');
-	  });
-      });
-    </script>
-    {% endblock %}
-  </head>
-  <body>
-    <div id="doc" class="doc-main">
-      {% if user.is_authenticated %}
-      <div class="navbar navbar-inverse navbar-fixed-top">
-	<div class="navbar-inner">
-	  <div class="container">
-	    <a class="brand nav-brand" href="/about">Curve</a>
-	    <div class="nav-collapse collapse">
-	      <!-- navigation buttons. -->
-	      <ul class="nav">
-		<li class="active">
-		  <a href="/home">Home</a>
-		</li>
-		<li>
-		  <a href="/post/">Post</a>
-		</li>
-		<li>
-		  <a href="/announcements">Announcement</a>
-		</li>
-		<li>
-		  <a href="/live">Live!</a>
-		</li>
-		<li>
-		  <a href="/profile">Profile</a>
-		</li>
-	      </ul>
-
-	      <!-- put right form and dropdown menu. -->
-	      <div class="pull-right">
-		<ul class="nav">
-		  <li>
-		    <form action="/search" method="post" class="form-search">
-		      {% csrf_token %}
-		      <input id="search-query" type="text" class="search-input" placeholder="search"></input>
-		    </form>
-		  </li>
-		  <li class="me dropdown">
-		    <a class="dropdown-toggle" href="#" data-toggle="dropdown">
-		      <span class="profile-icon-wrapper">
-			<i class="profile-icon"></i>
-		      </span>
-		      <span class="caret"></span>
-		    </a>
-		    <ul class="dropdown-menu">
-		      <li class="current-user" data-name="profile">
-			<a href="/zhoup3ng" class="account-summary" data-name="profile">
-			  <div class="profile-content">
-			    <div class="account-group">
-			      <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg"></img>
-			      <b class="fullname">ZhouP3ng</b>
-			      <small class="metadata">Edit profile</small>
-			    </div>
-			  </div>
-			</a>
-		      </li>
-		      <li class="divider"></li>
-		      <li>
-			<a class="" href="/member/setting">Settings</a>
-		      </li>
-		      <li>
-			<a class="" href="/signout">Sign out</a>
-		      </li>
-		    </ul>
-		  </li>
-		</ul>
-		<div class="topbar-post">
-		  <button type="button" id="global-post-btn" class="btn primary-btn compose-btn topbar-post-btn" placeholder="Post">Compose</button>
-		</div>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-      </div>
-    </div>
-    {% else %}
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-	<div class="container">
-	  <a class="brand nav-brand" href="/about">Curve</a>
-	</div>
-      </div>
-    </div>
-    {% endif %}
-
-    {% block page %}
-    {% endblock %}
-
-    <div id="global-post-dialog" class="module-container">
-      <div class="close-model-background-target"></div>
-      <div class="modal draggable" style="top: 147px; left: 290px;">
-	<div class="modal-content">
-	  <button type="button" class="modal-btn modal-close">
-	    <i class="close-medium"></i>
-	  </button>
-	  <div class="modal-header">
-	    <h3 class="modal-title">What's to know or what's to tell?</h3>
-	  </div>
-	  <div class="modal-body">
-	    <form class="post-form" method="post" action="/post/new">
-	      <div class="post-content">
-		<textarea></textarea>
-	      </div>
-	    </form>
-	    <div class="post-button">
-	      <button type="button" class="btn primary-btn" placeholder="Post">Post</button>
-	    </div>
-	  </div>
-	</div>
-      </div>
-    </div>
-  </body>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Curve</title>
+        <link rel="shortcut icon" href="/static/favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css" />
+        <link rel="stylesheet" type="text/css" href="/static/css/curve.css" />
+        {% block styles %}
+        {% endblock %}
+        <script type="text/javascript" src="/static/js/jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="/static/js/bootstrap.js"></script>
+        <script type="text/javascript" src="/static/js/common.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                // setup all draggable elements' event handlers.
+                $('.draggable').each(function(index, element) {
+                    $(this).mousedown(function(e) {
+                        $(this).attr('dragging', true);
+                        $(this).attr('posX', e.clientX - this.offsetLeft);
+                        $(this).attr('posY', e.clientY - this.offsetTop);
+                        //this.setCapture && this.setCapture();
+                        window.captureEvents(Event.MOUSEMOVE|Event.MOUSEUP); 
+                        return false;
+                    });
+                    
+                    $(this).parent().mousemove(function(e) {
+                        var dragging = $(this).attr('dragging');
+                        //$('#debug-output-panel').text($(this).text());
+                        if (dragging && dragging == 'true') {
+                            var e = e || window.event;
+                            //var oX = e.clientX - iX, oY = e.clientY - iY;
+                            var x = e.clientX - $(this).attr('posX'), y = e.clientY - $(this).attr('posY');
+                            $(this).css({"left":x + "px", "top":y + "px"});
+                            return false;
+                        }
+                        return true;
+                    });
+                    
+                    $(this).parent().mouseup(function(e) {
+                        $(this).attr('dragging', false);
+                        //window.releaseCapture();
+                        window.releaseEvents(Event.MOUSEMOVE|Event.MOUSEUP);
+                        e.cancelBubble = true;
+                    });
+                });
+                
+                $('#global-post-btn').click(function() {
+                    $('#global-post-dialog').show();
+                });
+                            
+//                var dragging = false;
+//                var iX, iY;
+//                // add drag support.
+//                $('.draggable').mousedown(function(e) {
+//                    dragging = true;
+//                    iX = e.clientX - this.offsetLeft;
+//                    iY = e.clientY - this.offsetTop;
+//                    this.setCapture && this.setCapture();
+//                    return false;
+//                });
+//                
+//                $('.draggable').mousemove(function(e) {
+//                    if (dragging) {
+//                        var e = e || window.event;
+//                        var oX = e.clientX - iX;
+//                        var oY = e.clientY - iY;
+//                        $(".draggable").css({"left":oX + "px", "top":oY + "px"});
+//                        return false;
+//                    }
+//                });
+//                
+//                $('.draggable').mouseup(function(e) {
+//                    dragging = false;
+//                    $(".draggable")[0].releaseCapture();
+//                    e.cancelBubble = true;
+//                });
+            });
+        </script>
+        {% block scripts %}
+        {% endblock %}
+    </head>
+    
+    <body>
+        <div id="doc" class="doc-main">
+            {% if user.is_authenticated %}
+            <div class="navbar navbar-inverse navbar-fixed-top">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <a class="brand nav-brand" href="/about">Curve</a>
+                        <div class="nav-collapse collapse">
+                            <!-- navigation buttons. -->
+                            <ul class="nav">
+                                <li class="active">
+                                    <a href="/home">Home</a>
+                                </li>
+                                <li>
+                                    <a href="/post/">Post</a>
+                                </li>
+                                <li>
+                                    <a href="/announcements">Announcement</a>
+                                </li>
+                                <li>
+                                    <a href="/live">Live!</a>
+                                </li>
+                                <li>
+                                    <a href="/profile">Profile</a>
+                                </li>
+                            </ul>
+    
+                            <!-- put right form and dropdown menu. -->
+                            <div class="pull-right">
+                                <ul class="nav">
+                                    <li>
+                                        <form action="/search" method="post" class="form-search">
+                                            {% csrf_token %}
+                                            <input id="search-query" type="text" class="search-input" placeholder="search"/>
+                                        </form>
+                                    </li>
+                                    <li class="me dropdown">
+                                        <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+                                            <span class="profile-icon-wrapper">
+                                                 <i class="profile-icon"></i>
+                                            </span>
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li class="current-user" data-name="profile">
+                                                <a href="/zhoup3ng" class="account-summary" data-name="profile">
+                                                    <div class="profile-content">
+                                                        <div class="account-group">
+                                                            <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg"/>
+                                                            <b class="fullname">ZhouP3ng</b>
+                                                            <small class="metadata">Edit profile</small>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li>
+                                                <a class="" href="/member/setting">Settings</a>
+                                            </li>
+                                            <li>
+                                                <a class="" href="/signout">Sign out</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <div class="topbar-post">
+                                    <button type="button" id="global-post-btn" class="btn primary-btn compose-btn topbar-post-btn" placeholder="Post">Compose</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="navbar navbar-inverse navbar-fixed-top">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <a class="brand nav-brand" href="/about">Curve</a>
+	               </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% block page %}
+            {% endblock %}
+        
+            <div id="global-post-dialog" class="dialog-container">
+                <div class="close-model-background-target"></div>
+                <div class="dialog draggable" style="top: 147px; left: 290px;">
+                    <div class="dialog-content">
+                        <button type="button" class="dialog-btn dialog-close">
+                            <i class="close-medium"></i>
+                        </button>
+                        <div class="dialog-header">
+                            <h3 class="dialog-title">What to know or what to tell?</h3>
+                        </div>
+                        <div class="dialog-body">
+                            <form class="post-form" method="post" action="/post/new">
+                                <div class="post-content">
+                                    <textarea></textarea>
+                                </div>
+                            </form>
+                            <div class="post-button">
+                                <button type="button" class="btn primary-btn" placeholder="Post">Post</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-wrapper">
+            <div id="debug-output-panel" class="debug-output">
+                <h3>Debug</h3>
+            </div>
+        </div>
+    </body>
 </html>
