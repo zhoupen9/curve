@@ -11,8 +11,19 @@
         <script type="text/javascript" src="/static/js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="/static/js/bootstrap.js"></script>
         <script type="text/javascript" src="/static/js/common.js"></script>
+        <!--
         <script type="text/javascript" src="/static/js/curve.js"></script>
+        -->
+        <script type="text/javascript" src="/static/js/draggable.js"></script>
         {% block scripts %}
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('#global-post-btn').click(function (e) {
+                    $('#post-dlg').draggable().show();
+                    $('#global-post-dialog').show();
+                });
+            });
+        </script>
         {% endblock %}
     </head>
     
@@ -104,7 +115,7 @@
         
             <div id="global-post-dialog" class="dialog-container">
                 <div class="close-model-background-target"></div>
-                <div class="dialog draggable" style="top: 147px; left: 290px;">
+                <div id="post-dlg" class="dialog draggable" style="top: 147px; left: 290px;">
                     <div class="dialog-content">
                         <button type="button" class="dialog-btn dialog-close">
                             <i class="close-medium"></i>
