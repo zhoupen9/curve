@@ -22,6 +22,10 @@
                     $('#post-dlg').draggable().show();
                     $('#global-post-dialog').show();
                 });
+                
+                $('#global-post').click(function (e) {
+                    window.alert('post clicked.');
+                });
             });
         </script>
         {% endblock %}
@@ -130,7 +134,7 @@
                                 </div>
                             </form>
                             <div class="post-button">
-                                <button type="button" class="btn primary-btn" placeholder="Post">Post</button>
+                                <button id="global-post" type="button" class="btn primary-btn" placeholder="Post">Post</button>
                             </div>
                         </div>
                     </div>

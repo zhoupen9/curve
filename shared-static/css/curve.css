@@ -291,11 +291,11 @@ i, cite, em, var, address, dfn {
 }
 
 .dialog {
-    position: relative;
+    position: absolute;
     top: 160px;
     width: 520px;
     margin: 0;
-    padding-bottom: 30px;
+/*    padding-bottom: 30px;*/
     z-index: 6000;
 }
 
@@ -318,7 +318,7 @@ i, cite, em, var, address, dfn {
 .dialog-header, .dialog-footer, .dialog-body {
     padding: 15px;
 /*    padding: 9px 15px;*/
-    border-bottom: 1px solid #eee;
+/*    border-bottom: 1px solid #eee;*/
 }
 
 .dialog-header {
@@ -380,6 +380,10 @@ i, cite, em, var, address, dfn {
 .close-medium, .error-x, .dismiss-white {
     width: 10px;
     height: 12px;
+}
+
+#global-post-dialog .dialog {
+    width: 500px !important;
 }
 
 .footer-wrapper {height: auto; min-height: 100%;}
