@@ -4,23 +4,39 @@
 (function ($) {
     "use strict";
     
-    //$.support.selectstart = document.createElement("div").hasOwnProperty('onselectstart');
-    // jquery draggable.
-    $.fn.draggable = function () {
-        var that = this, header = $(this).find('.dialog-header');
+    $.Plugin.plugin('draggable', {
+        /* Default options. */
+        options: {
+        },
         
-        // prevent selection.
-//        $(this).on($.support.selectstart ? 'selectstart' : 'mousedown', function (e) {
-//            e.preventDefault();
-//        });
+        /* create draggable. */
+        create: function () {
+            return this;
+        },
         
-        // dialog close button click handler.
-        $(this).find('.dialog-close').click(function (e) {
-            $(this).closest('.dialog').hide();
-            $(this).closest('.dialog-container').hide();
-        });
+        /* Initialize draggable. */
+        init: function () {
+            $(this).delegate('mousedown', this.handleMouseDown);
+            $(this).delegate('mousemove', this.handleMouseMove);
+            $(this).delegate('mouseup', this.handleMouseUp);
+        },
         
-        $(this).mousedown(function (e) {
+        /* Destroy draggable. */
+        destroy: function () {
+            $(this).off('mousemove mouseup mousedown');
+        },
+        
+        handleMouseMove: function (e) {
+            if ($(this).data('dragging')) {
+                //var oX = e.clientX - iX, oY = e.clientY - iY;
+                var x = e.pageX - $(this).data('offsetX'),
+                    y = e.pageY - $(this).data('offsetY');
+                $(this).css({"left": x + "px", "top": y + "px"});
+            }
+        },
+        
+        handleMouseDown: function (e) {
+            var that = this, header = $(this).find('.dialog-header');
             // test if mouse is over header.            
             if (header[0] === e.target || $.contains(header[0], e.target)) {
                 $(this).data('dragging', true);
@@ -43,26 +59,13 @@
                     }
                 });
             }
-        });
+        },
         
-        $(this).mousemove(function (e) {
-            if ($(this).data('dragging')) {
-                //var oX = e.clientX - iX, oY = e.clientY - iY;
-                var x = e.pageX - $(this).data('offsetX'),
-                    y = e.pageY - $(this).data('offsetY');
-                $(this).css({"left": x + "px", "top": y + "px"});
-            }
-        });
-        
-        $(this).mouseup(function (e) {
+        handleMouseUp: function (e) {
             $(this).removeData('dragging');
-            //window.releaseCapture();
-            //window.releaseEvents(Event.MOUSEMOVE|Event.MOUSEUP);
             $(':parent').off('mousemove mouseup');
             $(this).off('mousemove mouseup');
             e.cancelBubble = true;
-        });
-        
-        return this;
-    };
+        }
+    });
 }($));
