@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Javascript Test page</title>
+    <script type="text/javascript" src="../shared-static/js/jquery-1.9.1.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+      $(document).ready(function () {
+	  // function Plugin() {
+	  // }
+
+	  // Plugin.prototype = {
+	  //     constructor: function() {
+	  // 	  window.alert('constructor.');
+	  //     },
+	      
+	  //     Plugin: function(/*arguments*/) {
+	  // 	  window.alert('constructor called.');
+	  //     },
+
+	  //     message: function(msg) {
+	  // 	  window.alert(msg);
+	  //     }
+	  // };
+
+	  // function test() {
+	  //     var plugin = new Plugin();
+	  //     plugin.message('heelo, world.');
+	  // }
+
+	  // $('#test-btn').click(test);
+	  function foo(first, second) {
+	      if (typeof first === 'number' && typeof second === 'number') {
+		  // do something.
+	      }
+	  }
+
+	  function bar(first, second) {
+	      foo(arguments);
+	  }
+
+	  $('#test-btn').click(function () {
+	      bar(1, 3);
+	  });
+      });
+    </script>
+
+    <div>
+      <input id="test-btn" type="button" value="Test"></input>
+  </body>
+</html>
