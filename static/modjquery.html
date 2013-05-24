@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Javascript Test page</title>
+    <style type="text/css">
+      .test {
+	  width: 300px;
+	  height: 100px;
+	  background-color: #787878;
+	  display: none;
+      }
+    </style>
+    <script type="text/javascript" src="../shared-static/js/jquery-1.9.1.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+      $(document).ready(function () {
+	  var Foo = {
+	      name: 'foo.bar',
+	      element: undefined,
+	      create: function (options, elem) {
+		  this.element = $(elem);
+		  this.element.on('click', this.clickHandler);
+	      },
+		  
+	      clickHandler: function (e) {
+		  console.log('foo.bar().');
+		  return true;
+	      }
+	  };
+	  
+	  $.fn.foo = function (options, elem) {
+	      var that = this, foo, constructor;
+
+	      constructor = function (options, elem) {
+		  if (!this.create) {
+		      return new constructor(options, elem);
+		  }
+		  if (arguements.length > 0) {
+		      this.create(options, elem);
+		  }
+	      };
+	      
+	      this.each(function () {
+		  var instance = $.data(this, 'foo');
+		  if (instance) {
+		      console.log('instance.');
+		  } else {
+		      
+		      $.each(foo, function (prop, value) {
+			  if ($.isFunction(value)) {
+			      that[prop] = function () {
+				  return value.apply(this, arguments);
+			      };
+			  } else {
+			      $.data(that, prop, value);
+			  }
+		      });
+		  }
+	      });
+	      return this;
+	  };
+
+	  $('#test').foo().fadeIn();
+      });
+    </script>
+
+    <div id="test" class="test">
+    </div>
+  </body>
+</html>

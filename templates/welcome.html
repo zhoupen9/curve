@@ -3,13 +3,13 @@
 {% load staticfiles %}
 
 {% block styles %}
-<link rel="stylesheet" type="text/css" href="static/css/welcome.css" />
+<link rel="stylesheet" type="text/css" href="{% static 'css/welcome.css' %}" />
 {% endblock %}
 
 {% block scripts %}
 <script type="text/javascript">
 $(document).ready(function() {
-    $('submit.primary-btn').click(function(e) {
+    $('submit.primary-btn').click(function (e) {
 	var username = $('#signin-email'), password = $('#signin-password');
 	if (isEmpty(username)) {
 	    username.focus();
@@ -21,24 +21,6 @@ $(document).ready(function() {
 	    password.tooltip('show');
 	    return false;
 	}
-	// $.ajax({
-	//     data: $('#signin-form').serialize(),
-	//     url: '/member/login/',
-	//     type: 'post',
-	//     success: function(response) {
-	// 	if (response.success) {
-	// 	    $('location').href = '/home';
-	// 	} else {
-	// 	    var msg = $('.alert').remove();
-	// 	    $('.front-card').before('<div class="alert hide signin-alert">' + response.error
-	// 				    + '<button type="button" class="close" data-dismiss="alert">×</button>'
-	// 				    + '</div>');
-	// 	    $('.alert').show();
-	// 	}
-	//     }
-	// });
-		   
-	// return false to prevent submit.
 	return $('#sigin-form').submit();
     });
 });
@@ -52,10 +34,13 @@ $(document).ready(function() {
     <div class="front-bg">
       <!-- <img class="front-image" src="static/images/bg-mountain.jpg"></img> -->
     </div>
-    <div class="alert hide signin-alert">
-      <span>Something happed.</span>
-      <button type="button" class="close" data-dismiss="alert">×</button>
+    {% if error %}
+    <div class="alert alert-error signin-alert">
+      <a class="close" data-dismiss="alert">×</a>
+      <span>{{ error }}</span>
     </div>
+    {% else %}
+    {% endif %}
     <div class="front-card">
       <div class="front-welcome">
 	<div class="front-welcome-text">
@@ -63,7 +48,7 @@ $(document).ready(function() {
 	  <p>Make it easier to collaborate with friends, colleagues or any associates.</p>
 	</div>
 	<div id="login" class="front-signin">
-	  <form id="signin-form" action="/member/login/" class="signin" method="post">
+	  <form id="signin-form" action="/signin" class="signin" method="post">
 	    {% csrf_token %}
 	    <div class="username">
 	      <input type="text" id="signin-email" name="username" class="text-input email-input" placeholder="Username or email" data-toggle="tooltip" data-container="body" data-title="Username or email can not be empty.">
@@ -95,7 +80,7 @@ $(document).ready(function() {
 		</input>
 	      </label>
 	      <span class="separator">&nbsp;</span>
-	      <a class="forgot" href="/member/forgot_password">Forgot password?</a>
+	      <a class="forgot" href="/forgot_password">Forgot password?</a>
 	    </div>
 	  </form>
 	</div>

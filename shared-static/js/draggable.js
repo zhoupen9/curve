@@ -1,85 +1,127 @@
 /*jslint browser: true*/
-/*global  $*/
+/*global $*/
 
 (function ($) {
     "use strict";
     
-    $.plugin('draggable', {
+    $.ui.plugin('draggable', {
+	// plugin name.
+	name: 'draggable',
+	
+	// original document mousedown handler.
+	orig: undefined,
+
+	// dragging
+	dragging: false,
+
+	// if drag delay met.
+	delayMet: true,
+
+	// if drag minium disttance met.
+	distanceMet: true,
+	
         /* Default options. */
         options: {
+	    delay: 200, // delay 200 miliseconds to fire mouse events.
+	    distance: 4 // default fire mouse events when distance between start drag point great then 10 pixels.
         },
         
         /* create draggable. */
-        create: function (options, elem) {
-	    if (options) {
-		$.extend(this, options);
-	    }
-	    if (elem) {
-		return $.extend($(elem), this);
-	    }
+        createui: function () {
+	    console.log('creating draggable.');
         },
+
+	// clear document mouse event handlers.
+	clearbindings: function () {
+	    document.onmousemove = this.orig;
+	    $(document).off('mousemove.' + this.name + ' mouseup.' + this.name);
+	},
         
         /* Initialize draggable. */
-        init: function (options, elem) {
-            $(elem).on('mousedown', '.dialog-header', this.handleMouseDown);
-            $(elem).on('mousemove', '.dialog-header', this.handleMouseMove);
-            $(elem).on('mouseup', '.dialog-header', this.handleMouseUp);
-        },
-        
+        initui: function () {
+	    var that = this;
+	    this.orig = document.onmousedown;
+            this.element.on('mousedown.' + this.name, '.dialog-header', function (e) {
+		return that.handleMouseDown(e);
+	    });
+	},
+	
         /* Destroy draggable. */
-        destroy: function () {
-            $(this).off('mousemove mouseup mousedown');
+        destroyui: function () {
+	    this.element.off('.' + this.name);
+	    this.clearbindings();
         },
-        
-        handleMouseMove: function (e) {
-	    var x, y, parent = $(this).closest('.draggable');
-	    if ($(this).data('dragging')) {
-                //var oX = e.clientX - iX, oY = e.clientY - iY;
-                x = e.pageX - $(this).data('offsetX');
-                y = e.pageY - $(this).data('offsetY');
-                parent.css({"left": x + "px", "top": y + "px"});
-	    }
-        },
-        
+	
+	// Handle mouse down event.
+	// When mouse down on draggable element, set dragging flag to true,
+	// Register event handler on document to handle mouse move and mouse up.
+	// @param e mouse event.	 
         handleMouseDown: function (e) {
-            $(this).data('dragging', true);
-            $(this).data('offsetX', e.pageX - $(this).offset().left);
-            $(this).data('offsetY', e.pageY - $(this).offset().top);
-            // var that = this, header = $(this).find('.dialog-header');
-            // // test if mouse is over header.            
-            // if (header[0] === e.target || $.contains(header[0], e.target)) {
-            //     $(this).data('dragging', true);
-            //     $(this).data('offsetX', e.pageX - $(this).offset().left);
-            //     $(this).data('offsetY', e.pageY - $(this).offset().top);
-            
-            //     // handle parent mouse move to move draggable.
-            //     $(':parent').on('mousemove', function (e) {
-            //         if ($(that).data('dragging')) {
-            //             var x = e.pageX - $(that).data('offsetX'),
-            //                 y = e.pageY - $(that).data('offsetY');
-            //             $(that).css({"position": "relative", "left": x + "px", "top": y + "px"});
-            //         }
-            //     });
-                
-            //     // handle parent mouse up to release dragging.
-            //     $(':parent').on('mouseup', function (e) {
-            //         if ($(that).data('dragging')) {
-            //             $(that).removeData('dragging');
-            //         }
-            //     });
-            // }
+	    var that = this;
+	    if (!this.delayMet) {
+		return;
+	    }
+	    if (this.options.delay) {
+		setTimeout(function () {
+		    that.delayMet = true;
+		}, this.options.delay);
+	    }
+
+	    // binding mouse events of document for mouse move and up.
+	    this.mousemoveDelegate = function (e) {
+		return that.handleMouseMove(e);
+	    };
+	    this.mouseupDelegate = function (e) {
+		return that.handleMouseUp(e);
+	    };
+	    $(document).on('mousemove.' + this.name, this.mousemoveDelegate);
+	    $(document).on('mouseup.' + this.name, this.mouseupDelegate);
+	    // update dragging to true.
+            this.dragging = true;
+	    // record current position.
+            this.offsetX = e.pageX - this.element.offset().left;
+            this.offsetY =  e.pageY - this.element.offset().top;
+	    this.lastX = this.startX = e.pageX;
+	    this.lastY = this.startY = e.pageY;
+
+	    console.log('mouse down on draggable.');
+
+	    e.preventDefault();
+	    return true;
+        },
+
+	// Handle mouse move on document.
+	// If element has dragging flag set to true, then move element to current mouse's
+	// position (drag).
+        handleMouseMove: function (e) {
+	    var x, y;
+	    if (this.dragging) {
+		if (!this.delayMet || !this.distanceMet) {
+		    return;
+		}
+		if (this.options.distance) {
+		    if ((Math.abs(this.lastX - e.pageX) + Math.abs(this.lastY - e.pageY)) < this.options.distance) {
+			return e.preventDefault();
+		    }
+		}
+                //var oX = e.clientX - iX, oY = e.clientY - iY;
+                x = e.pageX - this.offsetX;
+                y = e.pageY - this.offsetY;
+                this.element.css({"left": x + "px", "top": y + "px"});
+		this.lastX = e.pageX;
+		this.lastY = e.pageY;
+		return e.preventDefault();
+	    }
+	    console.log('mouse moving while drag not active.');
+	    return !dragging;
         },
         
+        // Handle mouse up on document.
+	// Set element dragging flag to false and unbind all event handlers.
         handleMouseUp: function (e) {
-	    var draggable;
-	    if ($(this).data('draggable')) {
-		$(this).off('mousemove mouseup');
-	    } else {
-		draggable = $(this).find('.draggable');
-	    }
-            draggable.removeData('dragging');
-            draggable.off('mousemove mouseup');
-            e.cancelBubble = true;
+	    console.log('draggable mosue up.');
+	    this.dragging = false;
+	    this.clearbindings();
         }
     });
 }($));

@@ -316,9 +316,9 @@ i, cite, em, var, address, dfn {
 }
 
 .dialog-header, .dialog-footer, .dialog-body {
-    padding: 15px;
-/*    padding: 9px 15px;*/
-/*    border-bottom: 1px solid #eee;*/
+    /* padding: 15px; */
+    /* padding: 9px 15px; */
+    /* border-bottom: 1px solid #eee; */
 }
 
 .dialog-header {
@@ -394,3 +394,44 @@ i, cite, em, var, address, dfn {
     position: relative;
     margin-top: -50px;
 }
+
+.dialog-overlay {
+    background-color: #666;
+    opacity: .5;
+}
+
+.conversation {
+    background-color: #f0fafa;
+    padding: 15px;
+}
+
+.conversation-messages {
+    position: relative;
+    display: block;
+}
+
+.conversation .message-received .avatar {
+    float: left;
+}
+
+.conversation .message-sent .avatar {
+    float: right;
+}
+
+.message-sent .message-content {
+    margin: 0 50px 15px 0;
+    text-align: right;
+}
+
+.message-received .message-content {
+    margin: 0 0 15px 50px;
+    text-align: left;
+}
+
+/* .message-received .message { */
+/*     float: left; */
+/* } */
+
+/* .message-sent .message { */
+/*     float: right; */
+/* } */

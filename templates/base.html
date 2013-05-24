@@ -1,148 +1,214 @@
 <!DOCTYPE HTML>
-<html lang="en" class data-fouc-class-name="swift-loading">
-    <head>
-        <meta charset="utf-8"/>
-        <title>Curve</title>
-        <link rel="shortcut icon" href="/static/favicon.ico" />
-        <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css" />
-        <link rel="stylesheet" type="text/css" href="/static/css/curve.css" />
-        {% block styles %}
-        {% endblock %}
-        <script type="text/javascript" src="/static/js/jquery-1.9.1.js"></script>
-        <script type="text/javascript" src="/static/js/bootstrap.js"></script>
-        <script type="text/javascript" src="/static/js/common.js"></script>
-        <script type="text/javascript" src="/static/js/curve.js"></script>
-        <script type="text/javascript" src="/static/js/draggable.js"></script>
-        {% block scripts %}
-        <script type="text/javascript">
-            $(document).ready(function () {
-                $('#global-post-btn').click(function (e) {
-                    $('#post-dlg').draggable().show();
-                    $('#global-post-dialog').show();
-                });
-                
-                $('#global-post').click(function (e) {
-                    window.alert('post clicked.');
-                });
-            });
-        </script>
-        {% endblock %}
-    </head>
-    
-    <body>
-        <div id="doc" class="doc-main">
-            {% if user.is_authenticated %}
-            <div class="navbar navbar-inverse navbar-fixed-top">
-                <div class="navbar-inner">
-                    <div class="container">
-                        <a class="brand nav-brand" href="/about">Curve</a>
-                        <div class="nav-collapse collapse">
-                            <!-- navigation buttons. -->
-                            <ul class="nav">
-                                <li class="active">
-                                    <a href="/home">Home</a>
-                                </li>
-                                <li>
-                                    <a href="/post/">Post</a>
-                                </li>
-                                <li>
-                                    <a href="/announcements">Announcement</a>
-                                </li>
-                                <li>
-                                    <a href="/live">Live!</a>
-                                </li>
-                                <li>
-                                    <a href="/profile">Profile</a>
-                                </li>
-                            </ul>
-    
-                            <!-- put right form and dropdown menu. -->
-                            <div class="pull-right">
-                                <ul class="nav">
-                                    <li>
-                                        <form action="/search" method="post" class="form-search">
-                                            {% csrf_token %}
-                                            <input id="search-query" type="text" class="search-input" placeholder="search"/>
-                                        </form>
-                                    </li>
-                                    <li class="me dropdown">
-                                        <a class="dropdown-toggle" href="#" data-toggle="dropdown">
-                                            <span class="profile-icon-wrapper">
-                                                 <i class="profile-icon"></i>
-                                            </span>
-                                            <span class="caret"></span>
-                                        </a>
-                                        <ul class="dropdown-menu">
-                                            <li class="current-user" data-name="profile">
-                                                <a href="/zhoup3ng" class="account-summary" data-name="profile">
-                                                    <div class="profile-content">
-                                                        <div class="account-group">
-                                                            <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg"/>
-                                                            <b class="fullname">ZhouP3ng</b>
-                                                            <small class="metadata">Edit profile</small>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            </li>
-                                            <li class="divider"></li>
-                                            <li>
-                                                <a class="" href="/member/setting">Settings</a>
-                                            </li>
-                                            <li>
-                                                <a class="" href="/signout">Sign out</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                                <div class="topbar-post">
-                                    <button type="button" id="global-post-btn" class="btn primary-btn compose-btn topbar-post-btn" placeholder="Post">Compose</button>
-                                </div>
+<html lang="en" data-fouc-class-name="swift-loading" class="swift-loading">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>Curve</title>
+    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/curve.css">
+    {% block styles %}
+    {% endblock %}
+    <script type="text/javascript" src="/static/js/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/js/common.js"></script>
+    <script type="text/javascript" src="/static/js/curve.js"></script>
+    <script type="text/javascript" src="/static/js/draggable.js"></script>
+    {% block scripts %}
+    <script type="text/javascript">
+      $(document).ready(function () {
+          $('#global-post-btn').click(function (e) {
+              $('#post-dlg').draggable().show();
+              $('#global-post-dialog').show();
+          });
+          
+          $('#global-post').click(function (e) {
+              window.alert('post clicked.');
+          });
+
+	  $('#messages-menu').click(function (e) {
+	      $('#msg-dlg').draggable().show();
+	      $('#global-post-dialog').show();
+	      e.preventDefault();
+	  });
+      });
+    </script>
+    {% endblock %}
+  </head>
+  
+  <body>
+    <div id="doc" class="doc-main">
+      {% if user.is_authenticated %}
+      <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container">
+            <a class="brand nav-brand" href="/about">Curve</a>
+            <div class="nav-collapse collapse">
+              <!-- navigation buttons. -->
+              <ul class="nav">
+                <li class="active">
+                  <a href="/home">Home</a>
+                </li>
+                <li>
+                  <a href="/post/">Post</a>
+                </li>
+                <li>
+                  <a href="/announcements">Announcement</a>
+                </li>
+                <li>
+                  <a href="/live">Live!</a>
+                </li>
+                <li>
+                  <a href="/profile">Profile</a>
+                </li>
+              </ul>
+	      
+              <!-- put right form and dropdown menu. -->
+              <div class="pull-right">
+                <ul class="nav">
+                  <li>
+                    <form action="/search" method="post" class="form-search">
+                      {% csrf_token %}
+                      <input id="search-query" type="text" class="search-input" placeholder="search"/>
+                    </form>
+                  </li>
+                  <li class="me dropdown">
+                    <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+                      <span class="profile-icon-wrapper">
+                        <i class="profile-icon"></i>
+                      </span>
+                      <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li class="current-user" data-name="profile">
+                        <a href="/zhoup3ng" class="account-summary" data-name="profile">
+                          <div class="profile-content">
+                            <div class="account-group">
+                              <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg"/>
+                              <b class="fullname">ZhouP3ng</b>
+                              <small class="metadata">Edit profile</small>
                             </div>
-                        </div>
-                    </div>
+                          </div>
+                        </a>
+                      </li>
+                      <li class="divider"></li>
+		      <li>
+			<a id="messages-menu" class="" href="#" data-nav="message">Messages</a>
+		      </li>
+		      <li class="divider"></li>
+                      <li>
+                        <a class="" href="/member/setting">Settings</a>
+                      </li>
+                      <li>
+                        <a class="" href="/signout">Sign out</a>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+                <div class="topbar-post">
+                  <button type="button" id="global-post-btn" class="btn primary-btn compose-btn topbar-post-btn" placeholder="Post">Compose</button>
                 </div>
+              </div>
             </div>
-            {% else %}
-            <div class="navbar navbar-inverse navbar-fixed-top">
-                <div class="navbar-inner">
-                    <div class="container">
-                        <a class="brand nav-brand" href="/about">Curve</a>
-	               </div>
-                </div>
-            </div>
-            {% endif %}
-            
-            {% block page %}
-            {% endblock %}
-        
-            <div id="global-post-dialog" class="dialog-container">
-                <div class="close-model-background-target"></div>
-                <div id="post-dlg" class="dialog draggable" style="top: 147px; left: 290px;">
-                    <div class="dialog-content">
-                        <button type="button" class="dialog-btn dialog-close">
-                            <i class="close-medium"></i>
-                        </button>
-                        <div class="dialog-header">
-                            <h3 class="dialog-title">What to know or what to tell?</h3>
-                        </div>
-                        <div class="dialog-body">
-                            <form class="post-form" method="post" action="/post/new">
-                                <div class="post-content">
-                                    <textarea></textarea>
-                                </div>
-                            </form>
-                            <div class="post-button">
-                                <button id="global-post" type="button" class="btn primary-btn" placeholder="Post">Post</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-        <div class="footer-wrapper">
-            <div id="debug-output-panel" class="debug-output">
-                <h3>Debug</h3>
-            </div>
+      </div>
+      {% else %}
+      <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container">
+            <a class="brand nav-brand" href="/about">Curve</a>
+	  </div>
         </div>
-    </body>
+      </div>
+      {% endif %}
+      
+      {% block page %}
+      {% endblock %}
+      
+      <div id="global-post-dialog" class="dialog-container dialog-overlay"></div>
+      <div class="close-model-background-target"></div>
+      <div id="post-dlg" class="dialog draggable" style="top: 147px; left: 290px; display: none;">
+        <div class="dialog-content">
+          <button type="button" class="dialog-btn dialog-close">
+            <i class="close-medium"></i>
+          </button>
+          <div class="dialog-header">
+            <h3 class="dialog-title">What to know or what to tell?</h3>
+          </div>
+          <div class="dialog-body">
+            <form class="post-form" method="post" action="/post/new">
+              <div class="post-content">
+                <textarea></textarea>
+              </div>
+            </form>
+            <div class="post-button">
+              <button id="global-post" type="button" class="btn primary-btn" placeholder="Post">Post</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="msg-dlg" class="dialog draggable" style="top: 147px; left: 290px; display: none;">
+	<div class="dialog-content">
+	  <button type="button" class="dialog-btn dialog-close">
+	    <i class="close-medium"></i>
+	  </button>
+	  <div class="dialog-header">
+	    <h3 class="dialog-title">Message</h3>
+	  </div>
+	  <div class="dialog-body">
+	    <div class="conversation">
+	      <ol class="conversation-messages">
+		<li class="message-received">
+		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
+		  <div class="message-content">
+		    <div class="message">
+		      <p>Message content here.</p>
+		    </div>
+		  </div>
+		</li>
+		<li class="message-sent">
+		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
+		  <div class="message-content">
+		    <div class="message">
+		      <p>Message content here.</p>
+		    </div>
+		  </div>		
+		</li>
+		<li class="message-received">
+		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
+		  <div class="message-content">
+		    <div class="message">
+		      <p>Message content here.</p>
+		    </div>
+		  </div>	
+		</li>
+		<li class="message-sent">
+		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
+		  <div class="message-content">
+		    <div class="message">
+		      <p>Message content here.</p>
+		    </div>
+		  </div>	
+		  </div>
+		</li>
+	      </ol>
+	    </div>
+	    <form class="post-form" method="post" action="/message/new">
+	      <div class="message-content">
+		<textarea></textarea>
+	      </div>
+	    </form>
+	    <div class="send-button">
+	      <button id="message-send" type="button" class="btn primary-btn" placeholder="Send">Send</button>
+	    </div>
+	  </div>
+      </div>
+    </div>
+    <div class="footer-wrapper">
+      <div id="debug-output-panel" class="debug-output">
+        <h3>Debug</h3>
+      </div>
+    </div>
+  </body>
 </html>
