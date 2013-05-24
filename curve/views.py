@@ -12,7 +12,7 @@ def home(request):
     According to user's login status, render proper page,
     but not change current location (meaning server do not return redirect response).
     """
-    logger.debug('>> Executing curve.views.go...')
+    logger.debug('>> Executing home...')
 
     context = {}
     if request.user.is_authenticated():

@@ -9,6 +9,11 @@
 {% block scripts %}
 <script type="text/javascript">
 $(document).ready(function() {
+    if ($('.alert').length) {
+	$.ech($('.alert'), function () {
+	    this.alert();
+	});
+    }
     $('submit.primary-btn').click(function (e) {
 	var username = $('#signin-email'), password = $('#signin-password');
 	if (isEmpty(username)) {
@@ -35,9 +40,9 @@ $(document).ready(function() {
       <!-- <img class="front-image" src="static/images/bg-mountain.jpg"></img> -->
     </div>
     {% if error %}
-    <div class="alert alert-error signin-alert">
-      <a class="close" data-dismiss="alert">×</a>
-      <span>{{ error }}</span>
+    <div class="signin-alert">
+      <a class="reverse-close" data-dismiss="alert">×</a>
+      <span class="alert-text">{{ error }}</span>
     </div>
     {% else %}
     {% endif %}

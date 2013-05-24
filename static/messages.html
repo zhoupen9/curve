@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Messages</title>
+    <style type="text/css">
+      .icon {
+	  float: left;
+	  width: 32px;
+	  height: 32px;
+	  border-radius: 4px;
+	  background-color: #ccc;
+      }
+      .msg-wrapper {
+	  content: "  ";
+	  display: table;
+      }
+      .clear-fix {
+	  clear: both;
+      }
+      .line {
+	  border-bottom: 1px solid #ddd;
+	  height: 50px;
+      }
+      .msg {
+	  background-color: #252525;
+      }
+      .c {
+	  float: left;
+      }
+      .sent .c {
+	  float: right;
+      }
+      .sent .icon {
+	  float: right;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="clear-fix" style="width: 350px; height: 450px; background-color: #333;">
+      <div style="background-color: #ccc; height: 25px;">
+      </div>
+      <div class="clear-fix" style="height: 300px;">
+	<div style="padding: 5px;">
+	  <div class="recv line">
+	    <div>
+	      <div class="icon"></div>
+	    </div>
+	    <div class="msg">
+	      <div class="c">
+		<p>Content</p>
+	      </div>
+	    </div>
+	  </div>
+
+	  <div class="sent line">
+	    <div>
+	      <div class="icon"></div>
+	    </div>
+	    <div class="msg">
+	      <div class="c">
+		<p>Content</p>
+	      </div>
+	  </div>
+	</div>
+
+	
+      </div>
+    </div>
+  </body>
+</html>

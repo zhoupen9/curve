@@ -39,6 +39,9 @@
   <body>
     <div id="doc" class="doc-main">
       {% if user.is_authenticated %}
+      <!--
+      <div class="navbar navbar-inverse navbar-fixed-top">
+	-->
       <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
           <div class="container">
@@ -130,10 +133,10 @@
       <div class="close-model-background-target"></div>
       <div id="post-dlg" class="dialog draggable" style="top: 147px; left: 290px; display: none;">
         <div class="dialog-content">
-          <button type="button" class="dialog-btn dialog-close">
-            <i class="close-medium"></i>
-          </button>
           <div class="dialog-header">
+	    <button type="button" class="dialog-btn dialog-close">
+              <i class="close-medium"></i>
+	    </button>
             <h3 class="dialog-title">What to know or what to tell?</h3>
           </div>
           <div class="dialog-body">
@@ -156,53 +159,61 @@
 	  <div class="dialog-header">
 	    <h3 class="dialog-title">Message</h3>
 	  </div>
-	  <div class="dialog-body">
+	  <div class="dialog-body clear-fix">
 	    <div class="conversation">
-	      <ol class="conversation-messages">
-		<li class="message-received">
+	      <div class="message-received">
+		<div>
 		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
-		  <div class="message-content">
-		    <div class="message">
-		      <p>Message content here.</p>
-		    </div>
+		</div>
+		<div class="message-content">
+		  <div class="message">
+		    <p>Message content here.</p>
 		  </div>
-		</li>
-		<li class="message-sent">
+		</div>
+	      </div>
+	      <div class="message-sent">
+		<div>
 		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
-		  <div class="message-content">
-		    <div class="message">
-		      <p>Message content here.</p>
-		    </div>
-		  </div>		
-		</li>
-		<li class="message-received">
-		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
-		  <div class="message-content">
-		    <div class="message">
-		      <p>Message content here.</p>
-		    </div>
-		  </div>	
-		</li>
-		<li class="message-sent">
-		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
-		  <div class="message-content">
-		    <div class="message">
-		      <p>Message content here.</p>
-		    </div>
-		  </div>	
+		</div>
+		<div class="message-content">
+		  <div class="message">
+		    <p>The quick brown fox jumps over a lazy dog. Message content here.</p>
 		  </div>
-		</li>
-	      </ol>
+		</div>		
+	      </div>
+	      <div class="message-received">
+		<div>
+		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
+		</div>
+		<div class="message-content">
+		  <div class="message">
+		    <p>Message content here.</p>
+		  </div>
+		</div>	
+	      </div>
+	      <div class="message-sent">
+		<div>
+		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
+		</div>
+		<div class="message-content">
+		  <div class="message">
+		    <p>Message content here.</p>
+		  </div>
+		</div>	
+	      </div>
 	    </div>
-	    <form class="post-form" method="post" action="/message/new">
-	      <div class="message-content">
-		<textarea></textarea>
+	    <form class="post-form dialog-form" method="post" action="/message/new">
+	      <div style="height: 100px;">
+	      </div>
+	      <div class="send-button">
+		<button id="message-send" type="button" class="btn primary-btn" placeholder="Send">Send</button>
 	      </div>
 	    </form>
-	    <div class="send-button">
-	      <button id="message-send" type="button" class="btn primary-btn" placeholder="Send">Send</button>
-	    </div>
 	  </div>
+	  <div class="dialog-footer">
+	    <p>footer</p>
+	  </div>
+	</div>
       </div>
     </div>
     <div class="footer-wrapper">
