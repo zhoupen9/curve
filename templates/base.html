@@ -1,12 +1,12 @@
 <!DOCTYPE HTML>
 <html lang="en" data-fouc-class-name="swift-loading" class="swift-loading">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
+    <meta charset="utf-8"></meta>
     <title>Curve</title>
-    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/curve.css">
+    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon"></link>
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css"></link>
+    <link rel="stylesheet" type="text/css" href="/static/css/curve.css"></link>
     {% block styles %}
     {% endblock %}
     <script type="text/javascript" src="/static/js/jquery-1.9.1.js"></script>
@@ -14,34 +14,31 @@
     <script type="text/javascript" src="/static/js/common.js"></script>
     <script type="text/javascript" src="/static/js/curve.js"></script>
     <script type="text/javascript" src="/static/js/draggable.js"></script>
-    {% block scripts %}
     <script type="text/javascript">
       $(document).ready(function () {
           $('#global-post-btn').click(function (e) {
               $('#post-dlg').draggable().show();
-              $('#global-post-dialog').show();
+              $('.modal-overlay').show();
           });
-          
+
           $('#global-post').click(function (e) {
               window.alert('post clicked.');
           });
 
-	  $('#messages-menu').click(function (e) {
-	      $('#msg-dlg').draggable().show();
-	      $('#global-post-dialog').show();
-	      e.preventDefault();
-	  });
+          $('#messages-menu').click(function (e) {
+              $('#msg-dlg').draggable().show();
+              $('.modal-overlay').show();
+              e.preventDefault();
+          });
       });
     </script>
+    {% block scripts %}
     {% endblock %}
   </head>
-  
+
   <body>
     <div id="doc" class="doc-main">
       {% if user.is_authenticated %}
-      <!--
-      <div class="navbar navbar-inverse navbar-fixed-top">
-	-->
       <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
           <div class="container">
@@ -65,7 +62,7 @@
                   <a href="/profile">Profile</a>
                 </li>
               </ul>
-	      
+
               <!-- put right form and dropdown menu. -->
               <div class="pull-right">
                 <ul class="nav">
@@ -95,10 +92,10 @@
                         </a>
                       </li>
                       <li class="divider"></li>
-		      <li>
-			<a id="messages-menu" class="" href="#" data-nav="message">Messages</a>
-		      </li>
-		      <li class="divider"></li>
+                      <li>
+                        <a id="messages-menu" class="" href="#" data-nav="message">Messages</a>
+                      </li>
+                      <li class="divider"></li>
                       <li>
                         <a class="" href="/member/setting">Settings</a>
                       </li>
@@ -121,99 +118,113 @@
         <div class="navbar-inner">
           <div class="container">
             <a class="brand nav-brand" href="/about">Curve</a>
-	  </div>
+          </div>
         </div>
       </div>
       {% endif %}
-      
+
       {% block page %}
       {% endblock %}
-      
-      <div id="global-post-dialog" class="dialog-container dialog-overlay"></div>
-      <div class="close-model-background-target"></div>
-      <div id="post-dlg" class="dialog draggable" style="top: 147px; left: 290px; display: none;">
-        <div class="dialog-content">
-          <div class="dialog-header">
-	    <button type="button" class="dialog-btn dialog-close">
-              <i class="close-medium"></i>
-	    </button>
-            <h3 class="dialog-title">What to know or what to tell?</h3>
-          </div>
-          <div class="dialog-body">
-            <form class="post-form" method="post" action="/post/new">
-              <div class="post-content">
-                <textarea></textarea>
-              </div>
-            </form>
-            <div class="post-button">
-              <button id="global-post" type="button" class="btn primary-btn" placeholder="Post">Post</button>
+    </div>
+
+    <!-- Modal overlay. -->
+    <div class="modal-overlay"></div>
+    <!-- Global post dialog. -->
+    <!--
+    <div class="close-model-background-target"></div>
+    -->
+    <div id="post-dlg" class="dialog draggable" style="top: 147px; left: 290px; display: none;">
+      <div class="dialog-content">
+        <div class="dialog-header">
+          <button type="button" class="dialog-btn dialog-close">
+            <i class="close-medium"></i>
+          </button>
+          <h3 class="dialog-title">What to know or what to tell?</h3>
+        </div>
+        <div class="dialog-body">
+          <form class="post-form" method="post" action="/post/new">
+            <div class="post-content">
+              <textarea></textarea>
             </div>
+          </form>
+          <div class="post-button">
+            <button id="global-post" type="button" class="btn primary-btn" placeholder="Post">Post</button>
           </div>
         </div>
       </div>
-      <div id="msg-dlg" class="dialog draggable" style="top: 147px; left: 290px; display: none;">
-	<div class="dialog-content">
-	  <button type="button" class="dialog-btn dialog-close">
-	    <i class="close-medium"></i>
-	  </button>
-	  <div class="dialog-header">
-	    <h3 class="dialog-title">Message</h3>
-	  </div>
-	  <div class="dialog-body clear-fix">
-	    <div class="conversation">
-	      <div class="message-received">
-		<div>
-		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
-		</div>
-		<div class="message-content">
-		  <div class="message">
-		    <p>Message content here.</p>
-		  </div>
-		</div>
-	      </div>
-	      <div class="message-sent">
-		<div>
-		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
-		</div>
-		<div class="message-content">
-		  <div class="message">
-		    <p>The quick brown fox jumps over a lazy dog. Message content here.</p>
-		  </div>
-		</div>		
-	      </div>
-	      <div class="message-received">
-		<div>
-		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
-		</div>
-		<div class="message-content">
-		  <div class="message">
-		    <p>Message content here.</p>
-		  </div>
-		</div>	
-	      </div>
-	      <div class="message-sent">
-		<div>
-		  <img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
-		</div>
-		<div class="message-content">
-		  <div class="message">
-		    <p>Message content here.</p>
-		  </div>
-		</div>	
-	      </div>
-	    </div>
-	    <form class="post-form dialog-form" method="post" action="/message/new">
-	      <div style="height: 100px;">
-	      </div>
-	      <div class="send-button">
-		<button id="message-send" type="button" class="btn primary-btn" placeholder="Send">Send</button>
-	      </div>
-	    </form>
-	  </div>
-	  <div class="dialog-footer">
-	    <p>footer</p>
-	  </div>
-	</div>
+    </div>
+
+    <!-- GLobal messages dialog. -->
+    <div id="msg-dlg" class="dialog draggable" style="top: 147px; left: 290px; display: none;">
+      <div class="dialog-content">
+        <button type="button" class="dialog-btn dialog-close">
+          <i class="close-medium"></i>
+        </button>
+        <div class="dialog-header">
+          <h3 class="dialog-title">Message</h3>
+        </div>
+        <div class="dialog-body">
+          <div class="conversation">
+            <div class="message-received">
+              <img class="avatar size48" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
+              <div class="message-content clearfix">
+                <div class="message">
+                  <p>Message content here.</p>
+                  <div class="msg-caret">
+                    <div class="msg-caret-outer"></div>
+                    <div class="msg-caret-inner"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="message-sent">
+              <img class="avatar size48" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
+              <div class="message-content clearfix">
+                <div class="message">
+                  <p>The quick brown fox jumps over a lazy dog. Message content here, it demostrates a larger parograph of text.</p>
+                  <div class="msg-caret">
+                    <div class="msg-caret-outer"></div>
+                    <div class="msg-caret-inner"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="message-received">
+              <img class="avatar size48" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
+              <div class="message-content clearfix">
+                <div class="message">
+                  <p>Message content here.</p>
+                  <div class="msg-caret">
+                    <div class="msg-caret-outer"></div>
+                    <div class="msg-caret-inner"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="message-sent">
+              <img class="avatar size48" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
+              <div class="message-content clearfix">
+                <div class="message">
+                  <p>Message content here.</p>
+                  <div class="msg-caret">
+                    <div class="msg-caret-outer"></div>
+                    <div class="msg-caret-inner"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <form class="post-form dialog-form  " method="post" action="/message/new">
+            <div style="height: 100px;">
+            </div>
+            <div class="send-button">
+              <button id="message-send" type="button" class="btn primary-btn" placeholder="Send">Send</button>
+            </div>
+          </form>
+        </div>
+        <div class="dialog-footer">
+          <p>footer</p>
+        </div>
       </div>
     </div>
     <div class="footer-wrapper">

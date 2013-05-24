@@ -16,7 +16,7 @@ def home(request):
 
     context = {}
     if request.user.is_authenticated():
-        logger.debug('user name:', request.user.username, ' email:', request.user.email)
+        logger.debug('user name: %s, email: %s.', request.user.username, request.user.email)
         # if user already logged in, render home page.
         return render(request, 'home/home.html', context)
     else:
