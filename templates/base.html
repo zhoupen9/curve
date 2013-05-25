@@ -1,4 +1,5 @@
-{% load staticfiles %}
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
 <!DOCTYPE HTML>
 <html lang="en" data-fouc-class-name="swift-loading" class="swift-loading">
 	<head>
@@ -15,16 +16,15 @@
 		<script type="text/javascript" src="{% static 'js/common.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/curve.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/draggable.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/ui.js' %}"></script>
 		<script type="text/javascript">
 			$(document).ready(function () {
 				$('#global-post-btn').click(function (e) {
-					$('#post-dlg').draggable().show();
-					$('.modal-overlay').show();
+					$('#post-dlg').dialog().draggable().show();
 				});
 
 				$('#messages-menu').click(function (e) {
-					$('#msg-dlg').draggable().show();
-					$('.modal-overlay').show();
+					$('#msg-dlg').dialog();
 					e.preventDefault();
 				});
 			});

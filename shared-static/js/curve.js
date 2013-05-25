@@ -1,9 +1,7 @@
 /*jslint browser: true*/
 /*global $*/
 
-/*
- * jquery base plugin.
- */
+// jquery base plugin.
 (function ($) {
 	"use strict";
 
@@ -26,11 +24,9 @@
 		destory: $.noop
 	};
 
-	/*
-	 * create new plugin.
-	 * @name plugin name.
-	 * @proto plugin prototype.
-	 */
+	// create new plugin.
+	// @param name plugin name.
+	// @param proto plugin prototype.
 	$.plugin = function (name, base, proto) {
 		var constructor, basePrototype, proxyPrototype = {}, fullname = name.split('.')[0];
 		if (!name) {
@@ -50,6 +46,7 @@
 			if (!this.create) {
 				return new constructor(options, elem);
 			}
+			// ensure constructor called with arguments.
 			if (arguments.length) {
 				this.create(options, elem);
 			}
@@ -68,7 +65,7 @@
 		});
 
 		// create construtor's prototype using proxy prototype.
-		constructor.prototype = $.extend($.Plugin.prototype, basePrototype, proxyPrototype);
+		constructor.prototype = $.extend({}, $.Plugin.prototype, basePrototype, proxyPrototype);
 
 		// create bridge to Jquery.
 		$.fn[name] = function (options) {
@@ -87,9 +84,8 @@
 	};
 }($));
 
-/*
- * UI plugin.
- */
+
+// UI plugin.
 (function ($) {
 	// define ui in jquery.
 	$.ui = function () {};
@@ -128,15 +124,15 @@
 		element: undefined,
 		namespace: 'ui',
 
-		/* Create ui. */
+		// Create ui.
 		createui: $.noop,
 
-		/* destory ui. */
+		// destory ui.
 		destroyui: $.noop,
 
-		/* Create ui. */
+		// Create ui.
 		create: function (options, elem) {
-			$.extend(this.options, options);
+			$.extend(this, options);
 			this.element = $(elem);
 			this.createui();
 			this.initui();

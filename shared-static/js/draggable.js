@@ -19,14 +19,17 @@
 
 		// if drag minium disttance met.
 		distanceMet: true,
+
+		// draggable class name.
+		dragCls: 'dialog-header',
 		
-		/* Default options. */
+		// Default options.
 		options: {
 			delay: 200, // delay 200 miliseconds to fire mouse events.
 			distance: 4 // default fire mouse events when distance between start drag point great then 4 pixels.
 		},
 		
-		/* create draggable. */
+		// create draggable.
 		createui: function () {
 			console.log('creating draggable.');
 		},
@@ -37,16 +40,16 @@
 			$(document).off('mousemove.' + this.name + ' mouseup.' + this.name);
 		},
 		
-		/* Initialize draggable. */
+		// Initialize draggable.
 		initui: function () {
 			var that = this;
 			this.orig = document.onmousedown;
-			this.element.on('mousedown.' + this.name, '.dialog-header', function (e) {
+			this.element.on('mousedown.' + this.name, '.'.concat(this.dragCls), function (e) {
 				return that.handleMouseDown(e);
 			});
 		},
 		
-		/* Destroy draggable. */
+		// Destroy draggable.
 		destroyui: function () {
 			this.element.off('.' + this.name);
 			this.clearbindings();
