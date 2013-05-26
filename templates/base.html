@@ -14,17 +14,18 @@
 		<script type="text/javascript" src="{% static 'js/jquery-1.9.1.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/common.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/logging.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/curve.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/draggable.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/ui.js' %}"></script>
 		<script type="text/javascript">
 			$(document).ready(function () {
 				$('#global-post-btn').click(function (e) {
-					$('#post-dlg').dialog().draggable().show();
+					$('#post-dlg').dialog().draggable();//.show();
 				});
 
 				$('#messages-menu').click(function (e) {
-					$('#msg-dlg').dialog();
+					$('#msg-dlg').dialog().draggable().show();
 					e.preventDefault();
 				});
 			});

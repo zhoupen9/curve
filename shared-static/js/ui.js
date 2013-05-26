@@ -26,6 +26,9 @@
 			}
 		},
 
+		show: function () {
+		},
+
 		// create dialog ui.
 		createui: function () {
 			var that = this,
@@ -41,7 +44,7 @@
 				this.overlay = $('.'.concat(this.overlayCls));
 			}
 
-			this.element.show();
+			// this.element.show();
 		},
 
 		// initialize dialog ui.

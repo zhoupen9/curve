@@ -130,12 +130,36 @@
 		// destory ui.
 		destroyui: $.noop,
 
+		// show callbacks.
+		showCallbacks: $.Callbacks(),
+
+		visible: function () {
+			if (!this.element) {
+				return false;
+			}
+			return this.element.css('display') !== 'none';
+		},
+
 		// Create ui.
 		create: function (options, elem) {
 			$.extend(this, options);
 			this.element = $(elem);
 			this.createui();
 			this.initui();
+
+			// create show hook.
+			if (this.show) {
+				this.showCallbacks.add(this.show);
+			}
+
+			this.origShow = this.element.show;
+			this.element.show = function () {
+				if (!this.visible()) {
+					$.show.apply(this, arguements);
+					return that.showCallbacks.fire();
+				}
+				return this;
+			};
 		},
 
 		init: function () {
@@ -149,8 +173,41 @@
 
 	$.ui.plugin = function (name, proto)  {
 		var fullname = $.ui.prototype.namespace.concat('.').concat(name);
+		$.log.debug('Register ui plugin: ' + name + '.');
 		$.plugin(fullname, $.ui, proto);
 		// console.log($.ui.prototype.namespace);
 	};
 
+}($));
+
+// global curve object.
+(function ($) {
+	// declare curve object.
+	$.Curve = function () {};
+
+	// 
+	$.Curve.prototype = {
+		settings: {
+			debug: true,
+		},
+
+		// update settings.
+		setting: function (prop, value) {
+			if (!value) {
+				return this.settings[prop];
+			}
+			if (!$.isFunction(value)) {
+				this.settings[prop] = value;
+			}
+		}
+	};
+
+	$.fn.curve = function (options) {
+		$.curve = $.curve || new $.Curve();
+		if (options) {
+			$.each(options, function (prop, vlaue) {
+				$.curve.setting(prop, value);
+			});
+		}
+	};
 }($));
