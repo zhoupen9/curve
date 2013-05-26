@@ -2,7 +2,7 @@
 /*global  $*/
 
 (function ($) {
-    "use strict";
+    // "use strict";
     
     $.fn.keyboard = function() {
     };

@@ -3,13 +3,13 @@
 
 // jquery base plugin.
 (function ($) {
-	"use strict";
+	// "use strict";
 
 	// Add plugin to Jquery.
-	$.Plugin = $.Plugin || {};
+	var Plugin = function () {};
 
 	// Define Plugin prototype.
-	$.Plugin.prototype = {
+	Plugin.prototype = {
 		name: 'plugin',
 		version: '0.1',
 		options: {},
@@ -42,13 +42,16 @@
 
 		basePrototype = new base();
 		// create new constructor for plugin.
-		constructor = function (options, elem) {
+		// @param collection collection returned by jquery selectors.
+		// @param plugin user options.
+		// @param elem jquery element.
+		constructor = function (collection, options, elem) {
 			if (!this.create) {
-				return new constructor(options, elem);
+				return new constructor(collection, options, elem);
 			}
 			// ensure constructor called with arguments.
 			if (arguments.length) {
-				this.create(options, elem);
+				this.create(collection, options, elem);
 			}
 		};
 
@@ -65,21 +68,23 @@
 		});
 
 		// create construtor's prototype using proxy prototype.
-		constructor.prototype = $.extend({}, $.Plugin.prototype, basePrototype, proxyPrototype);
+		constructor.prototype = $.extend({}, basePrototype, proxyPrototype);
 
-		// create bridge to Jquery.
+		// create bridge to jquery, because Jquery('selector') always return a collection,
+		// plugin system need to hack into this collection to create hooks, so here pass this
+		// collection to plugin's constructor if plugin was call via jquery's selectors.
 		$.fn[name] = function (options) {
-			var retValue = this, plugin;
+			var that = this, plugin;
 
 			this.each(function () {
 				var instance = $.data(this, name);
 				if (instance) {
-					instance.init();
+					instance.init(that);
 				} else {
-					$.data(this, name, new constructor(options, this));
+					$.data(this, name, new constructor(that, options, this));
 				}
 			});
-			return retValue;
+			return that;
 		}
 	};
 }($));
@@ -88,11 +93,12 @@
 // UI plugin.
 (function ($) {
 	// define ui in jquery.
-	$.ui = function () {};
+	var UI = function () {};
 
-	$.extend($.ui, {
-		version: '0.1',
-		children: [],
+	// extends from base, Plugin.
+	UI.prototype = $.extend({}, Plugin.prototype);
+
+	$.extend(UI, {
 		keyCode: {
 			BACKSPACE: 8,
 			COMMA: 188,
@@ -119,50 +125,62 @@
 		}
 	});
 
-	$.ui.prototype = {
+	// UI plugin prototype.
+	UI.prototype = {
+		// ui's optins.
 		options: {},
-		element: undefined,
-		namespace: 'ui',
 
+		// plugin namespace.
+		namespace: 'ui',
+		
+		// ui's jquery object.
+		element: undefined,
+		
 		// Create ui.
 		createui: $.noop,
 
 		// destory ui.
 		destroyui: $.noop,
 
-		// show callbacks.
-		showCallbacks: $.Callbacks(),
-
 		visible: function () {
-			if (!this.element) {
-				return false;
-			}
-			return this.element.css('display') !== 'none';
+			return this.element ? this.element.css('display') !== 'none' : false;
 		},
 
 		// Create ui.
-		create: function (options, elem) {
+		create: function (collection, options, elem) {
+			var that = this, callback;
+			
 			$.extend(this, options);
 			this.element = $(elem);
 			this.createui();
-			this.initui();
 
 			// create show hook.
 			if (this.show) {
-				this.showCallbacks.add(this.show);
+				callback = function () {
+					return that.show();
+				};
+				// instance show callbacks.
+				this.showCallbacks = $.Callbacks(),
+				this.showCallbacks.add(callback);
 			}
-
-			this.origShow = this.element.show;
-			this.element.show = function () {
-				if (!this.visible()) {
-					$.show.apply(this, arguements);
-					return that.showCallbacks.fire();
-				}
-				return this;
-			};
+			// initialzie ui.
+			this.init(collection);
 		},
 
-		init: function () {
+		// Initialize ui.
+		// @param collection collection returned by jquery selectors.
+		init: function (collection) {
+			var that = this;
+			// Hack into jquery to setup hooks.
+			this.origShow = collection.show;
+			collection.show = function () {
+				if (!that.visible()) {
+					// call original show.
+					that.origShow.apply(collection, arguments);
+					that.showCallbacks && that.showCallbacks.fire();
+				}
+				return collection;
+			};
 			this.initui();
 		},
 
@@ -171,11 +189,11 @@
 		}
 	};
 
-	$.ui.plugin = function (name, proto)  {
-		var fullname = $.ui.prototype.namespace.concat('.').concat(name);
-		$.log.debug('Register ui plugin: ' + name + '.');
-		$.plugin(fullname, $.ui, proto);
-		// console.log($.ui.prototype.namespace);
+	// Shortcut for register an UI plugin which has a parent class UI.
+	$.ui = function (name, proto)  {
+		var fullname = UI.prototype.namespace.concat('.').concat(name);
+		$.debug('Register ui plugin: ' + name + '.');
+		$.plugin(fullname, UI, proto);
 	};
 
 }($));
@@ -183,10 +201,10 @@
 // global curve object.
 (function ($) {
 	// declare curve object.
-	$.Curve = function () {};
+	var Curve = function () {};
 
-	// 
-	$.Curve.prototype = {
+	// Cureve prototype.
+	Curve.prototype = {
 		settings: {
 			debug: true,
 		},
@@ -203,10 +221,10 @@
 	};
 
 	$.fn.curve = function (options) {
-		$.curve = $.curve || new $.Curve();
+		var curve = new Curve();
 		if (options) {
 			$.each(options, function (prop, vlaue) {
-				$.curve.setting(prop, value);
+				curve.setting(prop, value);
 			});
 		}
 	};

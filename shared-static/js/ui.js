@@ -5,7 +5,7 @@
 	// "use strict";
 
 	// Dialog ui.
-	$.ui.plugin('dialog', {
+	$.ui('dialog', {
 		// name.
 		name: 'dialog',
 
@@ -27,6 +27,9 @@
 		},
 
 		show: function () {
+			if (this.overlay) {
+				this.overlay.show();
+			}
 		},
 
 		// create dialog ui.
@@ -43,15 +46,10 @@
 			if (this.modal) {
 				this.overlay = $('.'.concat(this.overlayCls));
 			}
-
-			// this.element.show();
 		},
 
 		// initialize dialog ui.
 		initui: function () {
-			if (this.overlay) {
-				this.overlay.show();
-			}
 		},
 
 		destroyui: function () {

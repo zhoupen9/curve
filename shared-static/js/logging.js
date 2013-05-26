@@ -2,12 +2,12 @@
 // jquery logging plugin.
 (function ($) {
 	// Logging class.
-	$.Logging = function (level) {
+	var Logging = function (level) {
 		this.level = level;
 	};
 
 	// Logging prototype.
-	$.Logging.prototype = {
+	Logging.prototype = {
 		// logging supported levels.
 		levels: {
 			debug: {
@@ -84,8 +84,20 @@
 	};
 
 	// set default log level to "debug".
-	$.Logging.prototype.level = $.Logging.prototype.levels.debug;
+	Logging.prototype.level = Logging.prototype.levels.debug;
 	
-	// global logger.
-	$.log = $.log || new $.Logging();
+	// local logger.
+	var log = new Logging();
+
+	// register all logging methods to jquery.
+	$.each(['debug', 'info', 'warn', 'error'], function (index, value) {
+		var origFn = $[value], fn = {};
+		
+		fn[value] = function (message) {
+			var ret = log[value] && log[value].apply(log, arguments);
+			return (origFn && origFn.apply(this, arguments)) || ret;
+		};
+		
+		$.extend(fn);
+	});
 }($));

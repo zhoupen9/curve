@@ -4,7 +4,7 @@
 (function ($) {
 	// "use strict";
 	
-	$.ui.plugin('draggable', {
+	$.ui('draggable', {
 		// plugin name.
 		name: 'draggable',
 		
@@ -31,7 +31,7 @@
 		
 		// create draggable.
 		createui: function () {
-			console.log('creating draggable.');
+			$.debug('creating draggable.');
 		},
 
 		// clear document mouse event handlers.
@@ -87,7 +87,7 @@
 			this.lastX = this.startX = e.pageX;
 			this.lastY = this.startY = e.pageY;
 
-			console.log('mouse down on draggable.');
+			$.debug('mouse down on draggable.');
 
 			e.preventDefault();
 			return true;
@@ -114,14 +114,14 @@
 				this.lastY = e.pageY;
 				return e.preventDefault();
 			}
-			console.log('mouse moving while drag not active.');
+			$.warn('mouse moving while drag not active.');
 			return !dragging;
 		},
 		
 		// Handle mouse up on document.
 		// Set element dragging flag to false and unbind all event handlers.
 		handleMouseUp: function (e) {
-			console.log('draggable mosue up.');
+			$.debug('draggable mosue up.');
 			this.dragging = false;
 			this.clearbindings();
 		}

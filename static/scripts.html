@@ -1,45 +1,60 @@
 <!DOCTYPE HTML>
 <html>
-  <head>
-	<title>Javascript Test page</title>
-	<style type="text/css">
-	  .demo-div {
-		  height: 300px;
-		  width: 600px;
-		  background-color: #242424;
-		  display: none;
-	  }
-	</style>
-	<script type="text/javascript" src="../shared-static/js/jquery-1.9.1.js"></script>
-  </head>
-  <body>
-	<script type="text/javascript">
-	  $(document).ready(function () {
-		  $('#demo').fadeIn();
-		  $('#test-btn').click(function () {
-			  // window.location.reload(false, '_self');
-			  // var i, name = "bar", reg = /^|[^\w]bar[^\w]|$/; // new RegExp("^" + name + "\\s+|\\s+" + name + "$"),
-			  // str = 'bar barfoo bar  fobar bar1 bar';//$(this).attr('class'));
-			  // var array = str.split(/\s+/);
-			  // for (i = 0; i < array.length; i++) {
-				 //  if (array[i] == name) {
-				 //  }
-			  // }
+	<head>
+		<title>Javascript Test page</title>
+		<style type="text/css">
+			.demo-div {
+				height: 100px;
+				width: 600px;
+				background-color: #242424;
+				display: none;
+				margin: 10px 10px;
+			}
+		</style>
+		<script type="text/javascript" src="../shared-static/js/jquery-1.9.1.js"></script>
+		<script type="text/javascript" src="../shared-static/js/logging.js"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+		$(document).ready(function () {
 
-			  // window.alert('.'.concat('css'));
-			  // var isfoo = $(this).attr('class').split('\w');
-			  // $.each(isfoo, function (prop, value) {
-			  // 	  window.alert(prop + ': ' + value);
-			  // });
-		  	var str = 'hello, world';
-		  	str += '!';
-		  });
-	  });
-	</script>
+			var name = 'abc';
+			var proto = {};
+			proto[name] = function (message) {
+				console.log(message);
+			};
 
-	<div>
-	  <input id="test-btn" class="foo bar" type="button" value="Test"></input>
-	  <div id="demo" class="demo-div">
-	  </div>
+			$.extend(proto);
+			// $('#demo').fadeIn();
+			$('#test-btn').click(function () {
+				// window.location.reload(false, '_self');
+				// var i, name = "bar", reg = /^|[^\w]bar[^\w]|$/; // new RegExp("^" + name + "\\s+|\\s+" + name + "$"),
+				// str = 'bar barfoo bar  fobar bar1 bar';//$(this).attr('class'));
+				// var array = str.split(/\s+/);
+				// for (i = 0; i < array.length; i++) {
+					// if (array[i] == name) {
+					// }
+				// }
+
+				// window.alert('.'.concat('css'));
+				// var isfoo = $(this).attr('class').split('\w');
+				// $.each(isfoo, function (prop, value) {
+				// 	  window.alert(prop + ': ' + value);
+				// });
+
+				// new foo().modify().bar();
+				$.debug('hello, world.');
+			});
+		});
+		</script>
+
+		<div>
+			<input id="test-btn" class="foo bar" type="button" value="Test"></input>
+			<div id="demo" class="demo-div">
+			</div>
+
+			<div id="demo2" class="demo-div">
+			</div>
+		</div>
 	</body>
-  </html>
+</html>
