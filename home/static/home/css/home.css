@@ -119,11 +119,16 @@
     line-height: 16px;
     text-transform: uppercase;
     border-left: 1px solid #e8e8e8;
+    text-decoration: none;
+}
+
+.stats a:hover {
+    color: #0084b4;
+    text-decoration: none;
 }
 
 .stats a strong {
     display: block;
-    color: #333;
     font-size: 14px;
 }
 

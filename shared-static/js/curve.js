@@ -1,17 +1,19 @@
 /*jslint browser: true*/
 /*global $*/
 
-// jquery base plugin.
 (function ($) {
 	// "use strict";
 
-	// Add plugin to Jquery.
+	// Base plugin.
 	var Plugin = function () {};
 
 	// Define Plugin prototype.
 	Plugin.prototype = {
+		// plugin name.
 		name: 'plugin',
+		// plugin version.
 		version: '0.1',
+		// plugin options.
 		options: {},
 
 		// Plugin override this method to create.
@@ -26,22 +28,38 @@
 
 	// create new plugin.
 	// @param name plugin name.
+	// @param base base plugin type or base plugin object.
 	// @param proto plugin prototype.
 	$.plugin = function (name, base, proto) {
-		var constructor, basePrototype, proxyPrototype = {}, fullname = name.split('.')[0];
-		if (!name) {
-			return $.error("Plugin must declare a name.");
+		var constructor, proxyPrototype = {}, fullname, namespace, array;
+		if (!name || typeof name !== 'string' || name.trim() === '') {
+			return $.error("Plugin must declare a name(string).");
+		}
+		// namesapce, fullname and name.
+		array = name.split('.');
+		namespace = array.length > 1 ? array[0] : 'plugin';
+		name = array[array.length - 1];
+		fullname = namespace + '-' + name;
+
+		// create selector for plugin.
+		$.expr[':'][fullname.toLowerCase()] = function (elem) {
+			return !!$.data(elem, fullname);
 		}
 
-		name = name.split('.')[1];
-
+		// support two parameters. In this case, created plugin has a
+		// default parent which is Plugin.
 		if (!proto) {
 			proto = base;
-			base = $.ui;
+			base = Plugin;
 		}
 
-		basePrototype = new base();
+		if ($.isFunction(base) || typeof base !== 'object') {
+			base = new base();
+		}
+
 		// create new constructor for plugin.
+		// Plugin subclass's constructor need a collection returned by
+		// jquery selectors as first parameter to create hooks.
 		// @param collection collection returned by jquery selectors.
 		// @param plugin user options.
 		// @param elem jquery element.
@@ -51,7 +69,8 @@
 			}
 			// ensure constructor called with arguments.
 			if (arguments.length) {
-				this.create(collection, options, elem);
+				$.extend(this, options);
+				this.create(collection, elem);
 			}
 		};
 
@@ -68,11 +87,11 @@
 		});
 
 		// create construtor's prototype using proxy prototype.
-		constructor.prototype = $.extend({}, basePrototype, proxyPrototype);
+		constructor.prototype = $.extend({}, base, proxyPrototype);
 
 		// create bridge to jquery, because Jquery('selector') always return a collection,
 		// plugin system need to hack into this collection to create hooks, so here pass this
-		// collection to plugin's constructor if plugin was call via jquery's selectors.
+		// collection to plugin's constructor if plugin was called via jquery's selectors.
 		$.fn[name] = function (options) {
 			var that = this, plugin;
 
@@ -96,65 +115,37 @@
 	var UI = function () {};
 
 	// extends from base, Plugin.
-	UI.prototype = $.extend({}, Plugin.prototype);
-
-	$.extend(UI, {
-		keyCode: {
-			BACKSPACE: 8,
-			COMMA: 188,
-			DELETE: 46,
-			DOWN: 40,
-			END: 35,
-			ENTER: 13,
-			ESCAPE: 27,
-			HOME: 36,
-			LEFT: 37,
-			NUMPAD_ADD: 107,
-			NUMPAD_DECIMAL: 110,
-			NUMPAD_DIVIDE: 111,
-			NUMPAD_ENTER: 108,
-			NUMPAD_MULTIPLY: 106,
-			NUMPAD_SUBTRACT: 109,
-			PAGE_DOWN: 34,
-			PAGE_UP: 33,
-			PERIOD: 190,
-			RIGHT: 39,
-			SPACE: 32,
-			TAB: 9,
-			UP: 38
-		}
-	});
-
-	// UI plugin prototype.
-	UI.prototype = {
+	UI.prototype = $.extend({}, Plugin.prototype, {
 		// ui's optins.
 		options: {},
 
 		// plugin namespace.
 		namespace: 'ui',
-		
+
 		// ui's jquery object.
 		element: undefined,
-		
+
 		// Create ui.
 		createui: $.noop,
 
 		// destory ui.
 		destroyui: $.noop,
 
+		// If ui is currently visible.
 		visible: function () {
 			return this.element ? this.element.css('display') !== 'none' : false;
 		},
 
 		// Create ui.
-		create: function (collection, options, elem) {
+		create: function (collection, elem) {
 			var that = this, callback;
-			
-			$.extend(this, options);
+			// save a reference to element's jquery object.
 			this.element = $(elem);
+
+			// create ui.
 			this.createui();
 
-			// create show hook.
+			// If plugin extends ui has a show method, add it to callbacks.
 			if (this.show) {
 				callback = function () {
 					return that.show();
@@ -187,28 +178,53 @@
 		destroy: function () {
 			this.destroyui();
 		}
-	};
+	});
+
+	$.extend(UI, {
+		keyCode: {
+			BACKSPACE: 8,
+			COMMA: 188,
+			DELETE: 46,
+			DOWN: 40,
+			END: 35,
+			ENTER: 13,
+			ESCAPE: 27,
+			HOME: 36,
+			LEFT: 37,
+			NUMPAD_ADD: 107,
+			NUMPAD_DECIMAL: 110,
+			NUMPAD_DIVIDE: 111,
+			NUMPAD_ENTER: 108,
+			NUMPAD_MULTIPLY: 106,
+			NUMPAD_SUBTRACT: 109,
+			PAGE_DOWN: 34,
+			PAGE_UP: 33,
+			PERIOD: 190,
+			RIGHT: 39,
+			SPACE: 32,
+			TAB: 9,
+			UP: 38
+		}
+	});
 
 	// Shortcut for register an UI plugin which has a parent class UI.
 	$.ui = function (name, proto)  {
-		var fullname = UI.prototype.namespace.concat('.').concat(name);
-		$.debug('Register ui plugin: ' + name + '.');
-		$.plugin(fullname, UI, proto);
+		var ui = new UI(), fullname = ui.namespace.concat('.').concat(name);
+		$.debug('Register ui plugin: ' + fullname + '.');
+		$.plugin(fullname, ui, proto);
 	};
-
 }($));
 
-// global curve object.
 (function ($) {
 	// declare curve object.
-	var Curve = function () {};
+	var Curve = function () {
+		this.settings = {
+			debug: true
+		};
+	};
 
 	// Cureve prototype.
 	Curve.prototype = {
-		settings: {
-			debug: true,
-		},
-
 		// update settings.
 		setting: function (prop, value) {
 			if (!value) {
