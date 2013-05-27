@@ -1,0 +1,23 @@
+<li class="stream-item">
+	<div class="post">
+		<div class="post-content">
+			<div class="module-header">
+				{% if post.member.photo %}
+				<img class="avatar size48" src="/media/profiles/{{ post.member.photo }}" alt="{{ post.member.username }}"></img>
+				{% else %}
+				<img class="avatar size48" src="/media/profiles/default-photo.jpeg" alt="{{ post.member.username }}"></img>
+				{% endif %}
+				<a href="/user/{{ post.member.user.id }}">
+					<h3>{{ post.member.username }}</h3>
+				</a>
+				<small class="metadata">@{{ post.member.username }}</small>
+			</div>
+			<p>{{ post.content }}</p>
+			<div class="post-footer">
+				<small>
+					<a href="#">View detail</a>
+				</small>
+			</div>
+		</div>
+	</div>
+</li>

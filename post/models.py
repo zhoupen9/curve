@@ -1,5 +1,5 @@
 
-from django.contrib.auth import User
+from member.models import Member
 from django.db import models
 
 # Create your models here.
@@ -22,5 +22,5 @@ class Post(models.Model):
     title = models.CharField(max_length=256)
     tag = models.ManyToManyField(Tag)
     createTime = models.DateTimeField()
-    author = models.ForeignKey(User)
+    member = models.ForeignKey(Member)
     content = models.TextField()

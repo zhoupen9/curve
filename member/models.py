@@ -14,16 +14,15 @@ class MemberGroup(models.Model):
 class Member(models.Model):
     """ Curve members are registered user who can access fucilities. """
     id = models.AutoField(primary_key=True)
-    user = models.OneToOneField(User, unique=True)
+    user = models.ForeignKey(User, unique=True)
 
     """ member-group many-to-one relationship. """
     username = models.CharField(max_length=128, unique=True)
-    email = models.EmailField()
-    password = models.CharField(max_length=32)
     group = models.ForeignKey(MemberGroup, null=True)
-    department = models.CharField(max_length=128)
-    title = models.CharField(max_length=64)
-    description = models.CharField(max_length=1024)
+    department = models.CharField(max_length=128, null=True)
+    title = models.CharField(max_length=64, null=True)
+    description = models.CharField(max_length=1024, null=True)
+    photo = models.CharField(max_length=256, null=True)
 
 class Profile(models.Model):
     """ Member's individual profile. """

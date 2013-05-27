@@ -95,14 +95,15 @@ $(document).ready(function() {
 				<div id="signup" class="front-signup">
 					<h2><strong>New to Curve?</strong>Sign up</h2>
 					<form action="/member/signup" class="signup" method="post">
+						{% csrf_token %}
 						<div class="placeholding-input">
-							<input type="text" class="text-input" placeholder="Full name"></input>
+							<input type="text" name="fullname" class="text-input" placeholder="Full name"></input>
 						</div>
 						<div class="placeholding-input">
-							<input type="text" class="text-input" placeholder="Email"></input>
+							<input type="text" name="email" class="text-input" placeholder="Email"></input>
 						</div>
 						<div class="placeholding-input">
-							<input type="password" class="text-input" placeholder="Password"></input>
+							<input type="password" name="password" class="text-input" placeholder="Password"></input>
 						</div>
 						<button type="submit" class="btn signup-btn">Sign up for Curve</button>
 					</form>

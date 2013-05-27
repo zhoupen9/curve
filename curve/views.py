@@ -21,7 +21,7 @@ def home(request):
         return render(request, 'home/home.html', context)
     else:
         # if user did not logged in, render welcome page.
-        error = request.session.get('login_error', None)
+        error = request.session.get('error', None)
         if not error is None:
             context['error'] = error
         
@@ -44,8 +44,9 @@ def signin(request):
         login(request, user)
         if not request.POST.get('rem', None):
             request.session.set_expiry(0)
+        request.session['userid'] = user.id
     else:
-        request.session['login_error'] = "There was an error logging you in. Please Try again."
+        request.session['error'] = "There was an error logging you in. Please Try again."
     request.session['last_login'] = datetime.now()
     return redirect('/')
 # pass
@@ -54,7 +55,9 @@ def signout(request):
     """
     Sign out.
     """
-    del request.session['login_error']
+    for key in ['userid', 'error']:
+        if key in request.session:
+            del request.session[key]
     logout(request)
     return redirect('/')
 # pass

@@ -18,6 +18,13 @@ $(document).ready(function () {
 			load.addPostToStream(data.posts);
 		});
 	});
+
+	$('#activity-notify').on('click', function (e) {
+		$.get('/post/recent')
+		.done(function (data) {
+			$('#stream-items').prepend(data);
+		});
+	});
 });
 </script>
 {% endblock %}
@@ -106,11 +113,11 @@ $(document).ready(function () {
 				</div>
 				<div class="stream-container">
 					<div class="stream-item">
-						<div class="new-activities">4 new activities</div>
+						<div id="activity-notify" class="new-activities">4 new activities</div>
 					</div>
 
 					<div class="stream">
-						<ol class="stream-items">
+						<ol id="stream-items" class="stream-items">
 							<li class="stream-item">
 								<div class="post">
 									<div class="post-content">

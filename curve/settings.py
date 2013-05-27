@@ -130,6 +130,7 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'member',
     'home',
+    'post',
 )
 
 LOGIN_URL = "/"

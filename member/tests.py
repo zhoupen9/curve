@@ -9,7 +9,7 @@ from django.test import TransactionTestCase
 import logging
 from member.models import register
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('curve')
 
 class RegisterTest(TransactionTestCase):
     def testRegister(self):
