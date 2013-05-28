@@ -40,11 +40,12 @@ def signin(request):
     """
     username = request.POST['username']
     password = request.POST['password']
+    logger.debug('Authenticating %s...', username)
     user = authenticate(username=username, password=password)
-    if (not user is None) and user.is_active:
-        # Set Session Expiry to 0 if user clicks "Remember Me"
+    if user is not None and user.is_active:
         logger.debug("User authenticated and active, logging in...")
         login(request, user)
+        # Set Session Expiry to 0 if user clicks "Remember Me"
         if not request.POST.get('rem', None):
             request.session.set_expiry(0)
         member = Member.objects.get(user=user)
