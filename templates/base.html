@@ -57,7 +57,12 @@
 									<a href="/live">Live!</a>
 								</li>
 								<li>
-									<a href="/profile">Profile</a>
+									<a href="/profile">
+										<span>
+											<i class="nav-messages"></i>
+										</span>
+										<span>Messages</span>
+									</a>
 								</li>
 							</ul>
 
@@ -104,7 +109,9 @@
 									</li>
 								</ul>
 								<div class="topbar-post">
-									<button type="button" id="global-post-btn" class="btn primary-btn compose-btn topbar-post-btn" placeholder="Post">Compose</button>
+									<button type="button" id="global-post-btn" class="btn primary-btn compose-btn topbar-post-btn" placeholder="Post">
+										<i class="new-post"></i>
+									</button>
 								</div>
 							</div>
 						</div>
@@ -142,12 +149,32 @@
 				<div class="dialog-body">
 					<form class="post-form" method="post" action="/post/new">
 						<div class="post-content">
+							<div class="editor">
+								<div></div>
+							</div>
+							<div class="editor-normalizer">
+								<div></div>
+							</div>
+							<div class="dropdown-menu typeahead" style="display: none;">
+								<div class="dropdown-caret">
+									<div class="caret-outer"></div>
+									<div class="caret-inner"></div>
+								</div>
+								<div class="dropdown-inner js-typeahead-results">
+									<div class="typeahead-accounts js-typeahead-accounts">
+										<ul class="typeahead-items account-list">
+										</ul>
+									</div>
+								<ul clas="typeahead-items topic-list "></ul>
+								</div>
 							<textarea></textarea>
 						</div>
 					</form>
 					<div class="post-button">
 						<button id="global-post" type="button" class="btn primary-btn" placeholder="Post">Post</button>
 					</div>
+				</div>
+				<div class="dialog-footer">
 				</div>
 			</div>
 		</div>

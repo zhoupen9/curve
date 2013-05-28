@@ -17,12 +17,13 @@ def register(request):
     email = checkNull(request.POST['email'])
     password = checkNull(request.POST['password'])
 
+    # Ensure required fields are all non-empty.
     for name, value in { 'Name': fullname, 'Email': email, 'Password': password }.items():
         if not value:
             request.session['error'] = name + ' can NOT be empty.'
             return redirect('/')
-        pass
 
+    # Check if username or email already exists.
     user = User.objects.filter(username=fullname).filter(email=email)
     if user:
         logger.debug('user %s already exists.', fullname)
@@ -37,13 +38,23 @@ def register(request):
         member.save()
         logger.debug('member: %s created.', member.id)
 
-        user = authenticate(username=fullname, password=password)
+        # automatically login when signup.
+	user = authenticate(username=fullname, password=password)
         if user is not None:
             login(request, user)
+            request.session['userid'] = user.id
+            request.session['username'] = member.username
+
     return redirect('/')
 
-def checkNull(str):
-    return str is None or str.strip()
+def checkNull(obj):
+    """
+    Check given object is a non empty string.
+    @return False if obj is None or obj is not a string,
+    return None if obj is an empty string,
+    return stripped whitespaces string if obj is a non empty string.
+    """
+    return obj is not None and type(obj) == str and obj.strip() or None
 
 
 

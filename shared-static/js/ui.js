@@ -32,6 +32,12 @@
 			}
 		},
 
+		captureKeys: function () {
+			this.element.on('keydown', this.keydown);
+			this.element.on('keypress', this.keypress);
+			this.element.on('keyup', this.keyup);
+		},
+
 		// create dialog ui.
 		createui: function () {
 			var that = this,
@@ -50,10 +56,22 @@
 
 		// initialize dialog ui.
 		initui: function () {
+			if (this.options.captureKeys) {
+				this.captureKeys();
+			}
 		},
 
 		destroyui: function () {
 			this.element.parent().remove(this.element);
+		},
+
+		keydown: function (event) {
+		},
+
+		keypress: function (event) {
+		},
+
+		keyup: function (event) {
 		}
 	});
 }($));

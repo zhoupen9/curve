@@ -44,7 +44,7 @@ button {
 i, .icon {
 	display: inline-block;
 	vertical-align: text-top;
-	background-image: url(../img/twitter_web_sprite_icons.png);
+	background-image: url(../img/curve-sprites.png);
 	background-position: 0 0;
 	background-repeat: no-repeat;
 }
@@ -162,6 +162,11 @@ i, cite, em, var, address, dfn {
 	margin: 6px 1px 6px;
 }
 
+.navbar {
+	-webkit-box-shadow: 0 2px 3px rgba(0,0,0,.25);
+	box-shadow: 0 2px 3px rgba(0,0,0,.25);
+}
+
 .navbar-inner .form-search {
 	position: relative;
 	float: left;
@@ -172,7 +177,7 @@ i, cite, em, var, address, dfn {
 
 .nav>li>a {
 	font-weight: bold;
-	line-height: 1.25;
+	line-height: 1;
 	color: #bbb;
 	text-shadow: 0 -1px 1px rgba(0,0,0,.75);
 	padding: 15px 15px 10px !important;
@@ -181,6 +186,24 @@ i, cite, em, var, address, dfn {
 
 .nav li a {
 	font-size: 12px !important;
+}
+
+.nav .nav-messages {
+	background-position: -170px -115px;
+	width: 21px;
+	height: 19px;
+}
+
+.nav a:hover .nav-messages {
+	background-position: -144px -115px;
+	width: 21px;
+	height: 19px;
+}
+
+.topbar-post .new-post {
+	background-position: -210px -23px;
+	width: 22px;
+	height: 18px;
 }
 
 .form-search .search-input {
@@ -421,7 +444,7 @@ i, cite, em, var, address, dfn {
 }
 
 .close-medium {
-	background-position: -60px -510px;
+	background-position: -65px -175px;
 }
 
 .close-medium, .error-x, .dismiss-white {
