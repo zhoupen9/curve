@@ -5,7 +5,7 @@
 	// "use strict";
 
 	// Dialog ui.
-	$.ui('dialog', {
+	$.curve.ui('dialog', {
 		// name.
 		name: 'dialog',
 
@@ -17,6 +17,10 @@
 
 		// default behavior.
 		modal: true,
+
+		options: {
+			editorCls: 'editor'
+		},
 
 		// close dialog.
 		close: function (e) {
@@ -41,12 +45,17 @@
 		// create dialog ui.
 		createui: function () {
 			var that = this,
-			close = this.element.find('.'.concat(this.closeCls));
+			close = this.element.find('.'.concat(this.closeCls)),
+			editor = this.element.find('.'.concat(this.options.editorCls));
 			if (close.length) {
 				this.closeDelegate = function (e) {
 					return that.close(e);
 				};
 				close.on('click', this.closeDelegate);
+			}
+
+			if (editor.length) {
+				this.editor = editor.editor();
 			}
 
 			if (this.modal) {
@@ -58,6 +67,11 @@
 		initui: function () {
 			if (this.options.captureKeys) {
 				this.captureKeys();
+			}
+
+			// If dialog has a editor, focus to it.
+			if (this.editor) {
+				this.editor.initui();
 			}
 		},
 

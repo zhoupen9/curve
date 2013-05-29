@@ -11,8 +11,10 @@
 	Plugin.prototype = {
 		// plugin name.
 		name: 'plugin',
+
 		// plugin version.
 		version: '0.1',
+
 		// plugin options.
 		options: {},
 
@@ -23,94 +25,99 @@
 		init: $.noop,
 
 		// Plugin override this method to destroy anything if need to destory.
-		destory: $.noop
-	};
+		destory: $.noop,
 
-	// create new plugin.
-	// @param name plugin name.
-	// @param base base plugin type or base plugin object.
-	// @param proto plugin prototype.
-	$.plugin = function (name, base, proto) {
-		var constructor, proxyPrototype = {}, fullname, namespace, array;
-		if (!name || typeof name !== 'string' || name.trim() === '') {
-			return $.error("Plugin must declare a name(string).");
-		}
-		// namesapce, fullname and name.
-		array = name.split('.');
-		namespace = array.length > 1 ? array[0] : 'plugin';
-		name = array[array.length - 1];
-		fullname = namespace + '-' + name;
-
-		// create selector for plugin.
-		$.expr[':'][fullname.toLowerCase()] = function (elem) {
-			return !!$.data(elem, fullname);
-		}
-
-		// support two parameters. In this case, created plugin has a
-		// default parent which is Plugin.
-		if (!proto) {
-			proto = base;
-			base = Plugin;
-		}
-
-		if ($.isFunction(base) || typeof base !== 'object') {
-			base = new base();
-		}
-
-		// create new constructor for plugin.
-		// Plugin subclass's constructor need a collection returned by
-		// jquery selectors as first parameter to create hooks.
-		// @param collection collection returned by jquery selectors.
-		// @param plugin user options.
-		// @param elem jquery element.
-		constructor = function (collection, options, elem) {
-			if (!this.create) {
-				return new constructor(collection, options, elem);
+		// Create new plugin.
+		// Core plugin registration process invovles
+		// 1. add a selector for target element by ':pluginname';
+		// 2. create a prototype constructor to inherit plugin base.
+		// 3. invoke constructor to create plugin object and save this object
+		//    in jquery element's data[pluginname], if jquery's element call
+		//    extended function (which create after) first time.
+		// 4. invoke plugin's init funciton if jquery's element call extended
+		//    function different than first time (by checking if plugin object
+		//    was created in step 3).
+		// @param name plugin name.
+		// @param base base plugin type or base plugin object.
+		// @param proto plugin prototype.
+		plugin: function (name, base, proto) {
+			var constructor, proxyPrototype = {}, fullname, namespace, array;
+			if (!name || typeof name !== 'string' || name.trim() === '') {
+				return $.error("Plugin must declare a name(string).");
 			}
-			// ensure constructor called with arguments.
-			if (arguments.length) {
-				$.extend(this, options);
-				this.create(collection, elem);
+			// namesapce, fullname and name.
+			array = name.split('.');
+			namespace = array.length > 1 ? array[0] : 'plugin';
+			name = array[array.length - 1];
+			fullname = namespace + '-' + name;
+
+			// create selector for plugin.
+			$.expr[':'][fullname.toLowerCase()] = function (elem) {
+				return !!$.data(elem, fullname);
 			}
-		};
 
-		// copy prototype to proxy prototype.
-		$.each(proto, function (prop, value) {
-			if (!$.isFunction(value)) {
-				proxyPrototype[prop] = value;
-			} else {
-				// If constructor's prototype's entry is a function,
-				proxyPrototype[prop] = function () {
-					return value.apply(this, arguments);
-				};
+			// support two parameters. In this case, created plugin has a
+			// default parent which is Plugin.
+			if (!proto) {
+				proto = base;
+				base = Plugin;
 			}
-		});
 
-		// create construtor's prototype using proxy prototype.
-		constructor.prototype = $.extend({}, base, proxyPrototype);
+			if ($.isFunction(base) || typeof base !== 'object') {
+				base = new base();
+			}
 
-		// create bridge to jquery, because Jquery('selector') always return a collection,
-		// plugin system need to hack into this collection to create hooks, so here pass this
-		// collection to plugin's constructor if plugin was called via jquery's selectors.
-		$.fn[name] = function (options) {
-			var that = this, plugin;
+			// create new constructor for plugin.
+			// Plugin subclass's constructor need a collection returned by
+			// jquery selectors as first parameter to create hooks.
+			// @param collection collection returned by jquery selectors.
+			// @param plugin user options.
+			// @param elem jquery element.
+			constructor = function (collection, options, elem) {
+				if (!this.create) {
+					return new constructor(collection, options, elem);
+				}
+				// ensure constructor called with arguments.
+				if (arguments.length) {
+					$.extend(this, options);
+					this.create(collection, elem);
+				}
+			};
 
-			this.each(function () {
-				var instance = $.data(this, name);
-				if (instance) {
-					instance.init(that);
+			// copy prototype to proxy prototype.
+			$.each(proto, function (prop, value) {
+				if (!$.isFunction(value)) {
+					proxyPrototype[prop] = value;
 				} else {
-					$.data(this, name, new constructor(that, options, this));
+					// If constructor's prototype's entry is a function,
+					proxyPrototype[prop] = function () {
+						return value.apply(this, arguments);
+					};
 				}
 			});
-			return that;
+
+			// create construtor's prototype using proxy prototype.
+			constructor.prototype = $.extend({}, base, proxyPrototype);
+
+			// create bridge to jquery, because Jquery('selector') always return a collection,
+			// plugin system need to hack into this collection to create hooks, so here pass this
+			// collection to plugin's constructor if plugin was called via jquery's selectors.
+			$.fn[name] = function (options) {
+				var that = this, plugin;
+
+				this.each(function () {
+					var instance = $.data(this, name);
+					if (instance) {
+						instance.init(that);
+					} else {
+						$.data(this, name, new constructor(that, options, this));
+					}
+				});
+				return that;
+			}
 		}
-	};
-}($));
+	}
 
-
-// UI plugin.
-(function ($) {
 	// define ui in jquery.
 	var UI = function () {};
 
@@ -207,15 +214,6 @@
 		}
 	});
 
-	// Shortcut for register an UI plugin which has a parent class UI.
-	$.ui = function (name, proto)  {
-		var ui = new UI(), fullname = ui.namespace.concat('.').concat(name);
-		$.debug('Register ui plugin: ' + fullname + '.');
-		$.plugin(fullname, ui, proto);
-	};
-}($));
-
-(function ($) {
 	// declare curve object.
 	var Curve = function () {
 		this.settings = {
@@ -225,23 +223,62 @@
 
 	// Cureve prototype.
 	Curve.prototype = {
+		// settings.
+		options: {
+		},
+
+		plugins: [],
+
+		uis: [],
+
 		// update settings.
 		setting: function (prop, value) {
 			if (!value) {
-				return this.settings[prop];
+				return this.options[prop];
 			}
 			if (!$.isFunction(value)) {
-				this.settings[prop] = value;
+				this.options[prop] = value;
 			}
+		},
+
+		// Get curve settings or update curve settings.
+		// @param options plain object.
+		settings: function (options) {
+			var that = this;
+
+			if (!options) {
+				// support getting options when no parameters given.
+				return this.options;
+			}
+			
+			if (options) {
+				$.each(options, function (prop, vlaue) {
+					this.setting(prop, value);
+				});
+			}
+		},
+
+		// Register a new plugin.
+		// New registered plugin's name (not fullname, e.g. fullname is 'ui.dialog' then
+		// name should be 'dialog') will extend an associated jquery function to plugin
+		// functionalities to target element (mostly this).
+		// E.g. call $('#some_id').dilaog(); after registered 'ui.dialog' plugin, will
+		// apply Plugin.plugin(name, new Plugin() /* which is default. */, proto).
+		plugin: function (name, proto) {
+			var plugin = new Plugin();
+			$.debugg('Register plugin: ; + name');
+			plugin.plugin(name, proto);
+			this.plugins.push(plugin);
+		},
+
+		// Shortcut for register an UI plugin which has a parent class UI.
+		ui: function (name, proto)	{
+			var ui = new UI(), fullname = ui.namespace.concat('.').concat(name);
+			$.debug('Register ui plugin: ' + fullname + '.');
+			ui.plugin(fullname, ui, proto);
+			this.uis.push(ui);
 		}
 	};
 
-	$.fn.curve = function (options) {
-		var curve = new Curve();
-		if (options) {
-			$.each(options, function (prop, vlaue) {
-				curve.setting(prop, value);
-			});
-		}
-	};
+	$.curve = new Curve();
 }($));

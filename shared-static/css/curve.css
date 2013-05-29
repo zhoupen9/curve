@@ -96,6 +96,10 @@ i, cite, em, var, address, dfn {
 	background-position: top;
 }
 
+.front-container .wrapper {
+	background-image: url(/static/img/wash-white-30.png)
+}
+
 .front-image {
 	display: block;
 	top: 0;
@@ -501,6 +505,27 @@ i, cite, em, var, address, dfn {
 	left: 0;
 	/* z-index: 5000; */
 	z-index: 2000;
+}
+
+.post-toolbar {
+	content: " ";
+}
+
+.post-toolbar .post-toolbox {
+	float: left;
+}
+
+.post-button {
+	float:right;
+	margin: 0 15px 0 0;
+}
+
+.dialog .post-content {
+	margin: 0;
+}
+
+.post-content .editor {
+	height: 80px;
 }
 
 ol>li {

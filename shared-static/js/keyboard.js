@@ -40,7 +40,7 @@
 		},
 
 		destroy: function () {
-		},
+		}
 	};
 
 	// create keyboard manager.

@@ -4,7 +4,7 @@
 (function ($) {
 	// "use strict";
 	
-	$.ui('draggable', {
+	$.curve.ui('draggable', {
 		// plugin name.
 		name: 'draggable',
 		
