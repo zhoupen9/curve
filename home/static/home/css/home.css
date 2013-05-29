@@ -138,6 +138,15 @@
     border-radius: 0 0 5px 5px;
 }
 
+.home-post form {
+    margin: 0;
+}
+
+.home-post .editor {
+    width: 270px;
+    color: #aaa;
+}
+
 .home-activities {
     float: right;
     width: 522px;

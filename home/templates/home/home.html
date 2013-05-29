@@ -70,8 +70,41 @@ $(document).ready(function () {
 					<div class="home-post">
 						<form class="" action="/post/new" method="post">
 							{% csrf_token %}
-							<div class="post-content">
-								<div class="">Compose new post</div>
+							<div class="home-post-content">
+								<div class="post-editor editor" contenteditable="true" spellcheck="true" aria-multiline="true" dir="ltr" role="textbox">
+									<div>Compose new post...</div>
+								</div>
+								<div class="editor-normalizer">
+									<div></div>
+								</div>
+								<div class="dropdown-menu typeahead" style="display: none;">
+									<div class="dropdown-caret">
+										<div class="caret-outer"></div>
+										<div class="caret-inner"></div>
+									</div>
+									<div class="dropdown-inner js-typeahead-results">
+										<div class="typeahead-accounts js-typeahead-accounts">
+											<ul class="typeahead-items account-list">
+											</ul>
+										</div>
+										<ul clas="typeahead-items topic-list "></ul>
+									</div>
+									<textarea></textarea>
+								</div>
+							</div>
+							<div class="post-toolbar hide">
+								<div class="post-thumbnail"></div>
+								<div class="post-toolbox clearfix">
+									<div class="file-selector">
+										<input type="button" class="btn text-input file-input" placeholder="file"></input>
+									</div>
+									<div class="code-formatter">
+										<button type="button" class="btn">code</button>
+									</div>
+								</div>
+								<div class="post-button">
+									<button id="global-post" type="button" class="btn primary-btn" placeholder="Post" disabled="disabled">Post</button>
+								</div>
 							</div>
 						</form>
 					</div>

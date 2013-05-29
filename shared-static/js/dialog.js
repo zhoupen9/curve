@@ -18,7 +18,11 @@
 		// default behavior.
 		modal: true,
 
+		// default dialog options.
 		options: {
+			// default keyboard behavior.
+			captureKeys: true,
+			// default editor class name.
 			editorCls: 'editor'
 		},
 
@@ -37,16 +41,26 @@
 		},
 
 		captureKeys: function () {
-			this.element.on('keydown', this.keydown);
-			this.element.on('keypress', this.keypress);
-			this.element.on('keyup', this.keyup);
+			var that = this;
+			this.keydownDelegate = function (event) {
+				return that.keydown(event);
+			};
+			this.keypressDelegate = function (event) {
+				return that.keypress(event);
+			};
+			this.keyupDelegate = function (event) {
+				return that.keyup(event);
+			};
+			this.element.on('keydown', this.keydownDelegate);
+			this.element.on('keypress', this.keypressDelegate);
+			this.element.on('keyup', this.keyupDelegate);
 		},
 
 		// create dialog ui.
 		createui: function () {
 			var that = this,
 			close = this.element.find('.'.concat(this.closeCls)),
-			editor = this.element.find('.'.concat(this.options.editorCls));
+			editor = this.element.find('.'.concat(this.options.editorCls)).first();
 			if (close.length) {
 				this.closeDelegate = function (e) {
 					return that.close(e);
@@ -71,7 +85,7 @@
 
 			// If dialog has a editor, focus to it.
 			if (this.editor) {
-				this.editor.initui();
+				this.editor.focus();
 			}
 		},
 
@@ -80,12 +94,18 @@
 		},
 
 		keydown: function (event) {
+			if (event.which === 0x1b /* ESC */) {
+				this.close();
+				$.debug('ESC close dialog.');
+			}
 		},
 
 		keypress: function (event) {
+			// $.debug('dialog key pressed.');
 		},
 
 		keyup: function (event) {
+			// $.debug('dialog key up.');
 		}
 	});
 }($));

@@ -150,7 +150,7 @@
 				<div class="dialog-body">
 					<form class="post-form" method="post" action="/post/new">
 						<div class="post-content">
-							<div class="post-editor editor">
+							<div class="post-editor editor" contenteditable="true" spellcheck="true" aria-multiline="true" dir="ltr" role="textbox">
 								<div></div>
 							</div>
 							<div class="editor-normalizer">
@@ -171,23 +171,23 @@
 								<textarea></textarea>
 							</div>
 						</div>
-						<div class="post-toolbar">
-							<div class="post-toolbox">
+						<div class="post-toolbar clearfix">
+							<div class="post-thumbnail"></div>
+							<div class="post-toolbox clearfix">
 								<div class="file-selector">
-									<button type="button" title="file" class="btn" value="file"></button>
+									<input type="button" class="btn text-input file-input" placeholder="file"></input>
 								</div>
 								<div class="code-formatter">
-									<button type="button" title="code" class="btn" value="code"></button>
+									<button type="button" class="btn">code</button>
 								</div>
 							</div>
 							<div class="post-button">
-								<button id="global-post" type="button" class="btn primary-btn" placeholder="Post">Post</button>
+								<button id="global-post" type="button" class="btn primary-btn" placeholder="Post" disabled="disabled">Post</button>
 							</div>
 						</div>
 					</form>
 				</div>
-				<div class="dialog-footer">
-				</div>
+				{# <div class="dialog-footer"></div> #}
 			</div>
 		</div>
 

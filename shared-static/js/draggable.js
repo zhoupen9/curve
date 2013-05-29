@@ -32,6 +32,8 @@
 		// create draggable.
 		createui: function () {
 			$.debug('creating draggable.');
+			// When draggable created, it needs to hook on document immediately.
+			// this.initui();
 		},
 
 		// clear document mouse event handlers.

@@ -110,6 +110,7 @@
 					if (instance) {
 						instance.init(that);
 					} else {
+						$.debug('call constructor for: ' + name + '.');
 						$.data(this, name, new constructor(that, options, this));
 					}
 				});
@@ -149,9 +150,6 @@
 			// save a reference to element's jquery object.
 			this.element = $(elem);
 
-			// create ui.
-			this.createui();
-
 			// If plugin extends ui has a show method, add it to callbacks.
 			if (this.show) {
 				callback = function () {
@@ -162,12 +160,15 @@
 				this.showCallbacks.add(callback);
 			}
 			// initialzie ui.
-			this.init(collection);
+			this.init(collection, true);
+
+			// create ui.
+			this.createui();
 		},
 
 		// Initialize ui.
 		// @param collection collection returned by jquery selectors.
-		init: function (collection) {
+		init: function (collection, create) {
 			var that = this;
 			// Hack into jquery to setup hooks.
 			this.origShow = collection.show;
@@ -179,7 +180,13 @@
 				}
 				return collection;
 			};
-			this.initui();
+			// Due to composite ui plugins will cause call on non existed method,
+			// here cancel initui() call until figure it out.
+			if (!create) {
+				this.initui();
+			} else {
+				this.initui();
+			}
 		},
 
 		destroy: function () {

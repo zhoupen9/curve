@@ -12,37 +12,50 @@
 			capture: true,
 		},
 
+		// If editor's delay met.
 		delayMet: false,
 
 		// key down timer.
 		timer: undefined,
 
+		// normalized content saver.
 		normalizer: undefined,
 
+		// typeahead for content.
 		typeahead: undefined,
 
+		// content display.
 		display: undefined,
 
 		createui: function () {
-			this.editor = this.element.find('.editor');
-			this.display = this.editor.children(":first");
-			this.normalizer = this.element.find('.editor-normalizer').children(":first");
+			this.display = this.element.children(':first');
+			// this.normalizer = this.element.parent().children('div.editor-normalizer').first();
+			this.normalizer = this.element.siblings('div.editor-normalizer').first();
+			$.debug('display:' + this.display.length + ', normalizer:' + this.normalizer.length);
+			// When editor created or activated, it need to register focus handler.
 		},
 
 		initui: function () {
-			// stub.
-			this.element.on('focus', this.focused);
-			this.element.focus();
+			var that = this;
+			this.keydownDelegate = function (event) {
+				return that.keydown(event);
+			};
+			this.keypressDelegate = function (event) {
+				return that.keypress(event);
+			};
+			this.keyupDelegate = function (event) {
+				return that.keyup(event);
+			};
+			this.element.on('keydown', this.keydownDelegate);
+			this.element.on('keypress', this.keypressDelegate);
+			this.element.on('keyup', this.keyupDelegate);
 		},
 
 		destroyui: function () {
 			// stub.
 		},
 
-		focused: function () {
-			this.element.on('keydown', this.keydown);
-			this.element.on('keypress', this.keypress);
-			this.element.on('keyup', this.keyup);
+		inputCharacter: function (ch) {
 		},
 
 		// Handle key down event.
@@ -56,26 +69,25 @@
 
 			if (event.key == 0x1b /* ESC */) {
 				// handle Escape
+				event.preventDefault();
 			}
 
-			var html = this.display.html();
-			html = html.concat(event.which);
-			this.display.html(html);
+			this.normalizer.children('div').first().html(event.which);
 
-			this.normalizer.html(html);
+			$.debug('editor key pressed.');
 		},
 
 		// Handle key down event.
 		keydown: function (event) {
 			var that = this;
-			if (!delayMet) {
+			if (!this.delayMet) {
 				setTimeout(function () {
 					that.delayMet = true;
 				}, this.delay);
 				return;
 			}
 			this.keypress(event);
-			event.preventDefault();
+			// event.preventDefault();
 		},
 
 		keyup: function (event) {
