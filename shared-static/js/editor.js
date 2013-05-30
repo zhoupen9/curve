@@ -2,6 +2,38 @@
 (function ($) {
 	// "user strict";
 
+	// Abstract template.
+	var Template = function (regexp) {
+		this.regexp = regexp;
+	};
+
+	// Template 
+	Template.prototype = {
+		// Test if given text matches template.
+		test: function (text) {
+			return this.regexp.test(text);
+		},
+		
+		apply: function (text) {
+			// return plain html.
+			return '<a href="' + text + '" + >' + text + '</a>';
+		}
+	};
+
+	// url template.
+	var UrlTemplate = function () {};
+
+	// Url template prototype.
+	UrlTemplate.prototype = {
+		// supported prototypes.
+		supportedPrototypes: ['http[s]', 'ftp', 'ssh', 'svn', 'git', 'mms', 'e2dk', 'thunder'],
+		
+		// url regular expression.
+		urlRegExp: new RegExp('/(' + supportedPrototypes.join('|') + '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/'),
+	};
+
+	$.extend(UrlTemplate.prototype, Template.prototype);
+
 	// register editor plugin.
 	$.curve.ui('editor', {
 		// editor options.
@@ -10,6 +42,11 @@
 			delay: 100,
 			// capture keyboard by default.
 			capture: true,
+		},
+
+		// templates.
+		templates: {
+			url: new UrlTemplate()
 		},
 
 		// If editor's delay met.
@@ -60,7 +97,11 @@
 
 		// Handle key down event.
 		keypress: function (event) {
+			// capture input by preventing event to bubble.
+			event.preventDefault();
+			
 			if (event.repeat) {
+				
 			}
 
 			if (event.altKey || event.ctrlKey || event.metaKey) {
@@ -71,6 +112,7 @@
 				// handle Escape
 				event.preventDefault();
 			}
+			
 
 			this.normalizer.children('div').first().html(event.which);
 
@@ -89,8 +131,17 @@
 			this.keypress(event);
 			// event.preventDefault();
 		},
-
+		
+		// handle key up, Check if text input contains any content matches any
+		// predefined templates. And apply matched templates to the content.
 		keyup: function (event) {
+			var tmpl, match, text;
+
+			text = this.element.html();
+
+			$.each(this.templates, function (prop, value) {
+				match = value.test();
+			});
 		}
 	});
 }($));
