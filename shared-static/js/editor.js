@@ -3,12 +3,24 @@
 	// "user strict";
 
 	// Abstract template.
-	var Template = function (regexp) {
+	var Template = function (regexp, triggerKeys) {
+		var that = this;
 		this.regexp = regexp;
-	};
+		this.triggerKeys = [];
+		if (triggerKeys && $.isArray(triggerKeys)) {
+			$.each(triggerKeys, function () {
+				that.triggerKeys.push(this);
+			});
+		}
+	}, 
+	// url template.
+	UrlTemplate = function () {};
 
 	// Template 
 	Template.prototype = {
+		trigger: function (key) {
+			
+		},
 		// Test if given text matches template.
 		test: function (text) {
 			return this.regexp.test(text);
@@ -20,8 +32,6 @@
 		}
 	};
 
-	// url template.
-	var UrlTemplate = function () {};
 
 	// Url template prototype.
 	UrlTemplate.prototype = {
@@ -29,7 +39,9 @@
 		supportedPrototypes: ['http[s]', 'ftp', 'ssh', 'svn', 'git', 'mms', 'e2dk', 'thunder'],
 		
 		// url regular expression.
-		urlRegExp: new RegExp('/(' + supportedPrototypes.join('|') + '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/'),
+		urlRegExp: function () {
+			return new RegExp('/(' + this.supportedPrototypes.join('|') + '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/');
+		}
 	};
 
 	$.extend(UrlTemplate.prototype, Template.prototype);
@@ -46,7 +58,6 @@
 
 		// templates.
 		templates: {
-			url: new UrlTemplate()
 		},
 
 		// If editor's delay met.
@@ -64,7 +75,10 @@
 		// content display.
 		display: undefined,
 
+		// Original
+
 		createui: function () {
+			this.templates['url'] = new UrlTemplate();
 			this.display = this.element.children(':first');
 			// this.normalizer = this.element.parent().children('div.editor-normalizer').first();
 			this.normalizer = this.element.siblings('div.editor-normalizer').first();
@@ -83,9 +97,13 @@
 			this.keyupDelegate = function (event) {
 				return that.keyup(event);
 			};
+			this.selectstartDelegate = function (event) {
+				return that.selectstart(event);
+			};
 			this.element.on('keydown', this.keydownDelegate);
 			this.element.on('keypress', this.keypressDelegate);
 			this.element.on('keyup', this.keyupDelegate);
+			// this.element.on('selectionchange', this.selectstartDelegate);
 		},
 
 		destroyui: function () {
@@ -97,8 +115,9 @@
 
 		// Handle key down event.
 		keypress: function (event) {
+			var range, clone;
 			// capture input by preventing event to bubble.
-			event.preventDefault();
+			// event.preventDefault();
 			
 			if (event.repeat) {
 				
@@ -108,15 +127,15 @@
 				// parse command.
 			}
 
-			if (event.key == 0x1b /* ESC */) {
+			if (event.key === this.keyCode.ESCAPE /* ESC */) {
 				// handle Escape
 				event.preventDefault();
 			}
-			
 
-			this.normalizer.children('div').first().html(event.which);
+			// if (event.
 
-			$.debug('editor key pressed.');
+			// this.normalizer.children('div').first().html(event.which);
+			// $.debug('editor key pressed.');
 		},
 
 		// Handle key down event.
@@ -135,13 +154,25 @@
 		// handle key up, Check if text input contains any content matches any
 		// predefined templates. And apply matched templates to the content.
 		keyup: function (event) {
-			var tmpl, match, text;
+			var tmpl, match, text, range;
 
-			text = this.element.html();
+			if (event.which === this.keyCode.DELETE || event.which === this.keyCode.BACKSPACE) {
+				// Handle delete.
+				range = window.getSelection().getRangeAt(0);
+				if (range) {
+					clone = range.cloneRange();
+					clone.selectNode(range.startContainer);
+					$.debug('result: ' + clone.toString());
+					var link = document.createElement('a');
+					link.href = 'example.com';
+					link.appendChild(document.createTextNode('Example'));
+					clone.insertNode(link);
+				}
+			}
 
-			$.each(this.templates, function (prop, value) {
-				match = value.test();
-			});
+			// $.each(this.templates, function (prop, value) {
+			// 	match = value.test();
+			// });
 		}
 	});
 }($));

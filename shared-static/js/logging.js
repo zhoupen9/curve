@@ -1,9 +1,11 @@
 
 // jquery logging plugin.
 (function ($) {
+	// "use strict";
+	
 	// Logging class.
-	var Logging = function (level) {
-		this.level = level;
+	var log, Logging = function (level) {
+		this.level = this.levels[level];
 	};
 
 	// Logging prototype.
@@ -87,7 +89,7 @@
 	Logging.prototype.level = Logging.prototype.levels.debug;
 	
 	// local logger.
-	var log = new Logging();
+	log = new Logging($.curve ? $.curve.setting('logging').level : 'debug');
 
 	// register all logging methods to jquery.
 	$.each(['debug', 'info', 'warn', 'error'], function (index, value) {

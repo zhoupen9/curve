@@ -149,6 +149,9 @@
 			var that = this, callback;
 			// save a reference to element's jquery object.
 			this.element = $(elem);
+			
+			// create ui.
+			this.createui();
 
 			// If plugin extends ui has a show method, add it to callbacks.
 			if (this.show) {
@@ -161,9 +164,6 @@
 			}
 			// initialzie ui.
 			this.init(collection, true);
-
-			// create ui.
-			this.createui();
 		},
 
 		// Initialize ui.
@@ -194,7 +194,7 @@
 		}
 	});
 
-	$.extend(UI, {
+	$.extend(UI.prototype, {
 		keyCode: {
 			BACKSPACE: 8,
 			COMMA: 188,
@@ -224,7 +224,7 @@
 	// declare curve object.
 	var Curve = function () {
 		this.settings = {
-			debug: true
+			debug: false
 		};
 	};
 
@@ -232,6 +232,9 @@
 	Curve.prototype = {
 		// settings.
 		options: {
+			logging: {
+				level: 'debug'
+			}
 		},
 
 		plugins: [],
@@ -273,7 +276,7 @@
 		// apply Plugin.plugin(name, new Plugin() /* which is default. */, proto).
 		plugin: function (name, proto) {
 			var plugin = new Plugin();
-			$.debugg('Register plugin: ; + name');
+			$.debugg('Register plugin: ' + name + '.');
 			plugin.plugin(name, proto);
 			this.plugins.push(plugin);
 		},

@@ -94,7 +94,7 @@
 		},
 
 		keydown: function (event) {
-			if (event.which === 0x1b /* ESC */) {
+			if (event.which === this.keyCode.ESCAPE) {
 				this.close();
 				$.debug('ESC close dialog.');
 			}

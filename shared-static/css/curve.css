@@ -41,6 +41,10 @@ button {
 	margin: 0;
 }
 
+button:disabled {
+	border-color: #ccc;
+}
+
 i, .icon {
 	display: inline-block;
 	vertical-align: text-top;
