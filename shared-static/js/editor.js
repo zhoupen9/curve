@@ -7,6 +7,9 @@
 	Template = function () {},
 	// url template.
 	UrlTemplate = function () {},
+	// '@' template.
+	AtTemplate = function () {},
+	// '#' list
 
 	Clickable = function () {};
 
@@ -19,33 +22,45 @@
 			link: 'link'
 		},
 
+		// Create html node according to protocol and user data.
 		output: function (protocol, data) {
-			var html;
+			var node;
 			switch (protocol) {
 			case this.protocols.at:
 				// output a link to user dialog.
-				html = '<a data-user="' + data + '">' + data + '</a>';
+				node = document.createElement('a');
+				node.setAttribute('data-user', data);
+				node.appendChild(document.createTextNode(data));
 				break;
 			case this.protocols.hashTag:
 				// output a link to user dialog.
-				html = '<a data-user="' + data + '">' + data + '</a>';
+				node = document.createElement('a');
+				node.setAttribute('data-user', data);
+				node.appendChild(document.createTextNode(data));
 				break;
 			case this.protocols.tag:
 				// output a link to tag module.
-				html = '<a href="/tag/' + data + '">' + data + '</a>';
+				node = document.createElement('a');
+				node.setAttribute('href', '/tag/' + data);
+				node.appendChild(document.createTextNode(data));
 				break;
 			case this.protocols.list:
 				// output a link to list module.
-				html = '<a href="/list/' + data + '">' + data + '</a>';
+				node = document.createElement('a');
+				node.setAttribute('href', '/list/' + data);
+				node.appendChild(document.createTextNode(data));
 				break;
 			case this.protocols.link:
 				// output a regular link.
-				html = '<a href="' + data + '">' + data + '</a>';
+				node = document.createElement('a');
+				node.setAttribute('href', data);
+				node.appendChild(document.createTextNode(data));
 				break;
 			default:
+				node = document.createTextNode(data);
 				break;
 			}
-			return html;
+			return node;
 		}
 	};
 
@@ -86,8 +101,10 @@
 	// Url template prototype.
 	// Url template replaces supported format from plain text to a html link.
 	UrlTemplate.prototype = $.extend({}, Template.prototype, {
+		// default url clickable.
 		clickable: 'link',
 
+		// default trigger keys.
 		triggerKeys: [
 			// BACKSPACE
 			8,
@@ -96,6 +113,14 @@
 			// DELETE
 			46,
 		],
+
+		// eliminate whitespace.
+		createTextNode: function (text) {
+			if (text && text === ' ') {
+				text = '&nbsp;';
+			}
+			return document.createTextNode(text);
+		},
 
 		// supported prototypes.
 		supportedProtocols: ['http[s]', 'ftp', 'ssh', 'svn', 'git', 'mms', 'e2dk', 'thunder'],
@@ -108,20 +133,22 @@
 		},
 
 		// Apply template to text and return replaced text.
-		apply: function (range) {
-			var text =range.toString(), clickable, match = this.regexp.exec(text), matched, index, nodes = [];
+		apply: function (text) {
+			var node, clickable, match = this.regexp.exec(text), matched, index, nodes = [];
 			if (!match) {
 				return;
 			}
 			matched = match[0];
 			index = text.indexOf(matched);
 			if (index > 0) {
-				nodes.push(document.createTextNode(text.substring(0, index)));
+				node = this.createTextNode(text.substring(0, index));
+				nodes.push(node);
 			}
 			clickable = new Clickable();
 			nodes.push(clickable.output(this.clickable, matched));
 			if (index + matched.length < text.length) {
-				nodes.push(document.createTextNode(text.substring(index + matched.length, text.length - 1)));
+				node = this.createTextNode(text.substring(index + matched.length, text.length));
+				nodes.push(node);
 			}
 			return nodes;
 		}
@@ -235,28 +262,49 @@
 		// handle key up, Check if text input contains any content matches any
 		// predefined templates. And apply matched templates to the content.
 		keyup: function (event) {
-			var that = this, text, range, key = event.which;
+			var that = this, selection, nodes, range, edit, tmpl, key = event.which;
 
 			if (key === this.keyCode.DELETE || key === this.keyCode.BACKSPACE) {
 			}
 
 			if (this.templateKeys.indexOf(key) != -1) {
-				range = window.getSelection().getRangeAt(0);
+				selection = window.getSelection();
+				range = selection.getRangeAt(0);
 				if (!range) {
 					return;
 				}
-				clone = range.cloneRange();
-				clone.selectNode(range.startContainer);
-				text = clone.toString();
+				edit = range.cloneRange();
+				edit.selectNode(range.startContainer);
+				text = edit.toString();
 
 				$.each(this.templates, function (prop, template) {
 					if (template.test(key, text)) {
-						clone.deleteContents();
-						text = template.apply(text);
-						var ins = document.createTextNode(text);
-						clone.insertNode(ins);
-						// $(range.startContainer).html(text);
-						// range.startContainer.innerHTML = text;
+						// clone a tmplate range to apply.
+						tmpl = range.cloneRange();
+						tmpl.selectNode(range.startContainer);
+						nodes = template.apply(tmpl.toString()).reverse();
+
+						// delete original content selected by edit.
+						edit.deleteContents();
+
+						// insert template results.
+						$.each(nodes, function () {
+							tmpl.insertNode(this);
+						});
+
+						// move cursor to content end position.
+						// edit = document.createRange();
+						// range.setStart(selection.anchorNode, selection.anchorOffset);
+						// range.setEnd(selection.focusNode, selection.focusOffset);
+						// tmpl.selectNode(nodes[0]);
+						if (selection.removeAllRanges) {
+							selection.removeAllRanges();
+						} else if (selection.empty) {
+							selection.empty();
+						}
+						tmpl.collapse(false);
+						selection.addRange(tmpl);
+						// selection.collapse();
 					}
 				});
 			}

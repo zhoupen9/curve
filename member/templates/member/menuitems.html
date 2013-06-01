@@ -1,0 +1,14 @@
+<ol class="dropdown-menu">
+	{% for member in members %}
+	<li class="current-user" data-name="profile">
+		<div class="account-group">
+			<img class="avatar size48" src="/media/profiles/{{ post.member.photo }}" alt="{{ post.member.username }}"></img>
+			{% else %}
+			<img class="avatar size48" src="/media/profiles/default-photo.jpeg" alt="{{ post.member.username }}"></img>
+			{% endif %}
+			<small class="metadata">@{{ member.username }}</small>
+			<b class="fullname">ZhouP3ng</b>
+		</div>
+	</li>
+	{% endfor %}
+</ol>

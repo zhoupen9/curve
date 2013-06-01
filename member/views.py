@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 from member.models import Member
 
@@ -56,6 +57,7 @@ def checkNull(obj):
     """
     return obj is not None and type(obj) == str and obj.strip() or None
 
-
-
-
+@login_required
+def mostActive(request):
+    actives = Member.objects.all()[:5];
+    return render(request, 'member/menuitems.html', { 'members': actives });
