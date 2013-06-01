@@ -5,9 +5,11 @@
 	// "use strict";
 
 	// Base plugin.
+	// Plugin is an abstraction for dynmatically add/modify/remove functionalities.
 	var Plugin = function () {};
 
 	// Define Plugin prototype.
+	// All sub plugins will inherite this prototype as default features.
 	Plugin.prototype = {
 		// plugin name.
 		name: 'plugin',
@@ -41,7 +43,7 @@
 		// @param base base plugin type or base plugin object.
 		// @param proto plugin prototype.
 		plugin: function (name, base, proto) {
-			var constructor, proxyPrototype = {}, fullname, namespace, array;
+			var Constructor, proxyPrototype = {}, fullname, namespace, array;
 			if (!name || typeof name !== 'string' || name.trim() === '') {
 				return $.error("Plugin must declare a name(string).");
 			}
@@ -56,7 +58,8 @@
 				return !!$.data(elem, fullname);
 			}
 
-			// support two parameters. In this case, created plugin has a
+			// support two parameters.
+			// If caller only provides two parameters, created plugin has a
 			// default parent which is Plugin.
 			if (!proto) {
 				proto = base;
@@ -73,13 +76,19 @@
 			// @param collection collection returned by jquery selectors.
 			// @param plugin user options.
 			// @param elem jquery element.
-			constructor = function (collection, options, elem) {
+			Constructor = function (collection, options, elem) {
 				if (!this.create) {
 					return new constructor(collection, options, elem);
 				}
 				// ensure constructor called with arguments.
 				if (arguments.length) {
-					$.extend(this, options);
+					// When creating plugin, if options were set, instead of modify on prototype's
+					// options, simplely attach those options to the instance, so options will
+					// only apply to the instance.
+					$.extend(this.options, options);
+					// call abstract create method.
+					// if plugin does not implements abstract methods defined in Plugin.prototype,
+					// it will invoke the default methods, and do nothing.
 					this.create(collection, elem);
 				}
 			};
@@ -97,7 +106,7 @@
 			});
 
 			// create construtor's prototype using proxy prototype.
-			constructor.prototype = $.extend({}, base, proxyPrototype);
+			Constructor.prototype = $.extend({}, base, proxyPrototype);
 
 			// create bridge to jquery, because Jquery('selector') always return a collection,
 			// plugin system need to hack into this collection to create hooks, so here pass this
@@ -111,7 +120,7 @@
 						instance.init(that);
 					} else {
 						$.debug('call constructor for: ' + name + '.');
-						$.data(this, name, new constructor(that, options, this));
+						$.data(this, name, new Constructor(that, options, this));
 					}
 				});
 				return that;
@@ -119,19 +128,15 @@
 		}
 	}
 
-	// define ui in jquery.
+	// UI base plugin.
+	// UI is declared from within an announymous function, so that it can NOT be accessed
+	// directly outside of this function scope.	
 	var UI = function () {};
 
 	// extends from base, Plugin.
 	UI.prototype = $.extend({}, Plugin.prototype, {
-		// ui's optins.
-		options: {},
-
 		// plugin namespace.
 		namespace: 'ui',
-
-		// ui's jquery object.
-		element: undefined,
 
 		// Create ui.
 		createui: $.noop,
@@ -147,7 +152,7 @@
 		// Create ui.
 		create: function (collection, elem) {
 			var that = this, callback;
-			// save a reference to element's jquery object.
+			// introduce a reference to element's jquery object.
 			this.element = $(elem);
 			
 			// create ui.
@@ -163,12 +168,12 @@
 				this.showCallbacks.add(callback);
 			}
 			// initialzie ui.
-			this.init(collection, true);
+			this.init(collection);
 		},
 
 		// Initialize ui.
 		// @param collection collection returned by jquery selectors.
-		init: function (collection, create) {
+		init: function (collection) {
 			var that = this;
 			// Hack into jquery to setup hooks.
 			this.origShow = collection.show;
@@ -182,11 +187,7 @@
 			};
 			// Due to composite ui plugins will cause call on non existed method,
 			// here cancel initui() call until figure it out.
-			if (!create) {
-				this.initui();
-			} else {
-				this.initui();
-			}
+			this.initui();
 		},
 
 		destroy: function () {
@@ -194,6 +195,7 @@
 		}
 	});
 
+	// Define frequntly used keys.
 	$.extend(UI.prototype, {
 		keyCode: {
 			BACKSPACE: 8,
@@ -237,8 +239,10 @@
 			}
 		},
 
+		// all managed plugins.
 		plugins: [],
 
+		// all managed UIs.
 		uis: [],
 
 		// update settings.

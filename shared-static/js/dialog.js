@@ -15,11 +15,10 @@
 		// dialog overlay class name.
 		overlayCls: 'modal-overlay',
 
-		// default behavior.
-		modal: true,
-
 		// default dialog options.
 		options: {
+			// default behavior.
+			modal: true,
 			// default keyboard behavior.
 			captureKeys: true,
 			// default editor class name.
@@ -72,7 +71,7 @@
 				this.editor = editor.editor();
 			}
 
-			if (this.modal) {
+			if (this.options.modal) {
 				this.overlay = $('.'.concat(this.overlayCls));
 			}
 		},

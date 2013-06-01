@@ -30,10 +30,10 @@
 			}
 		},
 
-		// default format.
+		// Provide a default format.
 		format: '',
 
-		// default logger, console.
+		// by default all logging instances use this shared logger, console.
 		logger: console,
 
 		// check if given level is loggable according to this log's level.
@@ -94,7 +94,8 @@
 	// register all logging methods to jquery.
 	$.each(['debug', 'info', 'warn', 'error'], function (index, value) {
 		var origFn = $[value], fn = {};
-		
+
+		// extends jquery to plugin logging funcilities.
 		fn[value] = function (message) {
 			var ret = log[value] && log[value].apply(log, arguments);
 			return (origFn && origFn.apply(this, arguments)) || ret;

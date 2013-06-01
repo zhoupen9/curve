@@ -22,7 +22,7 @@
 		<script type="text/javascript">
 			$(document).ready(function () {
 				$('#global-post-btn').click(function (e) {
-					$('#post-dlg').dialog().draggable().show();
+					$('#post-dlg').dialog({ modal: false}).draggable().show();
 				});
 
 				$('#messages-menu').click(function (e) {

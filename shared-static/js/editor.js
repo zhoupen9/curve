@@ -3,48 +3,129 @@
 	// "user strict";
 
 	// Abstract template.
-	var Template = function (regexp, triggerKeys) {
-		var that = this;
-		this.regexp = regexp;
-		this.triggerKeys = [];
-		if (triggerKeys && $.isArray(triggerKeys)) {
-			$.each(triggerKeys, function () {
-				that.triggerKeys.push(this);
-			});
-		}
-	}, 
+	var
+	Template = function () {},
 	// url template.
-	UrlTemplate = function () {};
+	UrlTemplate = function () {},
 
-	// Template 
-	Template.prototype = {
-		trigger: function (key) {
-			
+	Clickable = function () {};
+
+	Clickable.prototype = {
+		protocols: {
+			at: '@',
+			hashTag: '#',
+			tag: '#',
+			list: '#',
+			link: 'link'
 		},
-		// Test if given text matches template.
-		test: function (text) {
-			return this.regexp.test(text);
-		},
-		
-		apply: function (text) {
-			// return plain html.
-			return '<a href="' + text + '" + >' + text + '</a>';
+
+		output: function (protocol, data) {
+			var html;
+			switch (protocol) {
+			case this.protocols.at:
+				// output a link to user dialog.
+				html = '<a data-user="' + data + '">' + data + '</a>';
+				break;
+			case this.protocols.hashTag:
+				// output a link to user dialog.
+				html = '<a data-user="' + data + '">' + data + '</a>';
+				break;
+			case this.protocols.tag:
+				// output a link to tag module.
+				html = '<a href="/tag/' + data + '">' + data + '</a>';
+				break;
+			case this.protocols.list:
+				// output a link to list module.
+				html = '<a href="/list/' + data + '">' + data + '</a>';
+				break;
+			case this.protocols.link:
+				// output a regular link.
+				html = '<a href="' + data + '">' + data + '</a>';
+				break;
+			default:
+				break;
+			}
+			return html;
 		}
 	};
 
+	// Template
+	Template.prototype = {
+		// All templates' type.
+		type: 'template',
+
+		// create template.
+		_create: function (regexp, triggerKeys) {
+			var that = this;
+			this.regexp = regexp;
+			this.triggerKeys = [];
+			if (triggerKeys && $.isArray(triggerKeys)) {
+				$.each(triggerKeys, function () {
+					that.triggerKeys.push(this);
+				});
+			}
+			return this;
+		},
+
+		// Test if given text matches template.
+		test: function (key, text) {
+			var test = this.regexp.test(text);
+			return test;//this.triggerKeys.indexOf(key) != -1 &&	this.regexp.test(text);
+		},
+
+		// create template.
+		create: $.noop,
+
+		// initialize template.
+		init: $.noop,
+
+		// apply template to text.
+		apply: $.noop
+	};
 
 	// Url template prototype.
-	UrlTemplate.prototype = {
-		// supported prototypes.
-		supportedPrototypes: ['http[s]', 'ftp', 'ssh', 'svn', 'git', 'mms', 'e2dk', 'thunder'],
-		
-		// url regular expression.
-		urlRegExp: function () {
-			return new RegExp('/(' + this.supportedPrototypes.join('|') + '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/');
-		}
-	};
+	// Url template replaces supported format from plain text to a html link.
+	UrlTemplate.prototype = $.extend({}, Template.prototype, {
+		clickable: 'link',
 
-	$.extend(UrlTemplate.prototype, Template.prototype);
+		triggerKeys: [
+			// BACKSPACE
+			8,
+			// WHITESPCE
+			32,
+			// DELETE
+			46,
+		],
+
+		// supported prototypes.
+		supportedProtocols: ['http[s]', 'ftp', 'ssh', 'svn', 'git', 'mms', 'e2dk', 'thunder'],
+
+		// create template.
+		create: function () {
+			// var regexp = new RegExp('/(' + this.supportedProtocols.join('|') + ')(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/');
+			var regexp = new RegExp('((' + this.supportedProtocols.join('|') + '):\/\/)?(?:\\w+:\\w+@)?((?:[\\w]+)(?:\\.[\\w-]+)+)(:[0-9]+)?(\\/[\\w#!:.?+=&%@!\\-\\/]+)');
+			return this._create(regexp, this.triggerKeys);
+		},
+
+		// Apply template to text and return replaced text.
+		apply: function (range) {
+			var text =range.toString(), clickable, match = this.regexp.exec(text), matched, index, nodes = [];
+			if (!match) {
+				return;
+			}
+			matched = match[0];
+			index = text.indexOf(matched);
+			if (index > 0) {
+				nodes.push(document.createTextNode(text.substring(0, index)));
+			}
+			clickable = new Clickable();
+			nodes.push(clickable.output(this.clickable, matched));
+			if (index + matched.length < text.length) {
+				nodes.push(document.createTextNode(text.substring(index + matched.length, text.length - 1)));
+			}
+			return nodes;
+		}
+	});
 
 	// register editor plugin.
 	$.curve.ui('editor', {
@@ -75,10 +156,10 @@
 		// content display.
 		display: undefined,
 
-		// Original
+		templateKeys: [ '@', 8, 32, 46 ],
 
 		createui: function () {
-			this.templates['url'] = new UrlTemplate();
+			this.templates['url'] = new UrlTemplate().create();
 			this.display = this.element.children(':first');
 			// this.normalizer = this.element.parent().children('div.editor-normalizer').first();
 			this.normalizer = this.element.siblings('div.editor-normalizer').first();
@@ -118,9 +199,9 @@
 			var range, clone;
 			// capture input by preventing event to bubble.
 			// event.preventDefault();
-			
+
 			if (event.repeat) {
-				
+
 			}
 
 			if (event.altKey || event.ctrlKey || event.metaKey) {
@@ -150,29 +231,35 @@
 			this.keypress(event);
 			// event.preventDefault();
 		},
-		
+
 		// handle key up, Check if text input contains any content matches any
 		// predefined templates. And apply matched templates to the content.
 		keyup: function (event) {
-			var tmpl, match, text, range;
+			var that = this, text, range, key = event.which;
 
-			if (event.which === this.keyCode.DELETE || event.which === this.keyCode.BACKSPACE) {
-				// Handle delete.
-				range = window.getSelection().getRangeAt(0);
-				if (range) {
-					clone = range.cloneRange();
-					clone.selectNode(range.startContainer);
-					$.debug('result: ' + clone.toString());
-					var link = document.createElement('a');
-					link.href = 'example.com';
-					link.appendChild(document.createTextNode('Example'));
-					clone.insertNode(link);
-				}
+			if (key === this.keyCode.DELETE || key === this.keyCode.BACKSPACE) {
 			}
 
-			// $.each(this.templates, function (prop, value) {
-			// 	match = value.test();
-			// });
+			if (this.templateKeys.indexOf(key) != -1) {
+				range = window.getSelection().getRangeAt(0);
+				if (!range) {
+					return;
+				}
+				clone = range.cloneRange();
+				clone.selectNode(range.startContainer);
+				text = clone.toString();
+
+				$.each(this.templates, function (prop, template) {
+					if (template.test(key, text)) {
+						clone.deleteContents();
+						text = template.apply(text);
+						var ins = document.createTextNode(text);
+						clone.insertNode(ins);
+						// $(range.startContainer).html(text);
+						// range.startContainer.innerHTML = text;
+					}
+				});
+			}
 		}
 	});
 }($));

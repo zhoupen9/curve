@@ -3,24 +3,65 @@
 
 (function ($) {
 	// "use strict";
+
+	// Helper to record element's start drag point and position element to new position.
+	var Helper = function (elem, delay, distance) {
+		var that = this;
+		this.element = elem;
+		this.delay = delay;
+		this.distance = distance;
+		this.delayMet = false;
+		if (delay) {
+			window.setTimeout(function () {
+				that.delayMet = true;
+			}, delay);
+		}
+	};
+
+	// Helper prototype.
+	Helper.prototype = {
+		met: function (event) {
+			return this.delayMet && this.distanceMet(event);
+		},
+		
+		// Check if distance met.
+		distanceMet: function (event) {
+			if (this.lastX == undefined || this.lastY == undefined) {
+				return true;
+			}
+			return this.distance && (Math.abs(this.lastX - event.pageX) + Math.abs(this.lastY - event.pageY)) > this.distance;
+		},
+
+		// Postion target element according to current dragging position.
+		position: function (event) {
+			var x, y;
+			if (!this.met(event)) {
+				return false;
+			}
+
+			x = event.pageX - this.offsetX, y = event.pageY - this.offsetY;
+			this.element.css({"left": x + "px", "top": y + "px"});
+			this.lastX = event.pageX;
+			this.lastY = event.pageY;
+			this.update(event);
+			
+			return true;
+		},
+
+		// Update helper.
+		update: function (event) {
+			this.offsetX = event.pageX - this.element.offset().left;
+			this.offsetY = event.pageY - this.element.offset().top;
+			this.lastX = this.startX = event.pageX;
+			this.lastY = this.startY = event.pageY;
+		}
+	};
 	
 	$.curve.ui('draggable', {
 		// plugin name.
 		name: 'draggable',
 		
-		// original document mousedown handler.
-		orig: undefined,
-
-		// dragging
-		dragging: false,
-
-		// if drag delay met.
-		delayMet: true,
-
-		// if drag minium disttance met.
-		distanceMet: true,
-
-		// draggable class name.
+		// defaultdraggable class name.
 		dragCls: 'dialog-header',
 		
 		// Default options.
@@ -32,8 +73,16 @@
 		// create draggable.
 		createui: function () {
 			$.debug('creating draggable.');
-			// When draggable created, it needs to hook on document immediately.
-			// this.initui();
+			// introduce attribute to record original document mousedown handler.
+			this.orig = undefined;
+			// record if instance is been dragging.
+			this.dragging = false;
+			// if drag delay met.
+			this.delayMet = true;
+			// if drag minium disttance met.
+			this.distanceMet = true;
+			// create helper.
+			this.helper = new Helper(this.element, this.options.delay, this.options.distance);
 		},
 
 		// clear document mouse event handlers.
@@ -55,6 +104,9 @@
 		destroyui: function () {
 			this.element.off('.' + this.name);
 			this.clearbindings();
+			if (this.helper) {
+				delete this.helper;
+			}
 		},
 		
 		// Handle mouse down event.
@@ -63,20 +115,16 @@
 		// @param e mouse event.	 
 		handleMouseDown: function (e) {
 			var that = this;
-			if (!this.delayMet) {
+
+			if (!this.helper.met(e)) {
 				return;
-			}
-			if (this.options.delay) {
-				setTimeout(function () {
-					that.delayMet = true;
-				}, this.options.delay);
 			}
 
 			// binding mouse events of document for mouse move and up.
-			this.mousemoveDelegate = function (e) {
+			this.mousemoveDelegate = this.mousemoveDelegate || function (e) {
 				return that.handleMouseMove(e);
 			};
-			this.mouseupDelegate = function (e) {
+			this.mouseupDelegate = this.mouseupDelegate || function (e) {
 				return that.handleMouseUp(e);
 			};
 			$(document).on('mousemove.' + this.name, this.mousemoveDelegate);
@@ -84,11 +132,7 @@
 			// update dragging to true.
 			this.dragging = true;
 			// record current position.
-			this.offsetX = e.pageX - this.element.offset().left;
-			this.offsetY =	e.pageY - this.element.offset().top;
-			this.lastX = this.startX = e.pageX;
-			this.lastY = this.startY = e.pageY;
-
+			this.helper.update(event);
 			$.debug('mouse down on draggable.');
 
 			e.preventDefault();
@@ -101,19 +145,7 @@
 		handleMouseMove: function (e) {
 			var x, y;
 			if (this.dragging) {
-				if (!this.delayMet || !this.distanceMet) {
-					return;
-				}
-				if (this.options.distance) {
-					if ((Math.abs(this.lastX - e.pageX) + Math.abs(this.lastY - e.pageY)) < this.options.distance) {
-						return e.preventDefault();
-					}
-				}
-				x = e.pageX - this.offsetX;
-				y = e.pageY - this.offsetY;
-				this.element.css({"left": x + "px", "top": y + "px"});
-				this.lastX = e.pageX;
-				this.lastY = e.pageY;
+				this.helper.position(e);
 				return e.preventDefault();
 			}
 			$.warn('mouse moving while drag not active.');
