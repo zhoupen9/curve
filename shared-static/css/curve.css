@@ -11,7 +11,7 @@ body {
 	/*background-repeat: repeat;*/
 	background-repeat: no-repeat;
 	background-color: #C0DEED;
-	overflow-y: scroll;
+	overflow-y: auto;
 	font-size: 14px;
 	line-height: 18px;
 	color: #333;

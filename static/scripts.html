@@ -7,7 +7,7 @@
 				height: 100px;
 				width: 600px;
 				background-color: #242424;
-				display: none;
+				display: block;
 				margin: 10px 10px;
 			}
 		</style>
@@ -17,39 +17,7 @@
 	<body>
 		<script type="text/javascript">
 		$(document).ready(function () {
-			var sp = ['http[s]', 'ftp', 'ssh', 'svn', 'git', 'mms', 'e2dk', 'thunder'];
-			var regexp = new RegExp('((' + sp.join('|') + '):\/\/)?(?:\\w+:\\w+@)?((?:[\\w]+)(?:\\.[\\w-]+)+)(:[0-9]+)?(\\/[\\w#!:.?+=&%@!\\-\\/]+)');
-			$.debug(regexp);
-			$.debug('----------------------------------');
-			$.debug(regexp.exec('a d1.a.b.c/a a'));
-			$.debug(regexp.exec('a.'));
-			$.debug(regexp.exec('.b'));
-			$.debug('----------------------------------');
-			var tests = {
-				www: "http://www.example .com:8080/home",
-				ftp: "link ftp://zhoup:s3cr3t@prefix.ftp.com:9001/home/zhoup check",
-				text: "The quick brown fox jumps over a lazy dog."
-			},
-			r = /(?:\w+:\/\/)?(?:\w+:\w+@)?((?:[\w-]+)(?:\.[\w-]+)+)(:[0-9]+)?(\/[\w#!:.?+=&%@!\-\/]+)/,
-			// reg = /(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/g,
-			i, match,
-			fields = [/*'matched', 'protocol', */'userinfo', 'site', 'port', 'path']
-
 			$('#test-btn').click(function () {
-				$.each(tests, function () {
-					match = r.test(this);
-					if (match) {
-						match = r.exec(this);
-						$.each(match, function (index, value) {
-							if ($.isNumeric(index)) {
-								var i = parseInt(index);
-								$.debug(fields[i] + ': ' + value);
-							} else {
-								$.debug(i + '--> ' + value);
-							}
-						});
-					}
-				});
 			});
 		});
 		</script>
@@ -57,9 +25,15 @@
 		<div>
 			<input id="test-btn" class="foo bar" type="button" value="Test"></input>
 			<div id="demo" class="demo-div">
+				<textarea id="text1"></textarea>
 			</div>
 
 			<div id="demo2" class="demo-div">
+				<textarea id="text2"></textarea>
+			</div>
+
+			<div id="demo3" class="demo-div" contenteditable="true">
+				<textarea id="text3"></textarea>
 			</div>
 		</div>
 	</body>

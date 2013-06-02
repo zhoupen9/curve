@@ -9,14 +9,34 @@ import logging
 
 logger = logging.getLogger('curve')
 
+def poststr(request, name):
+    """
+    Get a string from request POST if exists.
+    If give name is none or not a string or an empty string, None will return.
+    If there's no value stored in request.POST, None will return.
+    If value stored in request.POST is not a string, a string converted by that
+    value will return.
+    """
+    if name is not None and type(name) == str and name.strip() != '' and name in request.POST:
+        value = request.POST[name]
+        if type(value) != str:
+            value = str(value)
+        return value
+    return None
+
 @require_http_methods(['POST'])
 def register(request):
     """
     Register a new member.
+    When register a new member, if given fullname or email already in use,
+    register will be redirected to welcome page and display an alert to notify
+    that given name or email already taken.
+    If fullname and email is available, create a django user, and an associated
+    member, and then redirect new registered member to home page.
     """
-    fullname = checkNull(request.POST['fullname'])
-    email = checkNull(request.POST['email'])
-    password = checkNull(request.POST['password'])
+    fullname = checkNull(poststr(request, 'fullname'))
+    email = checkNull(poststr(request, 'email'))
+    password = checkNull(poststr(request, 'password'))
 
     # Ensure required fields are all non-empty.
     for name, value in { 'Name': fullname, 'Email': email, 'Password': password }.items():

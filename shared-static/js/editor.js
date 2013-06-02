@@ -162,7 +162,7 @@
 		// editor options.
 		options: {
 			// key down repeat delay, default 100 miliseconds.
-			delay: 100,
+			delay: 3000,
 			// capture keyboard by default.
 			capture: true,
 		},
@@ -171,27 +171,13 @@
 		templates: {
 		},
 
-		// If editor's delay met.
-		delayMet: false,
-
-		// key down timer.
-		timer: undefined,
-
-		// normalized content saver.
-		normalizer: undefined,
-
-		// typeahead for content.
-		typeahead: undefined,
-
-		// content display.
-		display: undefined,
-
 		// create dialog UI.
 		createui: function () {
 			this.templates['url'] = new UrlTemplate().create();
-			this.display = this.element.children(':first');
+			// textarea to record input content and prepare for submit.
+			this.content = this.element.parent().children('textarea');
+			// normalized content saver.
 			this.normalizer = this.element.siblings('div.editor-normalizer').first();
-			$.debug('display:' + this.display.length + ', normalizer:' + this.normalizer.length);
 		},
 
 		// initialize dialog UI.
@@ -209,9 +195,13 @@
 			this.selectstartDelegate = function (event) {
 				return that.selectstart(event);
 			};
-			this.element.on('keydown', this.keydownDelegate);
-			this.element.on('keypress', this.keypressDelegate);
-			this.element.on('keyup', this.keyupDelegate);
+			this.inputDelegate = function (event) {
+				return that.input(event);
+			};
+			// this.element.on('keydown', this.keydownDelegate);
+			// this.element.on('keypress', this.keypressDelegate);
+			// this.element.on('keyup', this.keyupDelegate);
+			this.element.on('input', this.inputDelegate);
 		},
 
 		destroyui: function () {
@@ -219,6 +209,21 @@
 		},
 
 		inputCharacter: function (ch) {
+			
+		},
+
+		// handle contenteditable input event.
+		input: function (event) {
+			var elem = event.target;
+			if (!this.element.children().length) {
+				// This little trick will ensure user's editing will be from within a '<div>' element.
+				$('<div><br/></div>').appendTo(this.element);
+				return;
+			}
+			// parse all div inside editor.
+			this.element.children('div').each(function () {
+				
+			});
 		},
 
 		// Handle key down event.
@@ -245,60 +250,63 @@
 
 		// Handle key down event.
 		keydown: function (event) {
-			var that = this;
-			if (!this.delayMet) {
-				setTimeout(function () {
-					that.delayMet = true;
-				}, this.delay);
-				return;
-			}
-			this.keypress(event);
-			// event.preventDefault();
+			var that = this, key = event.which,
+			text = this.content.html();
+
+			this.element.children().each(function () {
+				var nodes = this.childNodes();
+				if (nodes && nodes.length) {
+					$.each(nodes, function () {
+						$.debug(this.nodeValue);
+					});
+				}
+				// $.debug('child: ' + this.get);
+			});
 		},
 
 		// handle key up, Check if text input contains any content matches any
 		// predefined templates. And apply matched templates to the content.
 		keyup: function (event) {
-			var that = this, nodes, tmpl,
-			selection = window.getSelection(),
-			range = selection.getRangeAt(0),
-			edit = range.cloneRange();
+			// var that = this, nodes, tmpl,
+			// selection = window.getSelection(),
+			// range = selection.getRangeAt(0),
+			// edit = range.cloneRange();
 			
-			if (!range) {
-				return;
-			}
+			// if (!range) {
+			// 	return;
+			// }
 
 			
-			edit = range.cloneRange();
-			edit.selectNode(range.startContainer);
-			text = edit.toString();
+			// edit = range.cloneRange();
+			// edit.selectNode(range.startContainer);
+			// text = edit.toString();
 
-			$.each(this.templates, function (prop, template) {
-				if (template.test(text)) {
-					// clone a tmplate range to apply.
-					tmpl = range.cloneRange();
-					tmpl.selectNode(range.startContainer);
-					nodes = template.apply(tmpl.toString()).reverse();
+			// $.each(this.templates, function (prop, template) {
+			// 	if (template.test(text)) {
+			// 		// clone a tmplate range to apply.
+			// 		tmpl = range.cloneRange();
+			// 		tmpl.selectNode(range.startContainer);
+			// 		nodes = template.apply(tmpl.toString()).reverse();
 
-					// delete original content selected by edit.
-					edit.deleteContents();
+			// 		// delete original content selected by edit.
+			// 		edit.deleteContents();
 
-					// insert template results.
-					$.each(nodes, function () {
-						tmpl.insertNode(this);
-					});
+			// 		// insert template results.
+			// 		$.each(nodes, function () {
+			// 			tmpl.insertNode(this);
+			// 		});
 
-					// move cursor to content end position.
-					if (selection.removeAllRanges) {
-						selection.removeAllRanges();
-					} else if (selection.empty) {
-						selection.empty();
-					}
-					// collapse range to set cursor at end of ange.
-					tmpl.collapse(false);
-					selection.addRange(tmpl);
-				}
-			});
+			// 		// move cursor to content end position.
+			// 		if (selection.removeAllRanges) {
+			// 			selection.removeAllRanges();
+			// 		} else if (selection.empty) {
+			// 			selection.empty();
+			// 		}
+			// 		// collapse range to set cursor at end of ange.
+			// 		tmpl.collapse(false);
+			// 		selection.addRange(tmpl);
+			// 	}
+			// });
 		}
 	});
 }($));
