@@ -115,6 +115,10 @@
 		// @param e mouse event.	 
 		handleMouseDown: function (e) {
 			var that = this;
+			if (e.which !== 1) {
+				// only left mouse button can perform dragging.
+				return;
+			}
 
 			if (!this.helper.met(e)) {
 				return;
@@ -155,6 +159,9 @@
 		// Handle mouse up on document.
 		// Set element dragging flag to false and unbind all event handlers.
 		handleMouseUp: function (e) {
+			if (e.which !== 1) {
+				return;
+			}
 			$.debug('draggable mosue up.');
 			this.dragging = false;
 			this.clearbindings();

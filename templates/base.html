@@ -35,13 +35,13 @@
 		{% endblock %}
 	</head>
 
-	<body>
+	<body class="user-style-default">
 		<div id="doc" class="doc-main">
 			{% if user.is_authenticated %}
-			<div class="navbar navbar-inverse navbar-fixed-top">
+			<div id="topbar" class="navbar navbar-inverse navbar-fixed-top">
 				<div class="navbar-inner">
 					<div class="container">
-						<a class="brand nav-brand" href="/about">Curve</a>
+						<!-- <a class="brand nav-brand" href="/about">Curve</a> -->
 						<div class="nav-collapse collapse">
 							<!-- navigation buttons. -->
 							<ul class="nav">
@@ -69,13 +69,13 @@
 
 							<!-- put right form and dropdown menu. -->
 							<div class="pull-right">
+								<form action="/search" method="post" class="form-search">
+									{% csrf_token %}
+									<input id="search-query" type="text" class="search-input" placeholder="search"/>
+								</form>
 								<ul class="nav">
-									<li>
-										<form action="/search" method="post" class="form-search">
-											{% csrf_token %}
-											<input id="search-query" type="text" class="search-input" placeholder="search"/>
-										</form>
-									</li>
+									<!-- <li>
+									</li> -->
 									<li class="me dropdown">
 										<a class="dropdown-toggle" href="#" data-toggle="dropdown">
 											<span class="profile-icon-wrapper">
@@ -129,8 +129,12 @@
 			</div>
 			{% endif %}
 
-			{% block page %}
-			{% endblock %}
+			<div id="page">
+				<div class="container">
+				{% block page %}
+				{% endblock %}
+				</div>
+			</div>
 		</div>
 
 		<!-- Modal overlay. -->

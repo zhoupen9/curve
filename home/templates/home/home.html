@@ -30,171 +30,164 @@ $(document).ready(function () {
 {% endblock %}
 
 {% block page %}
-<div id="page">
-	<div class="front-container">
-		<div class="front-bg"></div>
-		<div class="wrapper">
-			<div class="dashboard">
-				<div class="module mini-profile">
-					<div class="profile-summary">
-						<a href="/zhoup3ng" class="account-summary" data-nav="profile">
-							<div class="profile-content">
-								<div class="account-group current-user" data-user-id="" data-screen-name="">
-									<img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" data-user-id="" alt=""></img>
-									<b class="fullname">Zhou P3ng</b>
-									<small class="metadata">View my profile page</small>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="mini-summary">
-						<ul class="stats" data-user-id="">
-							<li>
-								<a class="" href="/post">
-									<strong>12</strong>Posts
-								</a>
-							</li>
-							<li>
-								<a class="" href="/task">
-									<strong>9</strong>Tasks
-								</a>
-							</li>
-							<li>
-								<a class="" href="/im">
-									<strong>3</strong>Messages
-								</a>
-							</li>
-						</ul>
-					</div>
-
-					<div class="home-post">
-						<form class="" action="/post/new" method="post">
-							{% csrf_token %}
-							<div class="home-post-content">
-								<div class="post-editor editor" contenteditable="true" spellcheck="true" aria-multiline="true" dir="ltr" role="textbox">
-									<div>Compose new post...</div>
-								</div>
-								<div class="editor-normalizer">
-									<div></div>
-								</div>
-								<div class="dropdown-menu typeahead" style="display: none;">
-									<div class="dropdown-caret">
-										<div class="caret-outer"></div>
-										<div class="caret-inner"></div>
-									</div>
-									<div class="dropdown-inner js-typeahead-results">
-										<div class="typeahead-accounts js-typeahead-accounts">
-											<ul class="typeahead-items account-list">
-											</ul>
-										</div>
-										<ul clas="typeahead-items topic-list "></ul>
-									</div>
-									<textarea></textarea>
-								</div>
-							</div>
-							<div class="post-toolbar hide">
-								<div class="post-thumbnail"></div>
-								<div class="post-toolbox clearfix">
-									<div class="file-selector">
-										<input type="button" class="btn text-input file-input" placeholder="file"></input>
-									</div>
-									<div class="code-formatter">
-										<button type="button" class="btn">code</button>
-									</div>
-								</div>
-								<div class="post-button">
-									<button id="global-post" type="button" class="btn primary-btn" placeholder="Post" disabled="disabled">Post</button>
-								</div>
-							</div>
-						</form>
+<div class="dashboard">
+	<div class="module mini-profile">
+		<div class="profile-summary">
+			<a href="/zhoup3ng" class="account-summary" data-nav="profile">
+				<div class="profile-content">
+					<div class="account-group current-user" data-user-id="" data-screen-name="">
+						<img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" data-user-id="" alt=""></img>
+						<b class="fullname">Zhou P3ng</b>
+						<small class="metadata">View my profile page</small>
 					</div>
 				</div>
+			</a>
+		</div>
+		<div class="mini-summary">
+			<ul class="stats" data-user-id="">
+				<li>
+					<a class="" href="/post">
+						<strong>12</strong>Posts
+					</a>
+				</li>
+				<li>
+					<a class="" href="/task">
+						<strong>9</strong>Tasks
+					</a>
+				</li>
+				<li>
+					<a class="" href="/im">
+						<strong>3</strong>Messages
+					</a>
+				</li>
+			</ul>
+		</div>
 
-				<div class="module">
-					<div class="module-inner">
-						<div class="module-header">
-							<h3>What's new?</h3>
-							<small>
-								<a href="javascript:void(0)">Refresh</a>
-							</small>
-							<small>
-								<a href="/post/recent">View all</a>
-							</small>
+		<div class="home-post">
+			<form class="" action="/post/new" method="post">
+				{% csrf_token %}
+				<div class="home-post-content">
+					<div class="post-editor editor" contenteditable="true" spellcheck="true" aria-multiline="true" dir="ltr" role="textbox">
+						<div>Compose new post...</div>
+					</div>
+					<div class="editor-normalizer">
+						<div></div>
+					</div>
+					<div class="dropdown-menu typeahead" style="display: none;">
+						<div class="dropdown-caret">
+							<div class="caret-outer"></div>
+							<div class="caret-inner"></div>
+						</div>
+						<div class="dropdown-inner js-typeahead-results">
+							<div class="typeahead-accounts js-typeahead-accounts">
+								<ul class="typeahead-items account-list">
+								</ul>
+							</div>
+							<ul clas="typeahead-items topic-list "></ul>
+						</div>
+						<textarea></textarea>
+					</div>
+				</div>
+				<div class="post-toolbar hide">
+					<div class="post-thumbnail"></div>
+					<div class="post-toolbox clearfix">
+						<div class="file-selector">
+							<input type="button" class="btn text-input file-input" placeholder="file"></input>
+						</div>
+						<div class="code-formatter">
+							<button type="button" class="btn">code</button>
 						</div>
 					</div>
-				</div>
-
-				<div class="module">
-					<div class="module-inner">
-						<div class="module-header">
-							<h3>What's hot?</h3>
-							<small>
-								<a href="javascript:void(0)">Refresh</a>
-							</small>
-							<small>
-								<a href="/post/hot">View all</a>
-							</small>
-						</div>
+					<div class="post-button">
+						<button id="global-post" type="button" class="btn primary-btn" placeholder="Post" disabled="disabled">Post</button>
 					</div>
 				</div>
+			</form>
+		</div>
+	</div>
+
+	<div class="module">
+		<div class="module-inner">
+			<div class="module-header">
+				<h3>What's new?</h3>
+				<small>
+					<a href="javascript:void(0)">Refresh</a>
+				</small>
+				<small>
+					<a href="/post/recent">View all</a>
+				</small>
 			</div>
-			<div id="home-activities" class="content home-activities">
-				<div class="content-header">
-					<div class="header-inner">
-						<h2>Activities</h2>
-					</div>
-				</div>
-				<div class="stream-container">
-					<div class="stream-item">
-						<div id="activity-notify" class="new-activities">4 new activities</div>
-					</div>
+		</div>
+	</div>
 
-					<div class="stream">
-						<ol id="stream-items" class="stream-items">
-							<li class="stream-item">
-								<div class="post">
-									<div class="post-content">
-										<div class="module-header">
-											<img class="avatar size48" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
-											<h3>ZhouP3ng</h3>
-											<small class="metadata">@zhoup3ng</small>
-										</div>
-										<p>It was destiny to become great.</p>
-										<div class="post-footer">
-											<small>
-												<a href="#">View detail</a>
-											</small>
-										</div>
-									</div>
-								</div>
-							</li>
-							<li class="stream-item">
-								<div class="post">
-									<div class="post-content">
-										<div class="module-header">
-											<img class="avatar size48" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
-											<h3>ZhouP3ng</h3>
-											<small class="metadata">@zhoup3ng</small>
-										</div>
-										<p>What's in you mind?</p>
-										<div class="post-footer">
-											<small>
-												<a href="#">View detail</a>
-											</small>
-										</div>
-									</div>
-								</div>
-							</li>
-						</ol>
-					</div>
-				</div>
-				<div class="stream-footer">
-					<div class="stream-loading">
-						<div class="stream-loading-inner">
-							<span id="load-posts" class="spinner" title="loading...">loading...</span>
+	<div class="module">
+		<div class="module-inner">
+			<div class="module-header">
+				<h3>What's hot?</h3>
+				<small>
+					<a href="javascript:void(0)">Refresh</a>
+				</small>
+				<small>
+					<a href="/post/hot">View all</a>
+				</small>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="home-activities" class="content home-activities">
+	<div class="content-header">
+		<div class="header-inner">
+			<h2>Activities</h2>
+		</div>
+	</div>
+	<div class="stream-container">
+		<div class="stream-item">
+			<div id="activity-notify" class="new-activities">4 new activities</div>
+		</div>
+
+		<div class="stream">
+			<ol id="stream-items" class="stream-items">
+				<li class="stream-item">
+					<div class="post">
+						<div class="post-content">
+							<div class="module-header">
+								<img class="avatar size48" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
+								<h3>ZhouP3ng</h3>
+								<small class="metadata">@zhoup3ng</small>
+							</div>
+							<p>It was destiny to become great.</p>
+							<div class="post-footer">
+								<small>
+									<a href="#">View detail</a>
+								</small>
+							</div>
 						</div>
 					</div>
-				</div>
+				</li>
+				<li class="stream-item">
+					<div class="post">
+						<div class="post-content">
+							<div class="module-header">
+								<img class="avatar size48" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
+								<h3>ZhouP3ng</h3>
+								<small class="metadata">@zhoup3ng</small>
+							</div>
+							<p>What's in you mind?</p>
+							<div class="post-footer">
+								<small>
+									<a href="#">View detail</a>
+								</small>
+							</div>
+						</div>
+					</div>
+				</li>
+			</ol>
+		</div>
+	</div>
+	<div class="stream-footer">
+		<div class="stream-loading">
+			<div class="stream-loading-inner">
+				<span id="load-posts" class="spinner" title="loading...">loading...</span>
 			</div>
 		</div>
 	</div>

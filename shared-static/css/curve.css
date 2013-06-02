@@ -5,6 +5,18 @@ html, body, #doc, #page {
 	margin: 0px;
 }
 
+body {
+	background-position: left 40px;
+	background-attachment: fixed;
+	/*background-repeat: repeat;*/
+	background-repeat: no-repeat;
+	background-color: #C0DEED;
+	overflow-y: scroll;
+	font-size: 14px;
+	line-height: 18px;
+	color: #333;
+}
+
 ul, ol {
 	list-style: none;
 	margin: 0;
@@ -90,6 +102,21 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 	box-shadow: inset 0 1px 3px rgba(0,0,0,.05),0 0 8px rgba(82,168,236,.6);
 }
 
+.user-style-default {
+	background-image: url(/static/img/bg.png);
+}
+
+#page .container {
+	width: 837px;
+	padding: 54px 14px 15px;
+	min-height: 100%;
+	background-image: url(/static/img/wash-white-30.png)
+}
+
+#topbar .container {
+	width: 865px;
+}
+
 .size24 {
     width: 24px;
     height: 24px;
@@ -113,7 +140,7 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 }
 
 .content-header {
-	border-bottom-width: 0;
+	border-bottom-width: 0px !important;
 	border: 1px solid #eee;
 	border: 1px solid rgba(0,0,0,.1);
 	border-radius: 6px 6px 0 0;
@@ -140,19 +167,15 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 	max-height: 750px;
 }
 
-.front-bg {
+.page-bg {
 	position: fixed;
-	width: 200%;
+	width: 100%;
 	height: 100%;
-	left: -50%;
+	/*left: -50%;*/
 	background-color: #c0deed;
 	background-image: url(/static/img/bg.png);
 	background-repeat: no-repeat;
 	background-position: top;
-}
-
-.front-container .wrapper {
-	background-image: url(/static/img/wash-white-30.png)
 }
 
 .front-image {
@@ -230,6 +253,7 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 	position: relative;
 	float: left;
 	margin: 7px 0;
+	width: 225px;
 	height: 26px;
 	color: #bbb;
 }
@@ -268,7 +292,8 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 
 .form-search .search-input {
 	position: absolute;
-	width: 200px;
+	width: 165px;
+	height: 14px;
 	top: 0;
 	right: 0;
 	z-index: 2;
@@ -276,8 +301,6 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 	background-color: transparent;
 	background-image: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7);
 	display: block;
-	width: 163px;
-	height: 14px;
 	padding: 6px 27px 6px 12px;
 	font-size: 12px;
 	line-height: 1;
@@ -293,12 +316,12 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 }
 
 .form-search .search-input:active {
-	width: 250px;
+	width: 200px;
 	background-color: #fff;
 }
 
 .form-search .search-input:focus {
-	width: 250px;
+	width: 200px;
 	background-color: #fff;
 }
 
@@ -530,12 +553,20 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 	box-shadow: inset 1px 0 0 rgba(255,255,255,.5);
 }
 
+.dialog-close:hover {
+	background-color: #eee;
+}
+
 .dialog-close .close-medium {
 	float: left;
 }
 
-.close-medium {
-	background-position: -65px -175px;
+.dialog-close .close-medium {
+	background-position: -124px -176px;
+}
+
+.dialog-close:hover .close-medium {
+	background-position: -144px -176px;
 }
 
 .close-medium, .error-x, .dismiss-white {
@@ -572,6 +603,10 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 	vertical-align: top;
 	overflow: hidden;
 	text-shadow: none;
+}
+
+.editor a {
+	text-decoration: none !important;
 }
 
 .editor-normalizer {

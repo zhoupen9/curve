@@ -33,12 +33,19 @@
 			}
 		},
 
+		// show dialog.
 		show: function () {
 			if (this.overlay) {
 				this.overlay.show();
 			}
+			
+			// If dialog has a editor, focus to it.
+			if (this.editor) {
+				this.editor.focus();
+			}
 		},
 
+		// capture keys.
 		captureKeys: function () {
 			var that = this;
 			this.keydownDelegate = function (event) {
@@ -80,11 +87,6 @@
 		initui: function () {
 			if (this.options.captureKeys) {
 				this.captureKeys();
-			}
-
-			// If dialog has a editor, focus to it.
-			if (this.editor) {
-				this.editor.focus();
 			}
 		},
 
