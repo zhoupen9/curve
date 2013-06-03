@@ -11,16 +11,24 @@
 	AtTemplate = function () {},
 	// '#' list
 	ListTemplate = function () {},
-	// Clickable.
-	Visual = function () {};
+	// Formatter.
+	Formatter = function () {};
 
-	Visual.prototype = {
+	Formatter.prototype = {
 		protocols: {
 			at: '@',
 			hashTag: '#',
 			tag: '#',
 			list: '#',
 			link: 'link'
+		},
+
+		format: function (protocol, data) {
+			switch (protocol) {
+			case this.protocols.link:
+				return '<a href="' + data + '">' + data + '</a>';
+			}
+			return data;
 		},
 
 		// Create html node according to protocol and user data.
@@ -110,7 +118,7 @@
 				node = this.createTextNode(text.substring(0, index));
 				nodes.push(node);
 			}
-			visual = new Visual();
+			visual = new Formatter();
 			nodes.push(visual.create(this.visual, matched));
 			if (index + matched.length < text.length) {
 				node = this.createTextNode(text.substring(index + matched.length, text.length));
@@ -124,7 +132,7 @@
 	// Url template replaces supported format from plain text to a html link.
 	UrlTemplate.prototype = $.extend({}, Template.prototype, {
 		// default url visual, web link.
-		visual: 'link',
+		protocol: 'link',
 
 		// supported prototypes.
 		supportedProtocols: ['http[s]', 'ftp', 'ssh', 'svn', 'git', 'mms', 'e2dk', 'thunder'],
@@ -137,32 +145,26 @@
 
 		// Apply template to text and return replaced text.
 		apply: function (text) {
-			var node, visual, match = this.regexp.exec(text), matched, index, nodes = [];
-			if (!match) {
-				return;
-			}
-			matched = match[0];
-			index = text.indexOf(matched);
-			if (index > 0) {
-				node = this.createTextNode(text.substring(0, index));
-				nodes.push(node);
-			}
-			visual = new Visual();
-			nodes.push(visual.create(this.visual, matched));
-			if (index + matched.length < text.length) {
-				node = this.createTextNode(text.substring(index + matched.length, text.length));
-				nodes.push(node);
-			}
-			return nodes;
+			var match = this.regexp.exec(text);
+			return match ? new Formatter().format(this.protocol, text) : text;
 		}
 	});
 
 	// register editor plugin.
+	// This editor provides additional content editing features than textarea,
+	// 1. Popup suggestions.
+	//    When user input any predefined keywords, such as '@', '#', a dropdown
+	//    menu will popup and provides serveral suggestions.
+	// 2. URL, mention, tag will automatically transfer into a nicer format.
+	// 3. Use URL shorten service to shorten given url regardless it was typed in
+	//    or paste in.
+	// 4. Attach an imamge/audio/video into editor will automatically transfer them
+	//    into a link to uploaded URL.
 	$.curve.ui('editor', {
 		// editor options.
 		options: {
 			// key down repeat delay, default 100 miliseconds.
-			delay: 3000,
+			delay: 100,
 			// capture keyboard by default.
 			capture: true,
 		},
@@ -183,18 +185,6 @@
 		// initialize dialog UI.
 		initui: function () {
 			var that = this;
-			this.keydownDelegate = function (event) {
-				return that.keydown(event);
-			};
-			this.keypressDelegate = function (event) {
-				return that.keypress(event);
-			};
-			this.keyupDelegate = function (event) {
-				return that.keyup(event);
-			};
-			this.selectstartDelegate = function (event) {
-				return that.selectstart(event);
-			};
 			this.inputDelegate = function (event) {
 				return that.input(event);
 			};
@@ -212,56 +202,59 @@
 			
 		},
 
-		// handle contenteditable input event.
+		// Handle contenteditable input event.
+		// Editor plugin handles every input event fired from within associated contenteditable
+		// 'div' element. It's important to know that edit plugin ensures that every single line
+		// in content will be enclosed by a 'div' element. When input event triggered, plugin
+		// checks source 'div' elements' content (meaning every div as a single line), and parse it into
+		// a display form via employee a couple of template parser.
+		// This parsing processes act like lexical parser, each segment passing to parser can NOT
+		// be ambiguous, and each segment can only produce one and only one result.
+		// So template parsers work in a monopoly manner, instead of in a filter chain manner.
 		input: function (event) {
-			var elem = event.target;
+			var selection, range, node, div, html, offset, pos,
+			out = '', matched, regexp = /(\s+)?(\S+)/g;
+			
 			if (!this.element.children().length) {
-				// This little trick will ensure user's editing will be from within a '<div>' element.
+				// This little trick ensures that user's editing comes from within a '<div>' element.
 				$('<div><br/></div>').appendTo(this.element);
 				return;
 			}
-			// parse all div inside editor.
-			this.element.children('div').each(function () {
-				
-			});
-		},
 
-		// Handle key down event.
-		keypress: function (event) {
-			var range, clone;
-			// capture input by preventing event to bubble.
-			// event.preventDefault();
-
-			if (event.repeat) {
-
+			if (window.getSelection) {
+				selection = window.getSelection();
+				range = selection.getRangeAt(0);
+				node = range.commonAncestorContainer;
+				// determine which div been editing.
+				this.element.children('div').each(function () {
+					if (this.contains(node)) {
+						html = this.innerHTML;
+						div = this;
+						return;
+					}
+				});
+				offset = range.endOffset;
 			}
-
-			if (event.altKey || event.ctrlKey || event.metaKey) {
-				// parse command.
-			}
-
-			if (event.key === this.keyCode.ESCAPE /* ESC */) {
-				// handle Escape
-				event.preventDefault();
-			}
-
-
-		},
-
-		// Handle key down event.
-		keydown: function (event) {
-			var that = this, key = event.which,
-			text = this.content.html();
-
-			this.element.children().each(function () {
-				var nodes = this.childNodes();
-				if (nodes && nodes.length) {
-					$.each(nodes, function () {
-						$.debug(this.nodeValue);
+			
+			if (html) {
+				while ((matched = regexp.exec(html)) !== null) {
+					out += matched[1] ? matched[1] : ''; // save leading whitespaces.
+					$.each(this.templates, function (prop, tmpl) {
+						out += tmpl.apply(matched[2]);
 					});
 				}
-				// $.debug('child: ' + this.get);
-			});
+				div.innerHTML = out;
+				//
+				selection.removeAllRanges && selection.removeAllRanges();
+				selection.empty && selection.empty();
+				
+				pos = document.createRange();
+				pos.selectNode(div.lastChild);
+				// pos.setStart(div, 0);
+				// pos.setEnd(div, div.childNodes.length);
+				pos.collapse(false);
+				selection.addRange(pos);
+			}
 		},
 
 		// handle key up, Check if text input contains any content matches any
