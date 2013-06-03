@@ -28,7 +28,7 @@
 			case this.protocols.link:
 				return '<a href="' + data + '">' + data + '</a>';
 			}
-			return data;
+			return null;
 		},
 
 		// Create html node according to protocol and user data.
@@ -146,7 +146,7 @@
 		// Apply template to text and return replaced text.
 		apply: function (text) {
 			var match = this.regexp.exec(text);
-			return match ? new Formatter().format(this.protocol, text) : text;
+			return match ? new Formatter().format(this.protocol, text) : null;
 		}
 	});
 
@@ -212,8 +212,8 @@
 		// be ambiguous, and each segment can only produce one and only one result.
 		// So template parsers work in a monopoly manner, instead of in a filter chain manner.
 		input: function (event) {
-			var selection, range, node, div, html, offset, pos,
-			out = '', matched, regexp = /(\s+)?(\S+)/g;
+			var i, selection, range, node, value, values, rm = [], out = '', child,
+			newnode = null, offset, pos, matched, regexp = /(\s+)/, created = [];
 			
 			if (!this.element.children().length) {
 				// This little trick ensures that user's editing comes from within a '<div>' element.
@@ -221,40 +221,54 @@
 				return;
 			}
 
-			if (window.getSelection) {
-				selection = window.getSelection();
-				range = selection.getRangeAt(0);
-				node = range.commonAncestorContainer;
-				// determine which div been editing.
-				this.element.children('div').each(function () {
-					if (this.contains(node)) {
-						html = this.innerHTML;
-						div = this;
-						return;
-					}
-				});
-				offset = range.endOffset;
+			// if browser does not support selection, return to remain content unmodified.
+			if (!window.getSelection) {
+				return;
 			}
 			
-			if (html) {
-				while ((matched = regexp.exec(html)) !== null) {
-					out += matched[1] ? matched[1] : ''; // save leading whitespaces.
-					$.each(this.templates, function (prop, tmpl) {
-						out += tmpl.apply(matched[2]);
-					});
+			selection = window.getSelection();
+			range = selection.getRangeAt(0);
+			node = selection.anchorNode.nodeType == 3 ? selection.anchorNode.parentNode : selection.anchorNode;
+			offset = range.endOffset;
+
+			for (i = 0; i < node.childNodes.length; i++) {
+				child = node.childNodes[i];
+				if (child.nodeType == 3) {
+					// text node.
+					out = '';
+					values = child.nodeValue.split(regexp);
+					for (value in values) {
+						$.each(this.templates, function (prop, tmpl) {
+							newnode = tmpl.apply(values[value]);
+							return newnode == null;
+						});
+						out += newnode ? newnode : (values[value] === ' ' ? '&nbsp;' : values[value]);
+					}
+					created.push(out);
+				} else if (child.nodeType == 1) {
+					// element.
+					if (child.innerHTML) {
+						child.setAttribute('href', child.innerHTML);
+					}
+					created.push(child.outerHTML);
 				}
-				div.innerHTML = out;
-				//
-				selection.removeAllRanges && selection.removeAllRanges();
-				selection.empty && selection.empty();
-				
-				pos = document.createRange();
-				pos.selectNode(div.lastChild);
-				// pos.setStart(div, 0);
-				// pos.setEnd(div, div.childNodes.length);
-				pos.collapse(false);
-				selection.addRange(pos);
 			}
+
+			if (created.length) {
+				node.innerHTML = created.join('');
+			}
+			// div.innerHTML = out;
+			// //
+			// selection.removeAllRanges && selection.removeAllRanges();
+			// selection.empty && selection.empty();
+			
+			// pos = document.createRange();
+			// pos.selectNode(div.lastChild);
+			// // pos.setStart(div, 0);
+			// // pos.setEnd(div, div.childNodes.length);
+			// pos.collapse(false);
+			// selection.addRange(pos);
+
 		},
 
 		// handle key up, Check if text input contains any content matches any
