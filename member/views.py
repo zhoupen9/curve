@@ -52,13 +52,9 @@ def register(request):
     else:
         # create user.
         user = User.objects.create_user(fullname, email, password)
-        user.save()
         logger.debug('user: %s created.', fullname)
         # create member.
-        member = Member.objects.create(user=user, username=fullname)
-        member.save()
-        logger.debug('member: %s created.', member.id)
-
+        member = Member.objects.create_member(user, fullname)
         # automatically login when signup.
 	user = authenticate(username=fullname, password=password)
         if user is not None:
