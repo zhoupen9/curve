@@ -6,6 +6,36 @@ logger = logging.getLogger('curve')
 
 # Create your models here.
 
+class MemberManager(models.Manager):
+    """
+    Member models default manager.
+    It provides convenient methods for manipulating members.
+    """
+    def check_user_and_email(self, fullname, email):
+        """
+        Check if username or email already exists.
+        """
+        user = User.objects.filter(username=fullname).filter(email=email)
+        return user is None
+
+    def create_member(self, fullname, email, password):
+        """
+        Create a new member.
+        Because curve uses django's auth module, a django user need be created first.
+        """
+        user = User.objects.create_user(fullname, email, password)
+        if user is not None:
+            logger.debug('user: %s created.', fullname)
+
+	new_member = Member(user=user, username=fullname)
+	new_member.save()
+
+	logger.debug('member: %s created.', new_member.id)
+	return new_member
+
+    def get_lists_of_member(self, member):
+        return super(models.Manage, self).get_query_set().filter(member_id=member)
+
 class Member(models.Model):
     """
     Curve members are registered users who can access fucilities.
@@ -17,6 +47,7 @@ class Member(models.Model):
     title = models.CharField(max_length=64, null=True)
     description = models.CharField(max_length=1024, null=True)
     photo = models.CharField(max_length=256, null=True)
+    objects = MemberManager()
 
 class MemberGroup(models.Model):
     """
@@ -82,18 +113,3 @@ class ListSubscribes(models.Model):
     date_subscribed = models.DateField()
     class Meta:
         ordering = ['date_subscribed']
-
-class MemberManager(models.Manager):
-    """
-    Member models default manager.
-    It provides convenient methods for manipulating members.
-    """
-    def create_member(self, user, fullname):
-	new_member = Member(user=user, fullname=fullname)
-	new_member.save()
-
-	logger.debug('member: %s created.', new_member.id)
-	return new_member
-
-    def get_lists_of_member(self, member):
-        return super(models.Manage, self).get_query_set().filter(member_id=member)

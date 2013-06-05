@@ -1,6 +1,5 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 from member.models import Member
@@ -9,7 +8,7 @@ import logging
 
 logger = logging.getLogger('curve')
 
-def poststr(request, name):
+def get_request_post_str(request, name):
     """
     Get a string from request POST if exists.
     If give name is none or not a string or an empty string, None will return.
@@ -34,9 +33,9 @@ def register(request):
     If fullname and email is available, create a django user, and an associated
     member, and then redirect new registered member to home page.
     """
-    fullname = checkNull(poststr(request, 'fullname'))
-    email = checkNull(poststr(request, 'email'))
-    password = checkNull(poststr(request, 'password'))
+    fullname = checkNull(get_request_post_str(request, 'fullname'))
+    email = checkNull(get_request_post_str(request, 'email'))
+    password = checkNull(get_request_post_str(request, 'password'))
 
     # Ensure required fields are all non-empty.
     for name, value in { 'Name': fullname, 'Email': email, 'Password': password }.items():
@@ -45,16 +44,12 @@ def register(request):
             return redirect('/')
 
     # Check if username or email already exists.
-    user = User.objects.filter(username=fullname).filter(email=email)
-    if user:
+    if not Member.objects.check_user_and_email(fullname, email):
         logger.debug('user %s already exists.', fullname)
         request.session['error'] = 'User name or email already taken.'
     else:
-        # create user.
-        user = User.objects.create_user(fullname, email, password)
-        logger.debug('user: %s created.', fullname)
         # create member.
-        member = Member.objects.create_member(user, fullname)
+        member = Member.objects.create_member(fullname, email, password)
         # automatically login when signup.
 	user = authenticate(username=fullname, password=password)
         if user is not None:
