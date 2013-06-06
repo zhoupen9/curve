@@ -163,6 +163,47 @@
     background-color: #eee;
 }
 
+.stream-container {
+    font-size: 14px;
+    line-height: 18px;
+    color: #333;
+}
+
+.stream, .stream-items {
+    position: relative;
+    margin-left: 0;
+    list-style: none;
+}
+
+.stream-item, .unfocusable-stream-item {
+    background: #fff;
+    border-left: 1px solid #e8e8e8;
+    border-left: 1px solid rgba(0,0,0,.1);
+    border-right: 1px solid #e8e8e8;
+    border-right: 1px solid rgba(0,0,0,.1);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding;
+    background-clip: padding-box;
+}
+
+.stream-item.open:first-child {
+    margin-top: 0px;
+    margin-bottom: 8px;
+    border-radius: 0 0 6px 6px;
+}
+
+.stream-item.open:last-child {
+    margin-top: 8px;
+    margin-bottom: 0px;
+    border-radius: 6px 6px 0 0;
+}
+
+.stream-item.open {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+}
+
 .post {
     position: relative;
     min-height: 51px;
@@ -171,8 +212,26 @@
     cursor: pointer;
 }
 
-.post:hover {
+.stream-item .post:hover {
     background-color: #f5f5f5;
+}
+
+.stream-item.open .post:hover {
+    background-color: #fff;
+}
+
+.stream-container .post-open-container>li {
+    border-bottom: 1px solid #ddd;
+}
+
+.stream-container .post-open-container>li:first-child .post {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.stream-container .post-open-container>li:last-child .post {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
 }
 
 .post-content {
@@ -201,28 +260,6 @@
     font-size: 12px;
 }
 
-.stream-container {
-    font-size: 14px;
-    line-height: 18px;
-    color: #333;
-}
-
-.stream, .stream-items {
-    position: relative;
-    margin-left: 0;
-    list-style: none;
-}
-
-.stream-item, .unfocusable-stream-item {
-    background: #fff;
-    border-left: 1px solid #e8e8e8;
-    border-left: 1px solid rgba(0,0,0,.1);
-    border-right: 1px solid #e8e8e8;
-    border-right: 1px solid rgba(0,0,0,.1);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding;
-    background-clip: padding-box;
-}
 
 .stream-loading-inner {
     padding: 18px 30px;

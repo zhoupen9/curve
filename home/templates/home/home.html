@@ -19,10 +19,14 @@ $(document).ready(function () {
 		});
 	});
 
-	$('#activity-notify').on('click', function (e) {
+	$('#activity-notify').click(function () {
+		var i, items = $('#stream-items'), orig = items.length;
 		$.get('/post/recent')
 		.done(function (data) {
-			$('#stream-items').prepend(data);
+			items.prepend(data);
+			for (i = 0; i < orig; i++) {
+				items.children('li:nth-child(' + (i + 1) + ')').children(':first').post();
+			}
 		});
 	});
 });
@@ -147,40 +151,6 @@ $(document).ready(function () {
 
 		<div class="stream">
 			<ol id="stream-items" class="stream-items">
-				<li class="stream-item">
-					<div class="post">
-						<div class="post-content">
-							<div class="module-header">
-								<img class="avatar size48" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
-								<h3>ZhouP3ng</h3>
-								<small class="metadata">@zhoup3ng</small>
-							</div>
-							<p>It was destiny to become great.</p>
-							<div class="post-footer">
-								<small>
-									<a href="#">View detail</a>
-								</small>
-							</div>
-						</div>
-					</div>
-				</li>
-				<li class="stream-item">
-					<div class="post">
-						<div class="post-content">
-							<div class="module-header">
-								<img class="avatar size48" src="/static/img/profile-icons/vivalavida.jpeg" alt="zhoup3ng"></img>
-								<h3>ZhouP3ng</h3>
-								<small class="metadata">@zhoup3ng</small>
-							</div>
-							<p>What's in you mind?</p>
-							<div class="post-footer">
-								<small>
-									<a href="#">View detail</a>
-								</small>
-							</div>
-						</div>
-					</div>
-				</li>
 			</ol>
 		</div>
 	</div>

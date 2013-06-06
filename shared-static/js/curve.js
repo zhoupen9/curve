@@ -144,6 +144,9 @@
 		// destory ui.
 		destroyui: $.noop,
 
+		// initialize ui.
+		initui: $.noop,
+
 		// If ui is currently visible.
 		visible: function () {
 			return this.element ? this.element.css('display') !== 'none' : false;

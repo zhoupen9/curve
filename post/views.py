@@ -34,8 +34,14 @@ def userposts(request, userid, startid, limit=10):
 def recent(request):
     # user = User.objects.get(pk=request.session['userid'])
     member = Member.objects.get(user_id=request.session['userid'])
+    posts = []
     post = create_post(member)
-    return render(request, 'post/post.html', { 'post': post })
+    posts.append(post)
+    return render(request, 'post/post.html', { 'posts': posts })
+
+def get_inline_reply(request):
+    postid = request.get('post')
+    return render(request, 'post/inline-reply.html', { 'post': postid })
 
 def create_post(member):
     """ create new post. """

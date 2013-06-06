@@ -53,10 +53,6 @@ button {
 	margin: 0;
 }
 
-button:disabled {
-	border-color: #ccc;
-}
-
 i, .icon {
 	display: inline-block;
 	vertical-align: text-top;
@@ -761,4 +757,19 @@ ol>li {
 	left: -5px;
 	width: 10px;
 	height: 10px;
+}
+
+
+button:disabled, .btn[disabled], .btn.disabled:hover, .btn[disabled=true], .btn[disabled=true]:hover {
+	color: #777;
+	text-shadow: 0 1px 1px rgba(255,255,255,.75);
+	cursor: default;
+	background-color: #ddd;
+	background-image: none;
+	border-color: #ccc;
+	opacity: .65;
+}
+
+form {
+	margin: auto;
 }

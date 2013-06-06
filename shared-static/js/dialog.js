@@ -27,9 +27,9 @@
 
 		// close dialog.
 		close: function (e) {
-			this.element.hide();
+			this.element.fadeOut();
 			if (this.overlay) {
-				this.overlay.hide();
+				this.overlay.fadeOut();
 			}
 		},
 
