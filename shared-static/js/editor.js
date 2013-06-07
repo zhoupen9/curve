@@ -274,46 +274,34 @@
 		// handle key up, Check if text input contains any content matches any
 		// predefined templates. And apply matched templates to the content.
 		keyup: function (event) {
-			// var that = this, nodes, tmpl,
-			// selection = window.getSelection(),
-			// range = selection.getRangeAt(0),
-			// edit = range.cloneRange();
-			
-			// if (!range) {
-			// 	return;
-			// }
+		},
 
-			
-			// edit = range.cloneRange();
-			// edit.selectNode(range.startContainer);
-			// text = edit.toString();
+		// Travel node to get normalized content
+		// @private
+		travelNode: function (node) {
+			var i, content = '';
+			switch (node.nodeType) {
+				case 1:
+				for (i = 0; i < node.childNodes.length; i++) {
+					content += trivalNode(node.childNodes[i]);
+				}
+				break;
+				case 3:
+				content += node.nodeValue;
+				break;
+				default:
+				break;
+			}
+			return content;
+		},
 
-			// $.each(this.templates, function (prop, template) {
-			// 	if (template.test(text)) {
-			// 		// clone a tmplate range to apply.
-			// 		tmpl = range.cloneRange();
-			// 		tmpl.selectNode(range.startContainer);
-			// 		nodes = template.apply(tmpl.toString()).reverse();
-
-			// 		// delete original content selected by edit.
-			// 		edit.deleteContents();
-
-			// 		// insert template results.
-			// 		$.each(nodes, function () {
-			// 			tmpl.insertNode(this);
-			// 		});
-
-			// 		// move cursor to content end position.
-			// 		if (selection.removeAllRanges) {
-			// 			selection.removeAllRanges();
-			// 		} else if (selection.empty) {
-			// 			selection.empty();
-			// 		}
-			// 		// collapse range to set cursor at end of ange.
-			// 		tmpl.collapse(false);
-			// 		selection.addRange(tmpl);
-			// 	}
-			// });
+		// get normalized content of editor.
+		normalized: function () {
+			var content = '', parent = this.element.parent();
+			this.element.children('div').each(function () {
+				content += this.travelNode(this);
+			});
+			return content;
 		}
 	});
 }($));

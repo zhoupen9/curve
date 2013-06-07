@@ -25,11 +25,11 @@ $(document).ready(function () {
 		.done(function (data) {
 			items.prepend(data);
 			for (i = 0; i < orig; i++) {
-				items.children('li:nth-child(' + (i + 1) + ')').children(':first').post();
+				items.children('li:nth-child(' + (i + 1) + ')').children('.post').post();
 			}
 		});
 		e.preventDefault();
-		this.parentNode.removeChild(this);
+		// this.parentNode.removeChild(this);
 	});
 });
 </script>
@@ -70,7 +70,7 @@ $(document).ready(function () {
 		</div>
 
 		<div class="home-post">
-			<form class="" action="/post/new" method="post">
+			<form class="post-form" action="/post/new" method="post">
 				{% csrf_token %}
 				<div class="home-post-content">
 					<div class="post-editor editor" contenteditable="true" spellcheck="true" aria-multiline="true" dir="ltr" role="textbox">

@@ -52,8 +52,9 @@
 			} else {
 				parent = this.element.parentsUntil('ol.stream-items').last();
 				parent.toggleClass('open');
+				this.element.detach();
 				this.element.appendTo(parent);
-				parent.children('ol').remove();
+				parent.children('ol').toggleClass('hide');
 				this.collapsed = false;
 			}
 			// start loading contents.

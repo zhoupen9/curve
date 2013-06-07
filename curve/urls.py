@@ -8,6 +8,7 @@ urlpatterns = patterns(
     url(r'^$', 'curve.views.home'),
     url(r'^signin$', 'curve.views.signin'),
     url(r'^signout$', 'curve.views.signout'),
+    url(r'^connect$', 'curve.views.connect'),
     # url(r'^curve/', include('curve.foo.urls')),
     url(r'^home$', include('home.urls')),
     url(r'^member/', include('member.urls')),

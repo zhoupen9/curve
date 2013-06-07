@@ -16,8 +16,30 @@
 	</head>
 	<body>
 		<script type="text/javascript">
+		function trivalNode(node) {
+			var i, content = '';
+			switch (node.nodeType) {
+				case 1:
+				for (i = 0; i < node.childNodes.length; i++) {
+					content += trivalNode(node.childNodes[i]);
+				}
+				break;
+				case 3:
+				content += node.nodeValue;
+				break;
+				default:
+				break;
+			}
+			return content;
+		}
+
 		$(document).ready(function () {
 			$('#test-btn').click(function () {
+				var content = '';
+				$('#demo4').children('div').each(function () {
+					content += trivalNode(this);
+				});
+				$('#text2').html(content);
 			});
 		});
 		</script>
@@ -34,6 +56,10 @@
 
 			<div id="demo3" class="demo-div" contenteditable="true">
 				<textarea id="text3"></textarea>
+			</div>
+			<div id="demo4">
+				<div>a <a href="#">link</a></div>
+				<div>text</div>
 			</div>
 		</div>
 	</body>
