@@ -19,7 +19,7 @@ $(document).ready(function () {
 		});
 	});
 
-	$('#activity-notify').click(function () {
+	$('#activity-notify').click(function (e) {
 		var i, items = $('#stream-items'), orig = items.length;
 		$.get('/post/recent')
 		.done(function (data) {
@@ -28,6 +28,8 @@ $(document).ready(function () {
 				items.children('li:nth-child(' + (i + 1) + ')').children(':first').post();
 			}
 		});
+		e.preventDefault();
+		this.parentNode.removeChild(this);
 	});
 });
 </script>

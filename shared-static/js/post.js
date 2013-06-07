@@ -42,9 +42,10 @@
 				parent = this.element.parent();
 				// toggle collapsed css.
 				parent.toggleClass('open');
-				ol = $('<ol class="post-open-container"></ol>').appendTo(parent);
-				li = $('<li></li>').appendTo(ol);
+				ol = parent.children('ol').toggleClass('hide');
+				li = ol.children().first();
 				// move original post into 'li' tag.
+				this.element.detach();
 				this.element.appendTo(li);
 				// add inline reply.
 				this.collapsed = true;
