@@ -19,8 +19,12 @@
 		<script type="text/javascript" src="{% static 'js/draggable.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/dialog.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/editor.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/poster.js' %}"></script>
 		<script type="text/javascript">
 			$(document).ready(function () {
+				// create global poster inside post dialog.
+				$('#post-dlg').find('.dialog-body').poster();
+
 				$('#global-post-btn').click(function (e) {
 					$('#post-dlg').dialog(/*{ modal: false}*/).draggable().show();
 				});
@@ -152,7 +156,8 @@
 					<h3 class="dialog-title">What to know or what to tell?</h3>
 				</div>
 				<div class="dialog-body">
-					<form class="post-form" method="post" action="/post/new">
+					<form class="post-form" method="post" action="/post/create">
+					{% csrf_token %}
 						<div class="post-content">
 							<div class="post-editor editor" contenteditable="true" spellcheck="true" aria-multiline="true" dir="ltr" role="textbox">
 								<div><br/></div>
@@ -173,7 +178,7 @@
 									<ul clas="typeahead-items topic-list "></ul>
 								</div>
 							</div>
-							<textarea class="hide"></textarea>
+							<textarea name="post-content" class="hide"></textarea>
 						</div>
 						<div class="post-toolbar clearfix">
 							<div class="post-thumbnail"></div>

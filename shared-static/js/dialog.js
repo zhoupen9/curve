@@ -20,9 +20,7 @@
 			// default behavior.
 			modal: true,
 			// default keyboard behavior.
-			captureKeys: true,
-			// default editor class name.
-			editorCls: 'editor'
+			captureKeys: true
 		},
 
 		// close dialog.
@@ -35,13 +33,19 @@
 
 		// show dialog.
 		show: function () {
+			var i, focus;
+			
 			if (this.overlay) {
 				this.overlay.show();
 			}
-			
-			// If dialog has a editor, focus to it.
-			if (this.editor) {
-				this.editor.focus();
+
+			// check if dialog contains any focusables, if so, set focus to the first found.
+			for (i in this.focusable) {
+				focus = this.element.find(this.focusable[i]);
+				if (focus.length) {
+					focus[0].focus();
+					return;
+				}
 			}
 		},
 
@@ -65,17 +69,13 @@
 		// create dialog ui.
 		createui: function () {
 			var that = this,
-			close = this.element.find('.'.concat(this.closeCls)),
-			editor = this.element.find('.'.concat(this.options.editorCls)).first();
+			close = this.element.find('.'.concat(this.closeCls));
+			
 			if (close.length) {
 				this.closeDelegate = function (e) {
 					return that.close(e);
 				};
 				close.on('click', this.closeDelegate);
-			}
-
-			if (editor.length) {
-				this.editor = editor.editor();
 			}
 
 			if (this.options.modal) {

@@ -12,7 +12,9 @@
 	// '#' list
 	ListTemplate = function () {},
 	// Formatter.
-	Formatter = function () {};
+	Formatter = function () {},
+	// Visitor.
+	Visitor = function () {};
 
 	Formatter.prototype = {
 		protocols: {
@@ -150,6 +152,27 @@
 		}
 	});
 
+	// editor content element visitor.
+	Visitor.prototype = {
+		visit: function (node) {
+			var i, content = '';
+			switch (node.nodeType) {
+				case 1:
+				for (i = 0; i < node.childNodes.length; i++) {
+					content += this.visit(node.childNodes[i]);
+				}
+				break;
+				case 3:
+				content += node.nodeValue;
+				break;
+				default:
+				break;
+			}
+			return content;
+
+		}
+	};
+
 	// register editor plugin.
 	// This editor provides additional content editing features than textarea,
 	// 1. Popup suggestions.
@@ -214,7 +237,9 @@
 		input: function (event) {
 			var i, selection, range, node, value, values, rm = [], out = '', child,
 			newnode = null, offset, pos, matched, regexp = /(\s+)/, created = [];
-			
+
+			this.element.trigger('change.editor');
+
 			if (!this.element.children().length) {
 				// This little trick ensures that user's editing comes from within a '<div>' element.
 				$('<div><br/></div>').appendTo(this.element);
@@ -268,7 +293,6 @@
 			// // pos.setEnd(div, div.childNodes.length);
 			// pos.collapse(false);
 			// selection.addRange(pos);
-
 		},
 
 		// handle key up, Check if text input contains any content matches any
@@ -276,30 +300,13 @@
 		keyup: function (event) {
 		},
 
-		// Travel node to get normalized content
-		// @private
-		travelNode: function (node) {
-			var i, content = '';
-			switch (node.nodeType) {
-				case 1:
-				for (i = 0; i < node.childNodes.length; i++) {
-					content += trivalNode(node.childNodes[i]);
-				}
-				break;
-				case 3:
-				content += node.nodeValue;
-				break;
-				default:
-				break;
-			}
-			return content;
-		},
-
 		// get normalized content of editor.
 		normalized: function () {
-			var content = '', parent = this.element.parent();
+			var that = this, content = '', parent = this.element.parent(),
+			visitor = new Visitor();
+			
 			this.element.children('div').each(function () {
-				content += this.travelNode(this);
+				content += visitor.visit(this);
 			});
 			return content;
 		}

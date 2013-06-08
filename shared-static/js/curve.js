@@ -138,6 +138,9 @@
 		// plugin namespace.
 		namespace: 'ui',
 
+		// focusable selector.
+		focusable: ['div[contenteditable=true]', 'input', 'button', 'a', 'textarea'],
+
 		// Create ui.
 		createui: $.noop,
 

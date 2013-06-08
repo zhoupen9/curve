@@ -131,8 +131,9 @@
 }
 
 .home-post .editor {
-    width: 266px;
+    width: 258px;
     color: #aaa;
+    height: 20px;
 }
 
 .home-activities {
