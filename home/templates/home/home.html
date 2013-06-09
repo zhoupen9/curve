@@ -11,11 +11,13 @@
 <script type="text/javascript" src="{% static 'js/post.js' %}"></script>
 <script type="text/javascript">
 $(document).ready(function () {
-	var load = $('#load-posts');
+	var load = $('#load-posts'), loading = $('#loading-posts');
 	load.on('click', function (e) {
-		$.getJSON('http://localhost:8000/media/posts/posts.json')
-		.done(function (data) {
-			load.addPostToStream(data.posts);
+		load.toggleClass('hide');
+		loading.toggleClass('hide');
+		$.get('/connection/notify').always(function () {
+			load.toggleClass('hide');
+			loading.toggleClass('hide');
 		});
 	});
 
@@ -159,7 +161,8 @@ $(document).ready(function () {
 	<div class="stream-footer">
 		<div class="stream-loading">
 			<div class="stream-loading-inner">
-				<span id="load-posts" class="spinner" title="loading...">loading...</span>
+				<span id="loading-posts" class="spinner hide"></span>
+				<span id="load-posts" title="loading...">loading...</span>
 			</div>
 		</div>
 	</div>

@@ -98,6 +98,10 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 	box-shadow: inset 0 1px 3px rgba(0,0,0,.05),0 0 8px rgba(82,168,236,.6);
 }
 
+.spinner {
+	background-image: url(/static/img/spinner.gif);
+}
+
 .user-style-default {
 	background-image: url(/static/img/bg.png);
 }
@@ -106,7 +110,7 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 	width: 837px;
 	padding: 54px 14px 15px;
 	min-height: 100%;
-	background-image: url(/static/img/wash-white-30.png)
+	background-image: url(/static/img/wash-white-30.png);
 }
 
 #topbar .container {

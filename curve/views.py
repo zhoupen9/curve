@@ -1,5 +1,4 @@
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from datetime import datetime
@@ -18,17 +17,16 @@ def home(request):
 
     context = {}
     if request.user.is_authenticated():
-        logger.debug('user name: %s, email: %s.', request.user.username, request.user.email)
-        # if user already logged in, render home page.
-        return render(request, 'home/home.html', context)
+	logger.debug('user name: %s, email: %s.', request.user.username, request.user.email)
+	# if user already logged in, render home page.
+	return render(request, 'home/home.html', context)
     else:
-        # if user did not logged in, render welcome page.
-        error = request.session.get('error', None)
-        if not error is None:
-            context['error'] = error
-        
+	# if user did not logged in, render welcome page.
+	error = request.session.get('error', None)
+	if not error is None:
+	    context['error'] = error
+
     return render(request, 'welcome.html', context)
-# pass
 
 @require_http_methods(['POST'])
 def signin(request):
@@ -44,19 +42,18 @@ def signin(request):
     logger.debug('Authenticating %s...', username)
     user = authenticate(username=username, password=password)
     if user is not None and user.is_active:
-        logger.debug("User authenticated and active, logging in...")
-        login(request, user)
-        # Set Session Expiry to 0 if user clicks "Remember Me"
-        if not request.POST.get('rem', None):
-            request.session.set_expiry(0)
-        member = Member.objects.get(user=user)
-        request.session['userid'] = user.id
-        request.session['username'] = member.username            
+	logger.debug("User authenticated and active, logging in...")
+	login(request, user)
+	# Set Session Expiry to 0 if user clicks "Remember Me"
+	if not request.POST.get('rem', None):
+	    request.session.set_expiry(0)
+	member = Member.objects.get(user=user)
+	request.session['userid'] = user.id
+	request.session['username'] = member.username
     else:
-        request.session['error'] = "There was an error logging you in. Please Try again."
+	request.session['error'] = "There was an error logging you in. Please Try again."
     request.session['last_login'] = datetime.now()
     return redirect('/')
-# pass
 
 def signout(request):
     """
@@ -64,12 +61,10 @@ def signout(request):
     Remove remembered from session, and redirect to main page.
     """
     for key in ['userid', 'username', 'error']:
-        if key in request.session:
-            del request.session[key]
+	if key in request.session:
+	    del request.session[key]
     # django auth logout.
     logout(request)
     return redirect('/')
-# pass
 
-def connect(request):
-    return HttpResponse('test')
+
