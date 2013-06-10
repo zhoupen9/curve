@@ -8,17 +8,14 @@ status = {
     CLOSED: 'closed'
     }
 
-class SessionIdGenerator(object):
-    def next(self):
-        return self.generate()
-
 class Session(object):
     """
     Abstract session.
     A session is a connection orient abstraction.
+    Subclasses of this class must implement send() and recv().
     """
     def __init__(self):
-        self.id = self.idgenerator.next()
+        self.id = next(self.idgenerator)
         pass
     
     def open(self):
@@ -41,12 +38,12 @@ class Session(object):
         """
         raise NotImplementedError
 
-class UUIDGenerator(SessionIdGenerator):
+def UUIDGenerator():
     """
     UUID base session id generator.
     """
-    def generate(self):
-        return uuid.uuid1()
+    while True:
+        yield uuid.uuid1()
     
 # provide a default id generator base on uuid.
 Session.idgenerator = UUIDGenerator()

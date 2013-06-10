@@ -2,13 +2,32 @@ from datetime import datetime
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import simplejson
-from manager import Connection
+from django.views.decorators.http import require_http_methods
+from session import Session
 
 import logging
 
 logger = logging.getLogger('curve')
 
 @login_required
+def create(request):
+    """
+    Create BOSH session request.
+    """
+    result = {}
+    user = request.session['userid']
+    if user is None:
+        result['success'] = False
+    else:
+        try:
+            session = Session.manager.create(user)
+            logger.debug('session %s created.', session.id)
+        except:
+            result['success'] = False
+    return HttpResponse(simplejson.dumps(result))
+
+@login_required
+@require_http_methods(['POST'])
 def poll(request):
     """
     Try to poll data from server.

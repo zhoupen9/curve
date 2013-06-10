@@ -1,3 +1,0 @@
-
-class BoshConnectionManager(ConnectionManager):
-    pass
