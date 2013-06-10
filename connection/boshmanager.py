@@ -1,0 +1,3 @@
+
+class BoshConnectionManager(ConnectionManager):
+    pass
