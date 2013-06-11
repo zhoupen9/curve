@@ -4,10 +4,14 @@
 (function ($) {
 	// "use strict";
 
+	var
+	Plugin = function () {},
+	UI = function () {},
+	Component = function () {},
+	Curve = function () {};
+
 	// Base plugin.
 	// Plugin is an abstraction for dynmatically add/modify/remove functionalities.
-	var Plugin = function () {};
-
 	// Define Plugin prototype.
 	// All sub plugins will inherite this prototype as default features.
 	Plugin.prototype = {
@@ -119,7 +123,7 @@
 					if (instance) {
 						instance.init(that);
 					} else {
-						$.debug('call constructor for: ' + name + '.');
+						$.debug('call constructor for: ', name);
 						$.data(this, name, new Constructor(that, options, this));
 					}
 				});
@@ -131,8 +135,6 @@
 	// UI base plugin.
 	// UI is declared from within an announymous function, so that it can NOT be accessed
 	// directly outside of this function scope.	
-	var UI = function () {};
-
 	// extends from base, Plugin.
 	UI.prototype = $.extend({}, Plugin.prototype, {
 		// plugin namespace.
@@ -229,11 +231,18 @@
 		}
 	});
 
-	// declare curve object.
-	var Curve = function () {
-		this.settings = {
-			debug: false
-		};
+	// Abstract component.
+	Component.prototype = {
+		// component name.
+		name: 'component',
+		// component version.
+		version: '0.1',
+		// abstract create.
+		create: $.noop,
+		// initiallize.
+		init: $.noop,
+		// destroy component.
+		destroy: $.noop,
 	};
 
 	// Cureve prototype.
@@ -250,6 +259,9 @@
 
 		// all managed UIs.
 		uis: [],
+
+		// all managed components.
+		components: [],
 
 		// update settings.
 		setting: function (prop, value) {
@@ -285,18 +297,29 @@
 		// E.g. call $('#some_id').dilaog(); after registered 'ui.dialog' plugin, will
 		// apply Plugin.plugin(name, new Plugin() /* which is default. */, proto).
 		plugin: function (name, proto) {
-			var plugin = new Plugin();
-			$.debugg('Register plugin: ' + name + '.');
-			plugin.plugin(name, proto);
+			var base = new Plugin();
+			$.debugg('Register plugin:', name);
+			// FIXME save registered plugin.
+			plugin.plugin(name, plugin, proto);
 			this.plugins.push(plugin);
 		},
 
 		// Shortcut for register an UI plugin which has a parent class UI.
 		ui: function (name, proto)	{
 			var ui = new UI(), fullname = ui.namespace.concat('.').concat(name);
-			$.debug('Register ui plugin: ' + fullname + '.');
+			$.debug('Register ui plugin:', fullname);
 			ui.plugin(fullname, ui, proto);
 			this.uis.push(ui);
+		},
+
+		// Register a component.
+		component: function (name, proto) {
+			var component = new Component();
+			$.extend(component, proto);
+			$.debug('Register component:', name);
+			component.create();
+			this.component[name] = component;
+			this[name] = component;
 		}
 	};
 

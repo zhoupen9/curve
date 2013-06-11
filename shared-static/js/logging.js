@@ -3,9 +3,16 @@
 (function ($) {
 	// "use strict";
 	
-	// Logging class.
-	var log, Logging = function () {},
-
+	var log, loggin,
+	// Logging.
+	Logging = function () {},
+	// log record.
+	Record = function () {},
+	// log.
+	Log = function () {},
+	// fomat.
+	Format = function () {},
+	
 	// log record entry.
 	Entry = function (value) {
 		if (!value) {
@@ -16,50 +23,130 @@
 			this.value = value;
 		}
 		return this;
-	},
-	// log record.
-	Record = function () {},
-	// log.
-	Log = function () {},
-	// fomat.
-	Format = function () {},
-	// simple format.
-	SimpleFormat = function () {};
-
-	// Abstract formatter.
-	Format.prototype = {
-		format: $.noop
 	};
 
-	// Simple format.
-	SimpleFormat.prototype = {
-		// format date time to readable.
-		formatTime: function (date) {
+
+	// Log record formatter.
+	Format.prototype = {
+		// supported format patterns.
+		patterns: [ '%time', '%level' ],
+
+		// format target.
+		format: $.noop,
+
+		// default format.
+		defaultFormat: '%time %level %message',
+
+		// split regular expression.
+		splitRegExp: /(\s+)/,
+
+		// parse format.
+		// This method parse given format and then add associated formatter
+		// to this format for future uses.
+		parse: function (format) {
+			var i, value, segments;
+			this.plains = this.plains || [];
+			this.whitespaces = this.whitespaces || [];
+			this.formatters = this.formatters || [];
+			format = format || this.defaultFormat;
+			segments = format.split(this.splitRegExp);
+			for (i = 0; i < segments.length; i++) {
+				value = segments[i];
+				if (value.trim().length) {
+					switch (value) {
+					case '%time':
+						this.formatters.push(this.dateFormatter);
+						break;
+					case '%level':
+						this.formatters.push(this.levelFormatter);
+						break;
+					case '%message':
+						this.formatters.push(this.messageFormatter);
+						break;
+					default:
+						this.plains[i] = value;
+						this.formatters.push(this.plainFormatter);
+						break;
+					}
+				} else {
+					// whitespaces.
+					this.whitespaces[i] = value;
+					this.formatters.push(this.whitespaceFormatter);
+				}
+			}
+			return this;
+		},
+
+		// Format a log record.
+		format: function (context) {
+			var i, message = [], record = context.record, formatted = '';
+
+			// safe checking.
+			if (!this.formatters) {
+				this.parse(this.defaultFormat);
+			}
+			
+			for (i = 0; i < record.entries.length; i++) {
+				message.push(this.formatEntry(record.entries[i]));
+			}
+			context.message = message.join(',');
+			for (i = 0; i < this.formatters.length; i++) {
+				formatted += this.formatters[i].call(this, context, i);
+			}
+			return formatted;
+		},
+
+		// datetime format.
+		dateFormatter: function (context) {
+			date = context.date || new Date();
 			return '[' + date.getMonth() + '/' + date.getDate() + '/' +
 				date.getFullYear() + ' ' + date.getHours() + ':' +
 				date.getMinutes() + ':' + date.getSeconds() + ']';
 		},
 
+		// level format.
+		levelFormatter: function (context) {
+			return context.level.name;
+		},
+
+		// message format.
+		messageFormatter: function (context) {
+			return context.message || '';
+		},
+
+		// plain text format.
+		plainFormatter: function (context, index) {
+			return this.plains[index];
+		},
+
+		// whitespace format.
+		whitespaceFormatter: function (context, index) {
+			return this.whitespaces[index];
+		},
+
 		// format a log entry.
-		format: function (entry) {
+		formatEntry: function (entry) {
 			var i, v, ary, type = entry.type, value = entry.value, formatted = '';
 			if (type === 'object') {
 				if (Array.isArray(value)) {
 					ary = [];
 					for (i = 0; i < value.length; i++) {
-						ary.push(this.format(new Entry(value[i])));
+						ary.push(this.formatEntry(new Entry(value[i])));
 					}
 					formatted += '[' + ary.join(',') + ']';
 				} else {
-					fomatted += value instanceof Date ? this.formatTime(value) : value.toString();
+					formatted += value.toString();
 				}
 			} else {
 				formatted += value;
 			}
 			return formatted;
 		}
+
 	};
 
+	// Log record.
+	// A log record contains serveral entries inside.
 	Record.prototype = {
 		// add an entry.
 		add: function (entry) {
@@ -75,12 +162,11 @@
 		}
 	};
 
+	// Logger.
+	// The name of code below really should be 'Logger'.
 	Log.prototype = {
 		// default log will not persistant records.
 		persistant: false,
-
-		// default output console.
-		output: console,
 
 		// set log level.
 		setLevel: function (level) {
@@ -90,6 +176,13 @@
 		// set log format.
 		setFormat: function (format) {
 			this.format = format;
+			
+		},
+
+		// add handler.
+		addHandler: function (handler) {
+			this.handlers = this.handlers || [];
+			this.handlers.push(handler);
 		},
 
 		// create log record.
@@ -115,21 +208,9 @@
 			return level.level >= this.level.level;
 		},
 		
-		// write log.
-		write: function (record) {
-			var out = [], index, entry;
-
-			for (index = 0; index < record.entries.length; index++) {
-				entry = record.entries[index];
-				out.push(this.format.format(entry));
-			}
-
-			this.output.log(out.join(','));
-		},
-		
 		// format log message.
 		log: function (level, arguments) {
-			var record = new Record(), index, value,
+			var record = new Record(), index, value, formatted, context = {};
 			ary = Array.prototype.slice.call(arguments);
 
 			if (!this.loggable(level)) {
@@ -143,7 +224,16 @@
 			// save log record.
 			this.add(record);
 			// write.
-			this.write(record);
+			if (this.handlers) {
+				context.level = this.level;
+				context.record = record;
+				context.date = new Date();
+				formatted = this.format.format(context);
+				for (index = 0; index < this.handlers.length; index++) {
+					// NOTE normally, handler should handle log record instead of formatted content.
+					this.handlers[index].call(this, formatted);
+				}
+			}
 		},
 
 		// convenient method for logging at "debug" level.
@@ -219,7 +309,10 @@
 	// local logger.
 	log = new Log();
 	log.setLevel($.curve ? $.curve.setting('logging').level : 'debug');
-	log.setFormat(new SimpleFormat());
+	log.setFormat(new Format()); // default format.
+	log.addHandler(function (message) {
+		console.log(message);
+	});
 	
 	// create local logging.
 	logging = new Logging();

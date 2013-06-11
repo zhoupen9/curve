@@ -8,17 +8,7 @@ import logging
 
 logger = logging.getLogger('curve')
 
-# class Create(object):
-#     attributes = [
-#         'to',# This attribute specifies the target domain of the first stream.
-#         'lang', # xml:lang This attribute specifies the default language of any human-readable XML character data sent or received during the session.
-#         'ver', # This attribute specifies the highest version of the BOSH protocol that the client supports.
-#         'wait', # This attribute specifies the longest time (in seconds) that the connection manager is allowed to wait before responding to any request during the session.
-#         'hold', # This attribute specifies the maximum number of requests the connection manager is allowed to keep waiting at any one time during the session.
-#         ]
-#     pass
-
-class Scheme(object):
+class Schema(object):
     """
     BOSH scheme was documented as an xml scheme in XEP-0124:
     http://www.xmpp.org/extensions/xep-0124.html
@@ -68,6 +58,25 @@ class Scheme(object):
         'wait': int, # unsigned short
         'lang': str, # xml:lang
         }
+
+    def check(self):
+        """ Check if instance conform to its schema. """
+        if not hasattr(self, 'schema'):
+            raise TypeError('schema not found.')
+
+        if self.schema is None:
+            raise ValueError('schema is None.')
+
+        for name in self.schema:
+            if name not in self.attributes:
+                raise ValueError('invalid schema.')
+            value = self.schema[name]
+            if value is None:
+                raise ValueError('schema item:' + name + ' has no value.')
+            checkType = self.attributes[name]
+            checkType = type(checkType) == 'type' or 'string'
+            if type(value) != checkType:
+                raise TypeError('schema item: ' + name + ' has invalid value type.')
     pass
 
 class Connection(object):
@@ -87,6 +96,7 @@ class BoshSession(Session):
     """
     connections = {}
     dataPending = []
+    requests = []
     
     def getConnection(self, connectionType):
         """
@@ -135,6 +145,30 @@ class BoshSession(Session):
             conn.close()
         except:
             pass
+
+        pass
+    pass
+
+class ConnectResponse(object):
+    schema = [
+        'sid',
+        'wait',
+        'ver',
+        'polling',
+        'inactivity',
+        'requests',
+        'hold',
+        'to'
+        ]
+    pass
+
+class Terminate(Schema):
+    schema = [
+        'type',
+        'condition',
+        ]
+    pass
+
         
 class BoshManager(Manager):
     """
@@ -143,6 +177,16 @@ class BoshManager(Manager):
     which was defined in XEP-0124, http://xmpp.org/extensions/xep-0124.html
     """
     sessions = {}
+    # server default wait time in seconds.
+    version = '0.1'
+    wait = 60
+    polling = False
+    inactivity = 60
+    requests = 2
+    hold = 1
+
+    def getSid(self, userid):
+        return 'sid-'.concat(userid)
 
     def success(self, data=None):
         result = {}
@@ -150,30 +194,51 @@ class BoshManager(Manager):
             result['data'] = data
         return simplejson.dumps(result)
     
-    def createSessionInternal(self, connection):
+    def createSession(self, userid, request):
         """
         Create a bosh session.
         """
-        if connection is None:
+        result = {}
+        if request is None:
             raise ValueError('connection can not be none.')
 
-        conn_id = connection.id
-        if conn_id in self.sessions:
-            logger.debug('a session bind with %d already exists.', conn_id)
-            self.close(self.sessions[conn_id])
-            return None
+        if userid in self.sessions:
+            logger.debug('a session bind with %d already exists.', userid)
+            result['response'] = self.responseToCreate(False)
+            result['session'] = None
+        else:
+            session = BoshSession()
+            # session.connections[COMMAND_CONNECTION] = connection
+            result['session'] = session
+            result['respeone'] = self.responseToCreate()
+            
+        return result
 
-        session = BoshSession()
-        session.connections[COMMAND_CONNECTION] = connection
+    def terminate(self, condition, session=None):
+        """ Terminate session or creating session. """
+        if session is not None:
+            del self.sessions[session.id]
+            
+        response = Terminate()
+        response.type = 'terminate'
+        response.condition = condition
+        return response
 
-        result = {}
-        
-        # session.send(self.success(createResponse))
-        return session
-
-    def createInternal(self):
-        
-
+    def responseToCreate(self, success=True):
+        if success:
+            response = ConnectResponse()
+            response.sid = self.getSid()
+            response.wait = self.wait
+            response.ver = self.version
+            response.polling = self.polling
+            response.inactivity = self.inactivity
+            response.requests = self.requests
+            response.hold = self.hold
+            response.to = 'to'
+        else:
+            response = self.terminate()
+        return response
+    pass
 
 
 # Bosh session's default manager.

@@ -22,6 +22,10 @@
 		<script type="text/javascript" src="{% static 'js/poster.js' %}"></script>
 		<script type="text/javascript">
 			$(document).ready(function () {
+				// click handler for 'message' inside top bar.
+				$('#message').click(function (e) {
+
+				});
 				// create global poster inside post dialog.
 				$('#post-dlg').find('.dialog-body').poster();
 
@@ -62,7 +66,7 @@
 									<a href="/live">Live!</a>
 								</li>
 								<li>
-									<a href="/profile">
+									<a id="message">
 										<span>
 											<i class="nav-messages"></i>
 										</span>

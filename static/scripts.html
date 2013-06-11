@@ -16,30 +16,22 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-		function trivalNode(node) {
-			var i, content = '';
-			switch (node.nodeType) {
-				case 1:
-				for (i = 0; i < node.childNodes.length; i++) {
-					content += trivalNode(node.childNodes[i]);
-				}
-				break;
-				case 3:
-				content += node.nodeValue;
-				break;
-				default:
-				break;
+		var Foo = function () {};
+		Foo.prototype = {
+			bar: function () {
+				return 'foo.bar';
 			}
-			return content;
-		}
+		};
+
+		var foo = $.extend({}, new Foo(), {
+			bar: function () {
+				return 'bar';
+			}
+		});
 
 		$(document).ready(function () {
 			$('#test-btn').click(function () {
-				var content = '';
-				$('#demo4').children('div').each(function () {
-					content += trivalNode(this);
-				});
-				$('#text2').html(content);
+				window.alert(foo.bar());
 			});
 		});
 		</script>
