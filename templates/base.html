@@ -20,8 +20,23 @@
 		<script type="text/javascript" src="{% static 'js/dialog.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/editor.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/poster.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/bosh.js' %}"></script>
 		<script type="text/javascript">
 			$(document).ready(function () {
+				var userid, session, request, host = '/connect';
+
+				userid = $('#current-user').data('data-user-id');
+
+				$.curve.CM.connect(host).done(function () {
+					session = $.curve.CM.get(host);
+
+					if (session.isConnected()) {
+						$.debug('Session connected to server.');
+					} else {
+						$.debug('Session connect to server failed.');
+					}
+				});
+
 				// click handler for 'message' inside top bar.
 				$('#message').click(function (e) {
 
@@ -92,12 +107,12 @@
 											<span class="caret"></span>
 										</a>
 										<ul class="dropdown-menu">
-											<li class="current-user" data-name="profile">
-												<a href="/zhoup3ng" class="account-summary" data-name="profile">
+											<li id="current-user" class="current-user" data-name="profile" data-user-id="{{ request.session.userid }}">
+												<a href="/{{ request.session.username }}" class="account-summary" data-name="profile">
 													<div class="profile-content">
 														<div class="account-group">
 															<img class="avatar size32" src="{% static 'img/profile-icons/vivalavida.jpeg' %}"/>
-															<b class="fullname">ZhouP3ng</b>
+															<b class="fullname">{{ request.session.username }}</b>
 															<small class="metadata">Edit profile</small>
 														</div>
 													</div>

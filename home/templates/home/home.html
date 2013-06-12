@@ -43,9 +43,9 @@ $(document).ready(function () {
 		<div class="profile-summary">
 			<a href="/zhoup3ng" class="account-summary" data-nav="profile">
 				<div class="profile-content">
-					<div class="account-group current-user" data-user-id="" data-screen-name="">
+					<div class="account-group current-user" data-user-id="{{ request.session.userid}}" data-screen-name="">
 						<img class="avatar size32" src="/static/img/profile-icons/vivalavida.jpeg" data-user-id="" alt=""></img>
-						<b class="fullname">Zhou P3ng</b>
+						<b class="fullname">{{ request.session.username }}</b>
 						<small class="metadata">View my profile page</small>
 					</div>
 				</div>

@@ -1,5 +1,6 @@
 
 from django.utils import simplejson
+from notification import Notification, Delivery
 from datetime import datetime
 from session import Session
 from manager import Manager
@@ -77,18 +78,16 @@ class Schema(object):
             checkType = type(checkType) == 'type' or 'string'
             if type(value) != checkType:
                 raise TypeError('schema item: ' + name + ' has invalid value type.')
+            pass
+        pass
     pass
 
-class Connection(object):
-    """
-    BOSH connection.
-    BOSH connection is based on HTTP connection.
-    """
-    def __init__(self):
-        self.createTime = datetime.now()
-
-COMMAND_CONNECTION = 1
-DATA_CONNECTION = 2
+class Handler(object):
+    """ Abstract data handler. """
+    def handle(self, data):
+        raise NotImplementedError()
+    pass
+pass
 
 class BoshSession(Session):
     """
@@ -97,6 +96,7 @@ class BoshSession(Session):
     connections = {}
     dataPending = []
     requests = []
+    hold = []
     
     def getConnection(self, connectionType):
         """
@@ -117,32 +117,36 @@ class BoshSession(Session):
         # send response on command connection and wait a data connection
         # to poll data.
         try:
-            conn = self.getConnection(COMMAND_CONNECTION)
-            conn.response()
+            if len(self.hold) < 1:
+                logger.debug("There's no connection hold.")
+                raise RuntimeError('No active connection hold.')
+            
+            connection = self.hold.pop()
+            connection.send(data)
+            connection.notify()
         except RuntimeError:
             self.close()
         pass
 
-    def recv(self):
-        """
-        Try to receive data from BOSH session.
-        If there's no active connection in sessoin, server will close session.
-        """
-        try:
-            # receive data from data connection.
-            conn = self.getConnection(DATA_CONNECTION)
-            data = conn.recv()
-            return data
-        except RuntimeError:
-            logger.debug('no active data connection, server close session.')
-            self.close()
-        pass
+    # def recv(self, data):
+    #     """
+    #     Try to receive data from BOSH session.
+    #     If there's no active connection in sessoin, server will close session.
+    #     """
+    #     try:
+    #         # receive.
+            
+    #     except RuntimeError:
+    #         logger.debug('no active data connection, server close session.')
+    #         self.close()
+    #     pass
 
     def close(self):
+        """ Close BOSH session. """
         super(BoshSession, self).close()
         try:
-            conn = self.getConnection(COMMAND_CONNECTION)
-            conn.close()
+            for conn in self.hold:
+                conn.close()
         except:
             pass
 
@@ -169,7 +173,22 @@ class Terminate(Schema):
         ]
     pass
 
-        
+class BoshDelivery(Delivery):
+    """ Bosh delivery employee BOSH to send given data. """
+    def delivery(self, data):
+        """ Delivery data. """
+        target = getattr(data, 'target', None)
+        if target is None:
+            logger.debug('Delivery has no target, dicard.')
+            pass
+        session = BoshSession.manager.get(target)
+        if session is not None:
+            # target is online
+            session.send(data)
+        pass
+    
+    pass
+
 class BoshManager(Manager):
     """
     BOSH connection manager.
@@ -184,6 +203,7 @@ class BoshManager(Manager):
     inactivity = 60
     requests = 2
     hold = 1
+    handlers = []
 
     def getSid(self, userid):
         return 'sid-'.concat(userid)
@@ -224,6 +244,22 @@ class BoshManager(Manager):
         response.condition = condition
         return response
 
+    def recv(self, userid, data):
+        for handler in self.handlers:
+            match = handler.regex.match(data.to)
+            if match is not None:
+                handler.handle(userid, data)
+                pass
+            pass
+
+        sid = data.sid
+        session = self.sessions[sid]
+        if session is None:
+            logger.debug('Session not found, sid: %s.', sid)
+            pass
+        
+        pass
+
     def responseToCreate(self, success=True):
         if success:
             response = ConnectResponse()
@@ -243,3 +279,5 @@ class BoshManager(Manager):
 
 # Bosh session's default manager.
 BoshSession.manager = BoshManager()
+# register delivery to notification service.
+Notification.objects.setDelivery(BoshDelivery())
