@@ -18,47 +18,47 @@ Client request a session by sending a request which conforms to request schema.
 
 Server must response to this request, if request accepted an associated session
 **should** be created. Response **must** be form of:
-    ```javascript
-    schema: {
-    	to: '',
-    	rid: '',
-    	wait: '',
-    	ver: '',
-    	polling: '',
-    	inactivity: '',
-    	requests: '',
-    	hold: '',
-    	to: ''
-    }
-    ```
+```javascript
+schema: {
+	to: '',
+	rid: '',
+	wait: '',
+	ver: '',
+	polling: '',
+	inactivity: '',
+	requests: '',
+	hold: '',
+	to: ''
+}
+```
 ## Terminate
 
 Client can request to terminate session anytime. Request schema:
-    ```javascript
-    schema: {
-    	sid: 'SomeSID',
-    	rid: rid,
-    	type: 'terminate'
-    }
-    ```
+```javascript
+schema: {
+	sid: 'SomeSID',
+	rid: rid,
+	type: 'terminate'
+}
+```
 Server **must** response to terminate request with:
-    ```javascript
-    schema: {
-    	type: 'terminate'
-    }
-    ```
+```javascript
+schema: {
+	type: 'terminate'
+}
+```
 ## Send
 Client can send and receive data payload via http binding, after the client
 has successfully completed all required preconditions.
-    ```javascript
-	schema: {
-		sid: 'SomeSID',
-		rid: '',
-		data: {
-			'foo': 'bar'
-		}
+```javascript
+schema: {
+	sid: 'SomeSID',
+	rid: '',
+	data: {
+		'foo': 'bar'
 	}
-    ```
+}
+```
 Send/Receive process.
 
     Client | Server
@@ -68,17 +68,17 @@ Send/Receive process.
      | response queued data.
 
 Server empty response:
-    ```javascript
-    schema: {
-    	// nothing.
-	}
-    ```
+```javascript
+schema: {
+	// nothing.
+}
+```
 Server response with queued data:
-    ```javascript
-    schema: {
-    	data: {
-    		'foo': 'bar'
-    	}
-    }
-    ```
+```javascript
+schema: {
+	data: {
+		'foo': 'bar'
+	}
+}
+```
 ## Receive

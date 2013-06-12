@@ -12,12 +12,12 @@ manager will delivery requests to the application if conditions fit.
 
 Application must register on connection manager to told connection manager
 where the data package should be deliveried.
-	```python
-    from connection import Manager
-    def init(self):
-    	Manager.instance.register(r'^im/send$', self.send)
+```python
+from connection import Manager
+def init(self):
+	Manager.instance.register(r'^im/send$', self.send)
 
-    def send(self, request):
-    	# parse request.
-    	# delivery message.
-    ```
+def send(self, request):
+	# parse request.
+	# delivery message.
+```
