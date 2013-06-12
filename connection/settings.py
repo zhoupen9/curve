@@ -8,5 +8,6 @@ SESSION = {
     'lang': 'en',
     'ver': '0.1',
     'charset': 'UTF-8',
+    'inactivity': 60,
 }
     

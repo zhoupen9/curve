@@ -16,18 +16,21 @@ def connect(request):
     """
     Create BOSH session request.
     """
-    result = {}
     user = request.session['userid']
-
-    rs = manager.createSession(user, request.POST)
-    result['response'] = rs.response
-
+    result = manager.createSession(user, request.POST)
     return HttpResponse(simplejson.dumps(result))
 
 @login_required
 @require_http_methods(['POST'])
 def request(request):
+    """
+    Create request in BOSH session.
+    If request contains data which client sent to server, connection manager should handle it.
+    And connection manager would not resposne to this request until there's data to send to
+    client (recommended in BOSH).
+    """
     user = request.session['userid']
     connection = manager.recv(user, request.POST)
+    # if there's no data queue to send, poll will block.
     result = connection.poll()
     return HttpResponse(simplejson.dumps(result))

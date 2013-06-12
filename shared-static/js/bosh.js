@@ -6,7 +6,7 @@
 	var
 	Session = function () {},
 	BOSHProtocol = function () {},
-	SessionInitailizer = function() {},
+	SessionInitializer = function() {},
 	SessionRequestor = function () {},
 	SessionTerminator = function () {};
 
@@ -67,13 +67,14 @@
 
 		// check if given data is valid.
 		validate: function (schema, data) {
-			var key, type;
+			var index, key, type;
 
 			if (!data) {
 				return false;
 			}
 
-			for (key in schema) {
+			for (index in schema) {
+				key = schema[index]
 				type = this.schema[key];
 				// check given schema.
 				if (!type) {
@@ -102,18 +103,19 @@
 			'ver',
 			'hold',
 			'lang',
-			'charset',
+			'charsets',
 		],
 
 		// create initial BOSH session request.
-		create: function (protocol, to, rid, wait, hold) {
+		create: function (protocol, to, rid, wait, hold, ver, lang, charsets) {
 			var request = {
 				to: to,
-				lang: schema.lang,
-				ver: schema.ver,
+				lang: lang,
+				ver: ver,
 				wait: wait,
 				hold: hold,
-				rid: rid
+				rid: rid,
+				charsets: charsets,
 			};
 			return protocol.validate(this.schema, request) ? request : null;
 		}
@@ -127,7 +129,7 @@
 
 		// create session request.
 		create: function (protocol, sid, rid, data) {
-			var reqeust = {
+			var request = {
 				sid: sid,
 				rid: rid,
 			};
@@ -186,40 +188,52 @@
 		},
 
 		// create session.
-		create: function (sid, options) {
-			this.sid = sid;
+		create: function (to, options) {
+			this.sid = undefined;
+			this.to = to;
 			this.options = $.extend({}, options);
 			this.protocol = new BOSHProtocol();
 			this.initializer = new SessionInitializer();
 			this.requestor = new SessionRequestor();
-			this.terminator = new Sessionterminator();
+			this.terminator = new SessionTerminator();
 			this.status = this.statuses.created;
 		},
 		
-		setDestination: function (dist) {
-			this.dist = dist;
-		},
-
 		// generate a request id.
 		nextrid: function () {
 			this.rid = this.rid || (10000 + Math.round(Math.random() * 10000));
 			return ++this.rid;
 		},
 
-		// Connect to dist.
-		connect: function (dist) {
-			var	request = this.initializer.create(
+		// Connect to host.
+		connect: function (host, data) {
+			var that = this, request = this.initializer.create(
 				this.protocol,
 				host,
-				session.nextrid(),
+				this.nextrid(),
 				this.options.wait,
-				this.options.hold);
+				this.options.hold,
+				this.options.ver,
+				this.options.lang,
+				this.options.charsets
+			), deferred = $.Deferred();
 
 			this.status = this.statuses.connecting;
+
+			if (data) {
+				$.extend(request, data);
+			}
 			
-			return $[this.method](this.connectDist, request)
-				.done(this.connectDone)
-				.fail(this.connectFailed);
+			$[this.method](host, request)
+				.done(function (data) {
+					deferred.resolve(that, data);
+				})
+				.fail(function () {
+					deferred.reject(that, data);
+				});
+
+			deferred.done(this.connectDone).fail(this.connectFailed);
+			return deferred.promise();
 		},
 
 		// If session is currently connected.
@@ -229,7 +243,7 @@
 
 		// send data to BOSH connection manager.
 		send: function (data) {
-			var request = this.requestor.create(this.protocol, this.sid, this.nextrid(), data);
+			var that = this, request = this.requestor.create(this.protocol, this.sid, this.nextrid(), data);
 
 			if (!this.isConnected()) {
 				throw new Error('Session is net connected.');
@@ -251,11 +265,11 @@
 			}
 			
 			request = request || {};
-			$[this.method](this.dist, request)
+			$[this.method](this.to, request)
 				.done(this.onReceive)
 				.fail(this.onBroken)
 				.always(function () {
-					this.trigger('sent.session');
+					// that.trigger('sent.session');
 				});
 		},
 
@@ -266,7 +280,7 @@
 			if (response.data) {
 				// server send queued data back.
 				this.received.push(data);
-				this.trigger('received.session');
+				// this.trigger('received.session');
 			}
 
 			// decrease current requests.
@@ -306,7 +320,7 @@
 				rid: this.nextrid(),
 				type: 'terminate'
 			};
-			return $[this.method](this.dist, terminate)
+			return $[this.method](this.to, terminate)
 				.done()
 				.fail()
 				.always(this.cleanup);
@@ -323,33 +337,33 @@
 		},
 		
 		// Handle session connect done.
-		connectDone: function (response) {
+		connectDone: function (session, response) {
 			var session, to = response.to;
 			
 			if (response.type && response.type === 'terminate') {
 				// connection failed to create due to server terminated.
 				$.debug('session failed to connect.');
-				this.status = this.statuses.disconnected;
-				this.cleanup();
+				session.status = session.statuses.disconnected;
+				session.cleanup();
 				return;
 			}
 			
-			$.debug('Connected to:', response.to);
-			this.status = this.statuses.connected;
-			this.sid = response.id;
-			$.extend(this.options, {
-				wait: Math.min(response.wait, this.options.wait),
-				requests: Math.max(response.requests, this.options.requests),
-				polling: response.polling || this.options.polling,
+			$.debug('Connected to:', to);
+			session.status = session.statuses.connected;
+			session.sid = response.sid;
+			$.extend(session.options, {
+				wait: Math.min(response.wait, session.options.wait),
+				requests: Math.max(response.requests, session.options.requests),
+				polling: response.polling || session.options.polling,
 			});
 		},
 
 		// Handle session connect failed.
 		// Manager may want to reconnect in a future.
-		connectFailed: function (response) {
-			$.debug('Faield to connect to:', response.to);
-			this.status = this.statuses.disconnected;
-			this.cleanup();
+		connectFailed: function (session, response) {
+			$.debug('Faield to connect to:', response ? response.to : 'no response');
+			session.status = session.statuses.disconnected;
+			session.cleanup();
 		}
 	};
 
@@ -357,6 +371,10 @@
 	$.curve.component('CM', {
 		// default options for all session.
 		options: {
+			ver: '0.1',
+			hold: 1,
+			lang: 'en',
+			charsets: 'UTF-8',
 			wait: 60,
 			requests: 2,
 			polling: false,
@@ -368,20 +386,21 @@
 		},
 
 		// Get session.
-		get: function (dist) {
-			if (dist in this.sessions) {
-				return this.sessions[dist];
+		get: function (host) {
+			if (host in this.sessions) {
+				return this.sessions[host];
 			} else {
-				$.debug('session matches:', dist, ' not found.');
+				$.debug('session matches:', host, ' not found.');
 			}
 		},
 		
 		// Try to connect to server to create a session.
-		connect: function (host) {
+		connect: function (host, to, data) {
 			var session = new Session();
+			session.create(to, this.options);
 			// save session, notice that sesion not fully created yet.
 			this.sessions[host] = session;
-			return session.connect(host);
+			return session.connect(host, data);
 		},
 
 		// Try to close current session.

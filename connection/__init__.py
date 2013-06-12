@@ -9,4 +9,4 @@ MANAGER_CLASSNAME = ''.join(MANAGER_CLASS_FULL.split('.')[-1:])
 # import manager module.
 module = import_module(MANAGER_PACKAGE)
 # create connection's default manager.
-manager = getattr(module, MANAGER_CLASSNAME)()
+manager = getattr(module, MANAGER_CLASSNAME)(settings.SESSION)
