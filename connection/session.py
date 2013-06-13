@@ -3,10 +3,7 @@ import uuid
 OPEN = 1
 CLOSED = 2
 
-status = {
-    OPEN: 'open',
-    CLOSED: 'closed'
-    }
+SESSION_STATUS = (OPEN, CLOSED)
 
 class Session(object):
     """
@@ -19,11 +16,11 @@ class Session(object):
         pass
     
     def open(self):
-        self.status = status[OPEN]
+        self.status = OPEN
         pass
 
     def close(self):
-        self.status = status[CLOSED]
+        self.status = CLOSED
         pass
 
     def send(self, data):

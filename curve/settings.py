@@ -132,6 +132,7 @@ INSTALLED_APPS = (
     'home',
     'post',
     'connection',
+    'notification',
 )
 
 LOGIN_URL = "/"

@@ -17,6 +17,8 @@ def connect(request):
     Create BOSH session request.
     """
     user = request.session['userid']
+    logger.debug('request create session, userid: %s, rid: %s, to: %s', \
+                     user, request.POST['rid'], request.POST['to'])
     result = manager.createSession(user, request.POST)
     return HttpResponse(simplejson.dumps(result))
 
@@ -30,6 +32,7 @@ def request(request):
     client (recommended in BOSH).
     """
     user = request.session['userid']
+    logger.debug('send request, sid: %s, rid: %s.', request.POST['sid'], request.POST['rid'])
     connection = manager.recv(user, request.POST)
     # if there's no data queue to send, poll will block.
     result = connection.poll()

@@ -70,7 +70,7 @@
 			var index, key, type;
 
 			if (!data) {
-				return false;
+				throw new Error('Given data is empty.');
 			}
 
 			for (index in schema) {
@@ -79,19 +79,19 @@
 				// check given schema.
 				if (!type) {
 					$.debug(key, ' is not a valid attribute.');
-					return false;
+					throw new Erorr(key + ' is not a valid attribute.');
 				}
 				// check if data conforms to given schema.
 				if (!data[key]) {
 					$.debug('missing attribute:', key);
-					return false;
+					throw new Error('Missing attribute: ' + key);
 				}
 				// check if data type conforms to BOSH schema.
 				if (typeof(data[key]) !== type) {
 					$.debug(key, ' has invalid value type.');
+					throw new Error(key + ' has invalid value type.');
 				}
 			}
-			return true;
 		}
 	};
 
@@ -117,7 +117,8 @@
 				rid: rid,
 				charsets: charsets,
 			};
-			return protocol.validate(this.schema, request) ? request : null;
+			protocol.validate(this.schema, request);
+			return request;
 		}
 	};
 
@@ -138,7 +139,8 @@
 				request.data = data;
 			}
 
-			return protocol.validate(this.schema, request) ? request : null;
+			protocol.validate(this.schema, request);
+			return request;
 		}
 	};
 
@@ -156,7 +158,8 @@
 				rid: rid,
 				type: type,
 			};
-			return protocol.validate(this.schema, request) ? request : null;
+			protocol.validate(this.schema, request);
+			return request;
 		}
 	};
 
@@ -167,7 +170,7 @@
 		method: 'post',
 
 		// status.
-		statuses: {
+		Status: {
 			created: 0,
 			connecting: 1,
 			connected: 2,
@@ -175,14 +178,14 @@
 		},
 
 		// requests.
-		requests: {
+		Requests: {
 			clean: 0, // no active connections.
 			polling: 1, // polling from server.
 		},
 
 		// default options.
 		options: {
-			wait: 180, // max time to wait in seconds.
+			wait: 10, // max time to wait in seconds.
 			requests: 2,
 			polling: false, // by default, client doe not perform pure polling.
 		},
@@ -196,7 +199,7 @@
 			this.initializer = new SessionInitializer();
 			this.requestor = new SessionRequestor();
 			this.terminator = new SessionTerminator();
-			this.status = this.statuses.created;
+			this.status = this.Status.created;
 		},
 		
 		// generate a request id.
@@ -207,7 +210,8 @@
 
 		// Connect to host.
 		connect: function (host) {
-			var that = this, request = this.initializer.create(
+			var that = this, deferred = $.Deferred(),
+			request = this.initializer.create(
 				this.protocol,
 				host,
 				this.nextrid(),
@@ -216,11 +220,11 @@
 				this.options.ver,
 				this.options.lang,
 				this.options.charsets
-			), deferred = $.Deferred();
+			);
 
-			this.status = this.statuses.connecting;
+			this.status = this.Status.connecting;
 
-			$[this.method](host, request)
+			$[this.method](host, request, null, 'json')
 				.done(function (data) {
 					deferred.resolve(that, data);
 				})
@@ -234,12 +238,13 @@
 
 		// If session is currently connected.
 		isConnected: function () {
-			return this.status === this.statuses.connected;
+			return this.status === this.Status.connected;
 		},
 
 		// send data to BOSH connection manager.
 		send: function (data) {
-			var that = this, request = this.requestor.create(this.protocol, this.sid, this.nextrid(), data);
+			var that = this, deferred = $.Deferred(),
+			request = this.requestor.create(this.protocol, this.sid, this.nextrid(), data);
 
 			if (!this.isConnected()) {
 				throw new Error('Session is net connected.');
@@ -251,51 +256,64 @@
 					this.pending = this.pending || [];
 					this.pending.push(request);
 					// pending data will not be sent right now and it will not trigger 'sent.session' event.
-					return;
+					return deferred.reject('pending');
 				} else {
 					// increase current requests.
 					++this.current;
 				}
 			} else {
-				this.current = this.requests.polling;
+				this.current = this.Requests.polling;
 			}
 			
 			request = request || {};
 			$[this.method](this.to, request)
-				.done(this.onReceive)
-				.fail(this.onBroken)
+				.done(function (response) {
+					deferred.resolve(that, response);
+				})
+				.fail(function (response) {
+					deferred.reject(that, response);
+				})
 				.always(function () {
 					// that.trigger('sent.session');
 				});
+
+			deferred.done(this.onReceive).fail(this.onBroken);
+			return deferred.promise();
 		},
 
 		// Handle http connection response (receive data from server in BOSH).
-		onReceive: function (response) {
+		onReceive: function (session, response) {
 			var request;
-			this.received = this.received || [];
+			session.received = session.received || [];
 			if (response.data) {
 				// server send queued data back.
-				this.received.push(data);
-				// this.trigger('received.session');
+				session.received.push(data);
+				// session.trigger('received.session');
 			}
 
 			// decrease current requests.
-			--this.current;
+			--session.current;
 			
 			// client SHOULD send another request to poll incoming data immediately.
-			switch (this.current) {
-			case this.status.clean:
+			switch (session.current) {
+			case session.Requests.clean:
 				// if session is currently clean, send another request,
 				// the request to be sent will be empty if no data pending,
 				// or the head data in pending list.
-				request = this.pending && this.pending.pop();
-				this.send(request || {});
+				request = session.pending && session.pending.pop();
+				$.debug(request ? 'sending request...' : 'keep polling...');
+				session.send(request || {});
 				break;
-			case this.status.polling:
+			case session.Requests.polling:
 			default:
 				// if session is currently polling. do nothing.
 				break;
 			}
+		},
+
+		// Handle send failed due to broken connection.
+		onBroken: function (session, response) {
+			session.close();
 		},
 
 		// Receive data from session.
@@ -339,13 +357,13 @@
 			if (response.type && response.type === 'terminate') {
 				// connection failed to create due to server terminated.
 				$.debug('session failed to connect.');
-				session.status = session.statuses.disconnected;
+				session.status = session.Status.disconnected;
 				session.cleanup();
 				return;
 			}
 			
 			$.debug('Connected to:', to);
-			session.status = session.statuses.connected;
+			session.status = session.Status.connected;
 			session.sid = response.sid;
 			$.extend(session.options, {
 				wait: Math.min(response.wait, session.options.wait),
@@ -358,7 +376,7 @@
 		// Manager may want to reconnect in a future.
 		connectFailed: function (session, response) {
 			$.debug('Faield to connect to:', response ? response.to : 'no response');
-			session.status = session.statuses.disconnected;
+			session.status = session.Status.disconnected;
 			session.cleanup();
 		}
 	};
@@ -371,7 +389,7 @@
 			hold: 1,
 			lang: 'en',
 			charsets: 'UTF-8',
-			wait: 60,
+			wait: 10,
 			requests: 2,
 			polling: false,
 		},
@@ -391,12 +409,12 @@
 		},
 		
 		// Try to connect to server to create a session.
-		connect: function (host, to, data) {
+		connect: function (host, to) {
 			var session = new Session();
 			session.create(to, this.options);
 			// save session, notice that sesion not fully created yet.
 			this.sessions[host] = session;
-			return session.connect(host, data);
+			return session.connect(host);
 		},
 
 		// Try to close current session.

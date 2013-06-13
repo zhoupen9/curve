@@ -89,7 +89,7 @@
 			for (i = 0; i < record.entries.length; i++) {
 				message.push(this.formatEntry(record.entries[i]));
 			}
-			context.message = message.join(',');
+			context.message = message.join('');
 			for (i = 0; i < this.formatters.length; i++) {
 				formatted += this.formatters[i].call(this, context, i);
 			}
@@ -133,10 +133,14 @@
 					for (i = 0; i < value.length; i++) {
 						ary.push(this.formatEntry(new Entry(value[i])));
 					}
-					formatted += '[' + ary.join(',') + ']';
+					formatted += '[' + ary.join('') + ']';
 				} else {
 					formatted += value.toString();
 				}
+			} else if (type === 'string') {
+				formatted += value;
+			} else if (type === 'number') {
+				formatted += value + ',';
 			} else {
 				formatted += value;
 			}

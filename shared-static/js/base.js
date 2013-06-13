@@ -20,7 +20,7 @@
 			.done(function () {
 				session = $.curve.CM.get(host);
 				if (session.isConnected()) {
-					$.debug('polling...');
+					$.debug('start polling...');
 					session.send();
 				} else {
 					$.debug('session creation failed.');
@@ -31,15 +31,15 @@
 		$('#message').click(function (e) {
 
 		});
-		
+
 		// create global poster inside post dialog.
 		$('#post-dlg').find('.dialog-body').poster();
-		
+
 		// global post button handler.
 		$('#global-post-btn').click(function (e) {
 			$('#post-dlg').dialog(/*{ modal: false}*/).draggable().show();
 		});
-		
+
 		// post dialog post button handler.
 		$('#global-post').click(function (e) {
 			var form = $('#post-dlg > .post-form'),
@@ -55,7 +55,7 @@
 					spans.toggleClass('hide');
 				});
 		});
-		
+
 		// top bar dropmenu handler.
 		$('#messages-menu').click(function (e) {
 			$('#msg-dlg').dialog().draggable().show();

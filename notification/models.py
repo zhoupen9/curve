@@ -48,7 +48,7 @@ class NotificationManager(models.Manager):
         """ set notification delivery. """
         if delivery is None:
             raise ValueError('devliery can not be none.')
-        self.devliery = delivery
+        self.delivery = delivery
     pass
 
 class Notification(models.Model):

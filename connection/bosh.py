@@ -1,12 +1,11 @@
 
 from django.utils import simplejson
+from Queue import Queue as Pending, Empty
 from notification.models import Notification, Delivery
-from datetime import datetime
 from session import Session
 from manager import Manager
 from settings import SESSION
 
-import threading
 import logging
 
 logger = logging.getLogger('curve')
@@ -102,6 +101,9 @@ class Terminate(Schema):
     pass
 
 class ConnectResponse(object):
+    """
+    BOSH session initial request response.
+    """
     schema = [
 	'sid',
 	'wait',
@@ -142,23 +144,24 @@ class Connection(object):
     Virtual connection.
     This connection is an abstraction above HTTP connection.
     """
+    options = {
+        'pending_timeout': 1,
+        }
+    pending = Pending() # pending data queue, they will be pushed to client in a future request.
+    
     def __init__(self, wait=None, timeout=None):
         self.wait = wait
-        if timeout is not None and  not callable(timeout):
+        if timeout is not None and not callable(timeout):
             raise TypeError('timeout callback is not callable.')
         
         self.timeout = timeout
-	self.event = threading.Event()
-        self.event.clear()
 	pass
 
     def send(self, data):
         """
         Send data on this connection.
-        If client has already wait on this connection, notify it.
         """
-        self.pending = data
-        self.notify()
+        self.pending.put(data)
 
     def poll(self):
 	"""
@@ -166,22 +169,36 @@ class Connection(object):
 	Call this method will simply block until there's data to transfer
 	and event was set.
 	"""
+        pendings = []
         if self.wait is not None:
-            done = self.event.wait(self.wait)
-        else:
-            done = True
-        
-        if not done:
-            # timeout
-            timeout = getattr(self, 'timeout')
-            if timeout is not None and callable(timeout):
-                return timeout()
-            else:
-                return {}
+            logger.debug('try to poll on holding connect may block in %d seconds.', self.wait)
+            try:
+                data = self.pending.get(True, self.wait) # get queued data with block.
+                pendings.append(data)
+            except Empty:
+                # timeout
+                logger.debug('poll timeout in %d seconds.', self.wait)
+                timeout = getattr(self, 'timeout')
+                if timeout is not None and callable(timeout):
+                    return timeout()
+                else:
+                    return {}
+                pass
             pass
-        else:
-           return self.pending 
-	pass
+        # got head of queue, check rest of queue.
+        while True:
+            try:
+                data = self.pending.get(False) # get queued data without block.
+                pendings.append(data)
+                pass
+            except Empty:
+                break
+            finally:
+                self.pending.task_done()
+                pass
+            pass
+        logger.debug('poll done, got:%s.', str(pendings))
+        return pendings
 
     def notify(self):
         """ Notify client waiting on this connection that there's data to receive. """
@@ -191,12 +208,14 @@ class Connection(object):
 
 class ClosedConnection(Connection):
     """ Closed connection. """
+    def __init__(self, condition):
+        self.condition = condition
+        
     def poll(self):
 	"""
 	Poll on closed connection will result a terminate response.
 	"""
-	terminate = Terminate().create('bad-request')
-	return terminate
+	return Terminate().create(self.condition)
     pass
 
 class BoshSession(Session):
@@ -258,16 +277,16 @@ class BoshSession(Session):
 	    self.close()
 	pass
 
-    def recv(self, data):
+    def onReceive(self):
 	"""
-	Try to receive data from BOSH session.
+	Handle session received data.
 	If there's no active connection in sessoin, server will close session.
 	"""
 	try:
 	    # receive.
 	    connection = self.hold.pop()
 	    connection.notify()
-	except RuntimeError:
+	except:
 	    logger.debug('no active data connection, server may hold this connection.')
 	    pass
 
@@ -276,13 +295,14 @@ class BoshSession(Session):
             connection = Connection()
             connection.send(self.pending.pop())
         else:
-            if len(self.hold) >= self.options.hold:
+            if len(self.hold) >= self.options['hold']:
                 # Cant hold any connections.
                 self.close('policy-violation')
                 return ClosedConnection()
             else:
                 # hold this connection.
-                connection = Connection(self.options.wait, self.timeout)
+                logger.debug('no data queued, hold this connection.')
+                connection = Connection(self.options['wait'], self.timeout)
                 self.hold.append(connection)
                 pass
             pass
@@ -293,11 +313,21 @@ class BoshSession(Session):
 	super(BoshSession, self).close()
 
 	self.status = SessionStatus['disconnected']
-	connection = self.hold.pop()
-	if connection is not None:
-	    terminate = Terminate()
-	    connection.send(terminate.create(condition))
+        try:
+            connection = self.hold.pop()
+            terminate = Terminate().create(condition)
+	    connection.send(terminate)
+            # When close session, all holding connection should be closed gracefully.
+            while not self.hold.empty():
+                try:
+                    self.hold.pop().send(terminate)
+                except:
+                    logger.debug('no more connection held.')
+                    break
+                pass
             pass
+        except:
+            logger.debug('no connection held.')
         pass
 
     def timeout(self):
@@ -330,8 +360,12 @@ class BoshManager(Manager):
     which was defined in XEP-0124, http://xmpp.org/extensions/xep-0124.html
     """
     sessions = {}
-    options = {}
+    options = {
+        'encoding': 'utf8'
+        }
     handlers = []
+
+    session_counts = {} # remember userid session creation count.
 
     def __init__(self, options):
 	""" Initialize BOSH connection manager. """
@@ -342,7 +376,11 @@ class BoshManager(Manager):
 
     def createSid(self, userid):
 	""" Create session id. """
-	return 'sid-' + str(userid)
+        if userid not in self.session_counts:
+            self.session_counts[userid] = 1
+        else:
+            self.session_counts[userid] += 1
+	return unicode('sid-' + str(userid) + '-' + str(self.session_counts[userid]), self.options['encoding'])
 
     def success(self, data=None):
 	result = {}
@@ -358,50 +396,43 @@ class BoshManager(Manager):
 	if request is None:
 	    raise ValueError('connection can not be none.')
 
-	if userid in self.sessions:
-	    logger.debug('a session bind with %d already exists.', userid)
+        sid = self.createSid(userid)
+	if sid in self.sessions:
+	    logger.debug('a session bind with %s already exists.', sid)
 	    # terminate existed session.
-	    session = self.sessions[userid]
+	    session = self.sessions[sid]
 	    session.close('other-request')
-	    self.terminateSession(session, 'other-request')
+	    self.terminateSession(session)
 	    pass
 
 	session = BoshSession(self.options)
-	# response to request.
-	return session.create(self.createSid(userid), request['rid'], request['to'])
+        # response to request.
+        self.sessions[sid] = session
+	return session.create(sid, request['rid'], request['to'])
 
-    def terminateSession(self, session, condition=None):
+    def terminateSession(self, session):
 	""" Terminate session. """
-	response = Terminate()
-	response.type = 'terminate'
-	if condition is not None:
-	    response.condition = condition
-	    pass
-	session.send(response)
 	del self.sessions[session.sid]
 	pass
 
-    def recv(self, userid, data):
+    def recv(self, userid, request):
 	"""
 	Receive data from client's poll request.
 	"""
+        try:
+            sid = request['sid']
+            session = self.sessions[sid]
+        except KeyError:
+            return ClosedConnection('item-not-found')
+
 	for handler in self.handlers:
-	    match = handler.regex.match(data.to)
+	    match = handler.regex.match(session.to)
 	    if match is not None:
-		handler.handle(userid, data)
+		handler.handle(userid, request['data'])
 		pass
 	    pass
 
-	sid = data.sid
-	session = self.sessions[sid]
-	if session is None:
-	    logger.debug('Session not found, sid: %s.', sid)
-	    connection = ClosedConnection()
-	    pass
-	else:
-	    connection = session.recv(data)
-	    pass
-	return connection
+        return session.onReceive()
     pass
 
 
