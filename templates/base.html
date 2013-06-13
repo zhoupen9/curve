@@ -15,70 +15,16 @@
 		<script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/curve.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/common.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/jquery.cookie.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/csrftoken.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/logging.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/draggable.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/dialog.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/editor.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/poster.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/bosh.js' %}"></script>
-		<script type="text/javascript">
-			$(document).ready(function () {
-				var host, session, poll,
-				connectForm = $('#connection-form'),
-				pollForm = $('#poll-form'),
-				userid = $('#current-user').data('data-user-id'),
-				connect_csrf = connectForm.find('input'),
-				poll_csrf = pollForm.find('input'),
-				connect_token = {},
-				poll_token = {};
-
-				host = connectForm.attr('action');
-				poll = pollForm.attr('action');
-				connect_token[connect_csrf.attr('name')] = connect_csrf.attr('value');
-				poll_token[poll_csrf.attr('name')] = poll_csrf.attr('value');
-				$.curve.CM.connect(host, poll, connect_token)
-					.done(function () {
-						session = $.curve.CM.get(host);
-						if (session.isConnected()) {
-							$.debug('polling...');
-							session.send(poll_token);
-						} else {
-							$.debug('session creation failed.');
-						}
-					});
-
-				// click handler for 'message' inside top bar.
-				$('#message').click(function (e) {
-
-				});
-				// create global poster inside post dialog.
-				$('#post-dlg').find('.dialog-body').poster();
-				// global post button handler.
-				$('#global-post-btn').click(function (e) {
-					$('#post-dlg').dialog(/*{ modal: false}*/).draggable().show();
-				});
-				// post dialog post button handler.
-				$('#global-post').click(function (e) {
-					var form = $('#post-dlg > .post-form'),
-					spans = $('post-button > span');
-
-					spans.toggleClass('hide');
-					$.post(form.attr('action'), form.serialize())
-						.done(function () {
-							$('#post-dlg').fadeOut();
-						})
-						.fail(function () {})
-						.always(function () {
-							spans.toggleClass('hide');
-						});
-				});
-				// top bar dropmenu handler.
-				$('#messages-menu').click(function (e) {
-					$('#msg-dlg').dialog().draggable().show();
-					e.preventDefault();
-				});
-			});
-		</script>
+		<script type="text/javascript" src="{% static 'js/post.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/base.js' %}"></script>
 		{% block scripts %}
 		{% endblock %}
 	</head>
@@ -115,20 +61,6 @@
 								</li>
 							</ul>
 
-							<!-- hidden form for connection. -->
-							<div class="hide">
-								<form id="connection-form" action="/connection/connect" method="post">
-									{% csrf_token %}
-								</form>
-							</div>
-
-							<!-- hidden form for poll. -->
-							<div class="hide">
-								<form id="poll-form" action="/connection/request" method="post">
-									{% csrf_token %}
-								</form>
-							</div>
-
 							<!-- put right form and dropdown menu. -->
 							<div class="pull-right">
 								<form action="/search" method="post" class="form-search">
@@ -136,8 +68,6 @@
 									<input id="search-query" type="text" class="search-input" placeholder="search"/>
 								</form>
 								<ul class="nav">
-									<!-- <li>
-									</li> -->
 									<li class="me dropdown">
 										<a class="dropdown-toggle" href="#" data-toggle="dropdown">
 											<span class="profile-icon-wrapper">
@@ -185,7 +115,9 @@
 			<div class="navbar navbar-inverse navbar-fixed-top">
 				<div class="navbar-inner">
 					<div class="container">
-						<a class="brand nav-brand" href="/about">Curve</a>
+						<div class="nav-collapse collapse">
+							<a class="brand nav-brand" href="/about">Curve</a>
+						</div>
 					</div>
 				</div>
 			</div>

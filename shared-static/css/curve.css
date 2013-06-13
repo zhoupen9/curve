@@ -113,7 +113,15 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 	background-image: url(/static/img/wash-white-30.png);
 }
 
-#topbar .container {
+/*#topbar .container {
+	width: 865px;
+}*/
+
+.navbar-inner {
+    border-width: 0 0 0px !important;
+}
+
+.navbar-fixed-top .container {
 	width: 865px;
 }
 

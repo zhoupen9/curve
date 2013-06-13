@@ -1,4 +1,8 @@
 
+.navbar-inner {
+    border-width: 0 0 0px !important;
+}
+
 #page .container {
     background-image: none;
     position: absolute;

@@ -206,7 +206,7 @@
 		},
 
 		// Connect to host.
-		connect: function (host, data) {
+		connect: function (host) {
 			var that = this, request = this.initializer.create(
 				this.protocol,
 				host,
@@ -220,10 +220,6 @@
 
 			this.status = this.statuses.connecting;
 
-			if (data) {
-				$.extend(request, data);
-			}
-			
 			$[this.method](host, request)
 				.done(function (data) {
 					deferred.resolve(that, data);

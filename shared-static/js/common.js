@@ -1,35 +1,41 @@
 
-// Determine if given object is null
-function isNull(value) {
-	return value === undefined || value === null;
-}
+!(function ($) {
+	// 'user strict';
+	var utils = $.utils || {};
 
-// Determine if give object is empty.
-function isEmptyValue(value) {
-	return isNull(value) || value === '';
-}
+	$.extend(utils, {
+		// Determine if given object is null
+		isNull: function (value) {
+			return value === undefined || value === null;
+		},
 
-// Determine if given control's value if empty.
-// 
-function isEmpty(control, value) {
-	if (!control) {
-		value = control;
-	} else {
-		value = control ? control.val() : null;
-	}
-	return isEmptyValue(value);
-}
+		// Determine if give object is empty.
+		isEmptyValue: function (value) {
+			return this.isNull(value) || value === '';
+		},
 
-// Determine if given jquery object has class matches name.
-function hasClass(obj, name) {
-	var i, classes = obj.attr('class').split(/\s+/);
+		// Determine if given control's value if empty.
+		isEmpty: function (control, value) {
+			if (!control) {
+				value = control;
+			} else {
+				value = control ? control.val() : null;
+			}
+			return this.isEmptyValue(value);
+		},
 
-	if (!name || isEmptyValue(name)) {
-		return false;
-	}
-	for (i = 0; i < classes.length; i++) {
-		if (classes[i] === name) {
-			return true;
+		// Determine if given jquery object has class matches name.
+		hasClass: function (obj, name) {
+			var i, classes = obj.attr('class').split(/\s+/);
+
+			if (!name || this.isEmptyValue(name)) {
+				return false;
+			}
+			for (i = 0; i < classes.length; i++) {
+				if (classes[i] === name) {
+					return true;
+				}
+			}
 		}
-	}
-}
+	});
+}(jQuery));
