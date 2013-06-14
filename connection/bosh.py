@@ -1,12 +1,12 @@
-
-from django.utils import simplejson
+from datetime import datetime, timedelta
 from Queue import Queue as Pending, Empty
-from notification.models import Notification, Delivery
-from session import Session
-from manager import Manager
-from settings import SESSION
+from threading import Timer
+
+from notification.models import Delivery
+from models import Session, Manager, Handler
 
 import logging
+import settings
 
 logger = logging.getLogger('curve')
 
@@ -83,8 +83,6 @@ class Schema(object):
 	pass
     pass
 
-
-
 class Terminate(Schema):
     """ Server terminate session. """
     schema = [
@@ -151,13 +149,6 @@ class ConnectResponse(object):
 	return response
     pass
 
-class Handler(object):
-    """ Abstract data handler. """
-    def handle(self, data):
-	raise NotImplementedError()
-    pass
-pass
-
 # session status.
 SessionStatus = {
     'created': 0,
@@ -166,53 +157,132 @@ SessionStatus = {
     'disconnected': 3,
     }
 
-class Connection(object):
+class BoshHandler(Handler):
     """
-    Virtual connection.
-    This connection is an abstraction above HTTP connection.
+    Abstract BOSH session data handler.
+    Classes extends this class must implementst handle interface,
+    which is responsible for processing data transfered in BOSH session.
+    Data passed in is an impact HTTP request.
     """
-    options = {
-        'pending_timeout': 1,
-        }
-    pending = Pending() # pending data queue, they will be pushed to client in a future request.
+    def __init__(self, regex):
+        if regex is None or type(regex) != str:
+            raise ValueError('given regular expression is invalid.')
+        self.regex = regex # regular expression for matching BOSH session's destionation.
+        pass
+
+    def handle(self, request):
+        """
+        Handle BOSH session's HTTP request, it comes from client's poll request.
+        """
+        raise NotImplementedError()
+
+class BoshManager(Manager):
+    """
+    BOSH connection manager.
+    This class implement XMPP Bidirectional-streams Over Synchronous HTTP (BOSH),
+    which was defined in XEP-0124, http://xmpp.org/extensions/xep-0124.html
+    """
+    def connect(self, request):
+        """
+        BOSH connection manager connect implementation.
+
+        If request contains session id, key 'sid' in request.POST, the rquest is intented
+        to initizlied session, otherwise the request is a data transition.
     
-    def __init__(self, wait=None, timeout=None):
-        self.wait = wait
-        if timeout is not None and not callable(timeout):
-            raise TypeError('timeout callback is not callable.')
+        If request contains data which client sent to server, connection manager should handle it.
+        And connection manager would not resposne to this request until there's data to send to
+        client (recommended in BOSH).
+        """
         
-        self.timeout = timeout
+        user = request.session['userid']
+        if 'sid' not in request.POST:
+            # request to initialize session
+            logger.debug('request create session, userid: %s, rid: %s, to: %s', \
+                             user, request.POST['rid'], request.POST['to'])
+            result = super(BoshManager, self).accept(user, request.POST)
+        else:
+            sid = request.POST['sid']
+            logger.debug('new request, sid: %s, rid: %s.', sid, request.POST['rid'])
+            try:
+                session = super(BoshManager, self).get(sid)
+                result = session.recv(request.POST)
+            except KeyError:
+                result = Terminate().create('item-not-found')
+                pass
+            pass
+        return result
+
+    def getByOwnerId(self, userid):
+        """ Get session by owner name. """
+        for sid in self.sessions:
+            if sid.startswith('sid-' + userid + '-'):
+                return self.sessions[sid]
+            pass
+        return None
+
+    def createSession(self, sid, request):
+	"""
+	Create a bosh session.
+	Connection manager SHOULD response to request.
+	"""
+	if request is None:
+	    raise ValueError('connection can not be none.')
+
+        try:
+            connect = Connect().create(request)
+            session = BoshSession(sid)
+            return session, session.create(sid, connect)
+        except KeyError:
+            return None, Terminate().create('bad-request')
+    pass
+
+class BoshSession(Session):
+    """
+    BOSH session implementation.
+    """
+    manager = BoshManager()
+    
+    def __init__(self, sid, options=settings.SESSION_OPTIONS):
+	if sid is None or not sid.strip() or options is None:
+	    raise ValueError('parameter is invalid.')
+
+        self.options = {}
+        # copy options.
+        for option in options:
+            self.options[option] = options[option]
+            pass
+        
+        self.sid = sid
+        self.hold = [] # holding connections.
+        self.options = {} # session options
+        self.lastpoll = None # last poll timestamp
+        self.lastrid = None # last rid.
+        self.last = None # last data sent.
+        self.inactive = None # most recent inactive timestamp.
+        self.pending = Pending() # pending data queue, they will be pushed to client in a future request.
 	pass
 
-    def send(self, data):
+    def pollInternal(self):
         """
-        Send data on this connection.
+        Perform poll.
+        If wait is not None and there's no data queued, caller will block in a duration
+        of wait time (in seconds). Once poll returned, another unblocking fetching will
+        be performed to check if more data queued, if so fetch rest of queued data as well.
         """
-        self.pending.put(data)
-
-    def poll(self):
-	"""
-	Try poll data from connection.
-	Call this method will simply block until there's data to transfer
-	and event was set.
-	"""
         pendings = []
-        if self.wait is not None:
-            logger.debug('try to poll on holding connect may block in %d seconds.', self.wait)
+        wait = self.options['wait']
+        if wait is not None:
+            logger.debug('try to poll on holding connect may block in %d seconds.', wait)
             try:
-                data = self.pending.get(True, self.wait) # get queued data with block.
+                data = self.pending.get(True, wait) # get queued data with block.
                 pendings.append(data)
             except Empty:
                 # timeout
-                logger.debug('poll timeout in %d seconds.', self.wait)
-                timeout = getattr(self, 'timeout')
-                if timeout is not None and callable(timeout):
-                    return timeout()
-                else:
-                    return {}
-                pass
+                logger.debug('poll timeout in %d seconds.', wait)
+                return self.timeout()
             pass
-        # got head of queue, check rest of queue.
+        
+        # got head of queue, check rest of queue without blocking.
         while True:
             try:
                 data = self.pending.get(False) # get queued data without block.
@@ -224,48 +294,10 @@ class Connection(object):
                 self.pending.task_done()
                 pass
             pass
-        logger.debug('poll done, got:%s.', str(pendings))
+        # return joined queued data
         return pendings
-
-    def notify(self):
-        """ Notify client waiting on this connection that there's data to receive. """
-	self.event.set()
-	pass
-    pass
-
-class ClosedConnection(Connection):
-    """ Closed connection. """
-    def __init__(self, condition):
-        self.condition = condition
-        
-    def poll(self):
-	"""
-	Poll on closed connection will result a terminate response.
-	"""
-	return Terminate().create(self.condition)
-    pass
-
-class BoshSession(Session):
-    """
-    BOSH session implementation.
-    """
-    hold = [] # holding connections.
-    options = {} # session options
-    pending = [] # queued data pending to send. 
-
-    def __init__(self, options):
-	if options is None:
-	    raise TypeError('options is None.')
-	try:
-	    for option in options:
-		self.options[option] = options[option]
-		pass
-	    pass
-	except:
-	    raise TypeError('options is invalid.')
-	pass
-
-    def create(self, sid, connect):
+    
+    def createInternal(self, sid, connect):
 	"""
 	Create session and return response.
 	"""
@@ -284,61 +316,94 @@ class BoshSession(Session):
 	    'inactivity': self.options['inactivity'],
 	    'polling': self.options['polling'],
 	    }
+        # set create time as first poll time, to prevent client connected and hang it.
+        self.lastpoll = datetime.now()
+        self.scheduleInactivityCheck()
 	return response
 
+    def scheduleInactivityCheck(self):
+        """ 
+        Start a timer to check if session's inactivity.
+        Timer will timeout in a duration which is set in options.
+        """
+        Timer(self.options.inactivity, self.checkInactivity, ()).start()
+        pass
+
+    def checkInactivity(self):
+        """
+        Check session's inactivity.
+        """
+        now = datetime.now()
+        if now > self.lastpoll + timedelta(self.options.inactivity) and len(self.hold) < 1:
+            # Connection manager SHOULD assume client disconnected.
+            self.manager.disconnected(self)
+        pass
+    
     def send(self, data):
 	"""
 	Try to send data in session.
-	If there's no active command connection, server will close session.
+        This method simply put data in queue, if there's any connections holding,
+        the head of those hold conntions will unblock.
 	"""
-	# send response on command connection and wait a data connection
-	# to poll data.
-	try:
-	    if len(self.hold) < 1:
-		logger.debug("There's no connection hold, pending...")
-                self.pending.append(data)
-            else:
-                connection = self.hold.pop()
-                connection.send(data)
-	except RuntimeError:
-	    self.close()
+        self.pending.put(data)
 	pass
 
-    def onReceive(self):
+    def recv(self, request):
 	"""
-	Handle session received data.
-	If there's no active connection in sessoin, server will close session.
-	"""
-	try:
-	    # receive.
-	    connection = self.hold.pop()
-	    connection.notify()
-	except:
-	    logger.debug('no active data connection, server may hold this connection.')
-	    pass
+	Try poll data from connection.
+        Session will trial data from request first.
+        And then push queued data back to request if present, otherwise hold this connection
+        until there's data ready to push to client or encountered a timeout (meaning there's 
+        no data in the duration of wait time.
 
-        if len(self.pending) > 0:
-            # If there's data pending to send, sent it immediately.
-            connection = Connection()
-            connection.send(self.pending.pop())
-        else:
-            if len(self.hold) >= self.options['hold']:
-                # Cant hold any connections.
-                self.close('policy-violation')
-                return ClosedConnection()
-            else:
-                # hold this connection.
-                logger.debug('no data queued, hold this connection.')
-                connection = Connection(self.options['wait'], self.timeout)
-                self.hold.append(connection)
-                pass
+        This implementation will return a json serializable object.
+	"""
+        try:
+            rid = request['rid']
+        except KeyError:
+            logger.debug('rid not found in request.')
+            # Server will close session caused by bad request.
+            self.close('bad-request')
             pass
-	return connection
 
-    def close(self, condition=None):
+        if self.lastpoll is not None and datetime.now() < self.lastpoll + timedelta(seconds=self.options.polling):
+            # polling to frequently, overactivity.
+            self.close('policy-volation')
+            pass
+
+        self.lastpoll = datetime.now()
+        # trial data from request
+        if 'data' in request:
+            self.manager.recv(request['data'])
+
+        if rid == self.lastrid:
+            # request was resent by client on broken connection.
+            # server SHOULD send last HTTP 200 and queued data, see XEP-1024 broken connection.
+            return self.last
+        elif rid < self.lastrid:
+            self.close('bad-request')
+
+        if len(self.hold) >= self.options['hold']:
+            # Cant hold any connections.
+            self.close('policy-violation')
+            pass
+
+        # poll pending data.
+        polled = self.pollInternal()
+        logger.debug('poll done, got:%s.', str(polled))
+
+        # save last rid and last data, in case of broken connection.
+        self.lastrid = rid
+        self.last = polled
+
+        if len(self.hold) < 1:
+            # if no connection holds, schedule an inactivity check.
+            self.scheduleInactivityCheck()
+            pass
+        return polled
+    
+    def closeInternal(self, condition=None):
 	""" Close BOSH session. """
-	super(BoshSession, self).close()
-
 	self.status = SessionStatus['disconnected']
         try:
             connection = self.hold.pop()
@@ -371,104 +436,11 @@ class BoshDelivery(Delivery):
 	""" Delivery data. """
 	target = getattr(data, 'target', None)
 	if target is None:
-	    logger.debug('Delivery has no target, dicard.')
-	    pass
-	session = BoshSession.manager.get(target)
+	    logger.debug('Delivery has no target, discard.')
+	    return
+	session = BoshSession.manager.getByOwnerId(target.user.id)
 	if session is not None:
 	    # target is online
 	    session.send(data)
 	pass
     pass
-
-class BoshManager(Manager):
-    """
-    BOSH connection manager.
-    This class implement XMPP Bidirectional-streams Over Synchronous HTTP (BOSH),
-    which was defined in XEP-0124, http://xmpp.org/extensions/xep-0124.html
-    """
-    # sessions = {}
-    options = {
-        'encoding': 'utf8'
-        }
-    handlers = []
-
-    session_counts = {} # remember userid session creation count.
-
-    def __init__(self, options):
-	""" Initialize BOSH connection manager. """
-	for option in options:
-            self.options[option] = options[option]
-            pass
-	pass
-
-    def createSid(self, userid):
-	""" Create session id. """
-        if userid not in self.session_counts:
-            self.session_counts[userid] = 1
-        else:
-            self.session_counts[userid] += 1
-	return unicode('sid-' + str(userid) + '-' + str(self.session_counts[userid]), self.options['encoding'])
-
-    def success(self, data=None):
-	result = {}
-	if data:
-	    result['data'] = data
-	return simplejson.dumps(result)
-
-    def createSession(self, userid, request):
-	"""
-	Create a bosh session.
-	Connection manager SHOULD response to request.
-	"""
-	if request is None:
-	    raise ValueError('connection can not be none.')
-
-        try:
-            connect = Connect().create(request)
-        except KeyError:
-            return Terminate().create('bad-request')
-        
-        sid = self.createSid(userid)
-	if sid in self.sessions:
-	    logger.debug('a session bind with %s already exists.', sid)
-	    # terminate existed session.
-	    session = self.sessions[sid]
-	    session.close('other-request')
-	    self.terminateSession(session)
-	    pass
-
-	session = BoshSession(self.options)
-        # response to request.
-        self.sessions[sid] = session
-	return session.create(sid, connect)
-
-    def terminateSession(self, session):
-	""" Terminate session. """
-	del self.sessions[session.sid]
-	pass
-
-    def recv(self, userid, request):
-	"""
-	Receive data from client's poll request.
-	"""
-        try:
-            sid = request['sid']
-            session = self.sessions[sid]
-        except KeyError:
-            return ClosedConnection('item-not-found')
-
-	for handler in self.handlers:
-	    match = handler.regex.match(session.to)
-	    if match is not None:
-		handler.handle(userid, request['data'])
-		pass
-	    pass
-
-        return session.onReceive()
-    pass
-
-
-# Bosh session's default manager.
-BoshSession.manager = BoshManager(SESSION)
-# register delivery to notification service.
-Notification.objects.setDelivery(BoshDelivery())

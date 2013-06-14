@@ -1,0 +1,2 @@
+
+DELIVERY = 'connection.bosh.BoshDelivery'

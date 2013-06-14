@@ -17,7 +17,7 @@ class Delivery(object):
     If application runs in a distributed network, implementation also need to support
     delivery notifications to other nodes.
     """
-    def devliery(self, data):
+    def delivery(self, data):
         raise NotImplementedError()
     
 class NotificationManager(models.Manager):
@@ -47,7 +47,7 @@ class NotificationManager(models.Manager):
     def setDelivery(self, delivery):
         """ set notification delivery. """
         if delivery is None:
-            raise ValueError('devliery can not be none.')
+            raise ValueError('delivery can not be none.')
         self.delivery = delivery
     pass
 

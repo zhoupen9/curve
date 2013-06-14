@@ -228,7 +228,7 @@
 				.done(function (data) {
 					deferred.resolve(that, data);
 				})
-				.fail(function () {
+				.fail(function (data) {
 					deferred.reject(that, data);
 				});
 
@@ -409,9 +409,9 @@
 		},
 		
 		// Try to connect to server to create a session.
-		connect: function (host, to) {
+		connect: function (host) {
 			var session = new Session();
-			session.create(to, this.options);
+			session.create(host, this.options);
 			// save session, notice that sesion not fully created yet.
 			this.sessions[host] = session;
 			return session.connect(host);

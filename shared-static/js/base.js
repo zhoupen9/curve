@@ -8,17 +8,15 @@
 	// dropdown menu inside top navigate bar.
 	$(document).ready(function () {
 		var session,
-		host = '/connection/connect',
-		poll = '/connection/request',
-		userid = $('#current-user').data('data-user-id');
+		connect = '/connection/connect';
 
 		// enable jQuery csrf support.
 		$.csrfSetup();
 
 		// connect to connection manager.
-		$.curve.CM.connect(host, poll)
+		$.curve.CM.connect(connect)
 			.done(function () {
-				session = $.curve.CM.get(host);
+				session = $.curve.CM.get(connect);
 				if (session.isConnected()) {
 					$.debug('start polling...');
 					session.send();

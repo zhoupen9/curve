@@ -5,5 +5,4 @@ urlpatterns = patterns(
     # url(r'^poll$', 'poll'),
     # url(r'^notify$', 'notify'),
     url(r'^connect$', 'connect'),
-    url(r'^request$', 'request'),
 )
