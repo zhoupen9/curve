@@ -32,14 +32,14 @@ class NotificationManager(models.Manager):
         notification.save()
         pass
 
-    def addNotification(self, notification):
+    def add(self, notification):
         """ Add a new notification. """
         assert notification.status == NotificationStatus['unread']
         notification.save()
         self.delivery.delivery(notification)
         pass
 
-    def createNotification(self, sender, user, type, content):
+    def create(self, sender, user, type, content):
         """ Create a new notification. """
         notification = Notification(user=user, type=type, content=content, createTime=datetime.now(), status=NotificationStatus['unread'], sender=sender)
         return notification

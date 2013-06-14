@@ -1,5 +1,5 @@
 # from datetime import datetime
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 from django.utils import simplejson
 from django.views.decorators.http import require_http_methods
@@ -19,7 +19,7 @@ def connect(request):
     user = request.session['userid']
     logger.debug('request create session, userid: %s, rid: %s, to: %s', \
                      user, request.POST['rid'], request.POST['to'])
-    result = manager.createSession(user, request.POST)
+    result = manager.accept(user, request.POST)
     return HttpResponse(simplejson.dumps(result))
 
 @login_required
@@ -32,7 +32,11 @@ def request(request):
     client (recommended in BOSH).
     """
     user = request.session['userid']
-    logger.debug('send request, sid: %s, rid: %s.', request.POST['sid'], request.POST['rid'])
+    try:
+        sid = request.POST['sid']
+    except KeyError:
+        return HttpResponseForbidden()
+    logger.debug('send request, sid: %s, rid: %s.', sid, request.POST['rid'])
     connection = manager.recv(user, request.POST)
     # if there's no data queue to send, poll will block.
     result = connection.poll()

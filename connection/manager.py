@@ -27,25 +27,25 @@ class Manager(object):
 	result = self.createSession(userid, request)
         session = result['session']
 	if session is not None:
-	    self.sessions[userid] = session
+	    self.sessions[session.sid] = session
 	return result
 
-    def get(self, userid):
+    def get(self, sid):
 	"""
 	Get session for given user.
 	If there's no session bind with given user, create a new one.
 	"""
-	if userid in self.sessions:
-	    logger.debug('session bind with %s exists.', userid)
-	    return self.sessions[userid]
+	if sid in self.sessions:
+	    logger.debug('session bind with %s exists.', sid)
+	    return self.sessions[sid]
 	else:
-	    logger.debug('session bind with %s NOT FOUND, create one.', userid)
-	    return self.create(userid)
+	    logger.debug('session bind with %s NOT FOUND, create one.', sid)
+	    return self.create(sid)
 
-    def close(self, userid):
+    def close(self, sid):
 	"""
 	Close session.
 	Any further operations on closed session will raise error.
 	"""
-	self.closeSessionInternal(self, userid)
-	del self.session[userid]
+	self.closeSession(self, sid)
+	del self.session[sid]

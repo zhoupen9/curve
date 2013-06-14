@@ -5,12 +5,17 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
-from django.test import TestCase
+from django.test import TransactionTestCase
+from member.models import Member
+from notification.models import Notification
 
-
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
+class NotificationTest(TransactionTestCase):
+    def testAddNotification(self):
         """
-        Tests that 1 + 1 always equals 2.
+        Tests add notification
         """
-        self.assertEqual(1 + 1, 2)
+        member = Member.objects.create_member('z1', 'z1@example.com', 's3cr3t')
+        sender = member.user
+        target = member.user
+        notification = Notification.objects.create(sender, target, 'post', 'new post')
+        Notification.objects.add(notification)

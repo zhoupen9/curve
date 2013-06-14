@@ -83,6 +83,8 @@ class Schema(object):
 	pass
     pass
 
+
+
 class Terminate(Schema):
     """ Server terminate session. """
     schema = [
@@ -98,6 +100,31 @@ class Terminate(Schema):
 	if condition is not None:
 	    response['condition'] = condition
 	return response
+    pass
+
+class Connect(object):
+    """
+    BOSH session initial request.
+    """
+    schema = [
+        'rid',
+        'to',
+        'wait',
+        'ver',
+        'hold',
+        'lang',
+        'charsets',
+        ]
+
+    def create(self, post):
+        request = {}
+        for key in self.schema:
+            if key not in post:
+                raise KeyError(key + ' not found in request.')
+            else:
+                request[key] = post[key]                
+            pass        
+        pass
     pass
 
 class ConnectResponse(object):
@@ -238,18 +265,18 @@ class BoshSession(Session):
 	    raise TypeError('options is invalid.')
 	pass
 
-    def create(self, sid, rid, to):
+    def create(self, sid, connect):
 	"""
 	Create session and return response.
 	"""
         self.sid = sid
-        self.rid = rid
-        self.to = to
+        self.rid = connect['rid']
+        self.to = connect['to']
 	self.status = SessionStatus['connected']
 	response = {
-	    'sid': sid,
-	    'rid': rid,
-	    'to': to,
+	    'sid': self.sid,
+	    'rid': self.rid,
+	    'to': self.to,
 	    'ver': self.options['ver'],
 	    'lang': self.options['lang'],
 	    'wait': self.options['wait'],
@@ -359,7 +386,7 @@ class BoshManager(Manager):
     This class implement XMPP Bidirectional-streams Over Synchronous HTTP (BOSH),
     which was defined in XEP-0124, http://xmpp.org/extensions/xep-0124.html
     """
-    sessions = {}
+    # sessions = {}
     options = {
         'encoding': 'utf8'
         }
@@ -396,6 +423,11 @@ class BoshManager(Manager):
 	if request is None:
 	    raise ValueError('connection can not be none.')
 
+        try:
+            connect = Connect().create(request)
+        except KeyError:
+            return Terminate().create('bad-request')
+        
         sid = self.createSid(userid)
 	if sid in self.sessions:
 	    logger.debug('a session bind with %s already exists.', sid)
@@ -408,7 +440,7 @@ class BoshManager(Manager):
 	session = BoshSession(self.options)
         # response to request.
         self.sessions[sid] = session
-	return session.create(sid, request['rid'], request['to'])
+	return session.create(sid, connect)
 
     def terminateSession(self, session):
 	""" Terminate session. """
