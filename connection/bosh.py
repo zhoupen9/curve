@@ -249,6 +249,7 @@ class BoshSession(Session):
         self.last = None # last data sent.
         self.inactive = None # most recent inactive timestamp.
         self.pending = Pending() # pending data queue, they will be pushed to client in a future request.
+        self.timer = None # timer
 	pass
 
     def pollInternal(self):
@@ -323,7 +324,8 @@ class BoshSession(Session):
         Start a timer to check if session's inactivity.
         Timer will timeout in a duration which is set in options.
         """
-        Timer(self.options['inactivity'], self.checkInactivity).start()
+        self.timer = Timer(self.options['inactivity'], self.checkInactivity)
+        self.timer.start()
         pass
 
     def checkInactivity(self):
@@ -334,6 +336,9 @@ class BoshSession(Session):
         if now > self.lastpoll + timedelta(self.options['inactivity']) and len(self.hold) < 1:
             # Connection manager SHOULD assume client disconnected.
             self.manager.disconnected(self)
+            pass
+        del self.timer
+        self.timer = None    
         pass
     
     def send(self, data):
@@ -402,6 +407,8 @@ class BoshSession(Session):
     
     def closeInternal(self, condition=None):
 	""" Close BOSH session. """
+        if self.timer:
+            self.timer.cancel()
 	self.status = SessionStatus['disconnected']
         try:
             connection = self.hold.pop()
@@ -429,16 +436,16 @@ class BoshSession(Session):
     pass
 
 class BoshDelivery(Delivery):
-    """ Bosh delivery employee BOSH to send given data. """
-    def delivery(self, data):
-	""" Delivery data. """
-	target = getattr(data, 'target', None)
-	if target is None:
+    """ Bosh delivery employee BOSH to send notification. """
+    def delivery(self, notification):
+	""" Delivery notification. """
+        user = notification.user
+	if user is None:
 	    logger.debug('Delivery has no target, discard.')
 	    return
-	session = BoshSession.manager.getByOwnerId(target.user.id)
+	session = BoshSession.manager.getUserSession(user.id)
 	if session is not None:
 	    # target is online
-	    session.send(data)
+	    session.send(notification)
 	pass
     pass

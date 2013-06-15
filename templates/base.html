@@ -9,23 +9,8 @@
 		<link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon"></link>
 		<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}"></link>
 		<link rel="stylesheet" type="text/css" href="{% static 'css/curve.css' %}"></link>
+		<link rel="stylesheet" type="text/css" href="{% static 'css/notification.css' %}"></link>
 		{% block styles %}
-		{% endblock %}
-		<script type="text/javascript" src="{% static 'js/jquery-1.9.1.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/curve.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/common.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/jquery.cookie.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/csrftoken.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/logging.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/draggable.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/dialog.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/editor.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/poster.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/bosh.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/post.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/base.js' %}"></script>
-		{% block scripts %}
 		{% endblock %}
 	</head>
 
@@ -43,20 +28,17 @@
 									<a href="/home">Home</a>
 								</li>
 								<li>
-									<a href="/post/">Post</a>
+									<a href="/blog">Blog</a>
 								</li>
 								<li>
-									<a href="/announcements">Announcement</a>
+									<a href="/conference">Conference</a>
 								</li>
 								<li>
-									<a href="/live">Live!</a>
-								</li>
-								<li>
-									<a id="message">
+									<a href="#" id="message">
 										<span>
 											<i class="nav-messages"></i>
 										</span>
-										<span>Messages</span>
+										<small>Messages</small>
 									</a>
 								</li>
 							</ul>
@@ -109,6 +91,12 @@
 							</div>
 						</div>
 					</div>
+				</div>
+
+				<!-- notifications. -->
+				<div id="notifications" class="notifications">
+					<ol class="notification-items">
+					</ol>
 				</div>
 			</div>
 			{% else %}
@@ -252,11 +240,13 @@
 							</div>
 						</div>
 					</div>
-					<form class="post-form dialog-form" method="post" action="/message/new">
-						<div style="height: 100px;">
+					<form class="message-form dialog-form clearfix" method="post" action="/message/new">
+						<div class="message-editor editor"  contenteditable="true" spellcheck="true" aria-multiline="true" dir="ltr" role="textbox">
 						</div>
 						<div class="send-button">
-							<button id="message-send" type="button" class="btn primary-btn" placeholder="Send">Send</button>
+							<span class="spinner"></span>
+							<span class="message-count">140</span>
+							<button id="message-send" type="button" class="btn primary-btn" placeholder="Send Message">Send Message</button>
 						</div>
 					</form>
 				</div>
@@ -265,5 +255,24 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- Placed at the end of document so pages load faster. -->
+		<script type="text/javascript" src="{% static 'js/jquery-1.9.1.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/curve.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/common.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/jquery.cookie.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/csrftoken.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/logging.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/draggable.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/dialog.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/editor.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/poster.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/bosh.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/post.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/notification.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/application.js' %}"></script>
+		{% block scripts %}
+		{% endblock %}
 	</body>
 </html>

@@ -17,12 +17,12 @@ class Delivery(object):
     If application runs in a distributed network, implementation also need to support
     delivery notifications to other nodes.
     """
-    def delivery(self, data):
+    def delivery(self, notification):
         raise NotImplementedError()
     
 class NotificationManager(models.Manager):
     """ Notification manager. """
-    def getNotifications(self, userid):
+    def get(self, userid):
         """ Get user's notifications. """
         return super(NotificationManager, self).get_query_set().filter(user=userid).filter(status=NotificationStatus['unread'])
 
@@ -61,4 +61,4 @@ class Notification(models.Model):
     sender = models.ForeignKey(User, related_name="sender")
     status = models.IntegerField()
     objects = NotificationManager()
-
+    __json_fields__ = ('id', 'user.id', 'type', 'content', 'createTime', 'sender.id', 'status')

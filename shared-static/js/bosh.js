@@ -185,9 +185,9 @@
 
 		// default options.
 		options: {
-			wait: 10, // max time to wait in seconds.
+			wait: 60, // max time to wait in seconds.
 			requests: 2,
-			polling: false, // by default, client doe not perform pure polling.
+			polling: 30, // by default, client doe not perform pure polling.
 		},
 
 		// create session.
@@ -372,7 +372,7 @@
 			});
 
 			// since connection established, start polling.
-			this.send();
+			session.send();
 		},
 
 		// Handle session connect failed.
@@ -392,9 +392,9 @@
 			hold: 1,
 			lang: 'en',
 			charsets: 'UTF-8',
-			wait: 10,
+			wait: 60,
 			requests: 2,
-			polling: false,
+			polling: 30,
 		},
 
 		// create component.

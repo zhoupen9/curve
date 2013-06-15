@@ -19,6 +19,7 @@
 }
 
 .signin-alert {
+    z-index: 9900;
     position: absolute;
     top: 100px;
     left: 50%;
@@ -31,7 +32,8 @@
     -moz-box-shadow: 0 2px 4px rgba(0,0,0, .3);
     box-shadow: 0 2px 4px rgba(0,0,0, .3);
     padding: 8px 8px;
-    border-radius: 6px 6px 6px 6px;
+    /*border-radius: 6px 6px 6px 6px;*/
+    border-radius: 4px;
 }
 
 .alert-text {

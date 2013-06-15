@@ -152,7 +152,7 @@ class Manager(object):
         """
         if userid in self.users:
             sid = self.users[userid]
-            return self.get(sid)
+            return self.getSession(sid)
         else:
             return None
             

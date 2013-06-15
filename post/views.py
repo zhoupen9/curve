@@ -1,11 +1,9 @@
 
 from django.contrib.auth.decorators import login_required
-# from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
-# from django.template import Template
 from django.views.decorators.http import require_http_methods
-from django.utils import simplejson
+from curve.utils import SimpleJSON
 from member.models import Member
 from notification.models import Notification
 from datetime import datetime
@@ -67,4 +65,4 @@ def create(request):
 
     result = {}
     result['success'] = True    
-    return HttpResponse(simplejson.dumps(result))
+    return HttpResponse(SimpleJSON.dumps(result))

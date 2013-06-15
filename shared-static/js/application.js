@@ -7,24 +7,28 @@
 	// global post dialig setup.
 	// dropdown menu inside top navigate bar.
 	$(document).ready(function () {
-		var session,
+		var session, notifications, noti;
 		connect = '/connection/connect';
 
 		// enable jQuery csrf support.
 		$.csrfSetup();
 
+		// create notification plugin.
+		notifications = $('#notifications').notification();
+		noti = notifications.data('notification');
+
 		// connect to connection manager.
 		$.curve.CM.connect(connect)
 			.done(function () {
-
+				noti.notify({ type: 'info', content: 'Connected.'});
 			})
 			.fail(function () {
-
+				noti.notify({ type: 'alert', content: 'Failed to connect to server.'});
 			});
 
 		// click handler for 'message' inside top bar.
 		$('#message').click(function (e) {
-
+			noti.notify({ type: 'info', content: 'Message topbar button clicked.'});
 		});
 
 		// create global poster inside post dialog.

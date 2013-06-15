@@ -1,7 +1,7 @@
 # from datetime import datetime
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.utils import simplejson
+from curve.utils import SimpleJSON
 from django.views.decorators.http import require_http_methods
 
 from connection.models import Session
@@ -17,4 +17,4 @@ def connect(request):
     Connect to connection manager.
     """
     result = Session.manager.connect(request)
-    return HttpResponse(simplejson.dumps(result))
+    return HttpResponse(SimpleJSON.dumps(result))

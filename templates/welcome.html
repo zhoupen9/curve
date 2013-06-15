@@ -53,7 +53,8 @@
 				<div class="container">
 					{% if error %}
 					<div class="signin-alert">
-						<a class="reverse-close" data-dismiss="alert">×</a>
+						<!-- <button class="close" data-dismiss="alert">×</button> -->
+						<button class="close" data-dismiss="alert">&times;</button>
 						<span class="alert-text">{{ error }}</span>
 					</div>
 					{% else %}
@@ -71,7 +72,7 @@
 									{% csrf_token %}
 									<div class="username">
 										<input type="text" id="signin-email" name="username" class="text-input email-input" placeholder="Username or email" data-toggle="tooltip" data-container="body" data-title="Username or email can not be empty.">
-										<!-- <label for="signin-email" class="placeholder">Username or email</label> -->
+1										<!-- <label for="signin-email" class="placeholder">Username or email</label> -->
 										</input>
 									</div>
 

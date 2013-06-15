@@ -141,7 +141,7 @@
 		namespace: 'ui',
 
 		// focusable selector.
-		focusable: ['div[contenteditable=true]', 'input', 'button', 'a', 'textarea'],
+		focusable: ['div[contenteditable=true]', 'textarea', 'input', 'button'],
 
 		// Create ui.
 		createui: $.noop,
