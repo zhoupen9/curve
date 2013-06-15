@@ -3,7 +3,7 @@ from Queue import Queue as Pending, Empty
 from threading import Timer
 
 from notification.models import Delivery
-from models import Session, Manager, Handler
+from models import Session, Manager, Handler, getInternalRequest
 
 import logging
 import settings
@@ -62,7 +62,7 @@ class Schema(object):
 	}
 
     def check(self):
-	""" Check if instance conform to its schema. """
+	""" Check if instance conforms to its schema. """
 	if not hasattr(self, 'schema'):
 	    raise TypeError('schema not found.')
 
@@ -114,15 +114,18 @@ class Connect(object):
         'charsets',
         ]
 
-    def create(self, post):
+    def create(self, req):
+        """ Create connect request. """
         request = {}
         for key in self.schema:
-            if key not in post:
+            if key not in req:
+                logger.debug('key: ' + key + ' not found in connect request.')
                 raise KeyError(key + ' not found in request.')
             else:
-                request[key] = post[key]                
-            pass        
+                request[key] = req[key]
+            pass
         pass
+        return request
     pass
 
 class ConnectResponse(object):
@@ -141,6 +144,7 @@ class ConnectResponse(object):
 	]
 
     def create(self, sid, rid, to):
+        """ Create connect response. """
 	response = {
 	    'sid': sid,
 	    'rid': rid,
@@ -182,7 +186,7 @@ class BoshManager(Manager):
     This class implement XMPP Bidirectional-streams Over Synchronous HTTP (BOSH),
     which was defined in XEP-0124, http://xmpp.org/extensions/xep-0124.html
     """
-    def connect(self, request):
+    def connect(self, request, method='POST'):
         """
         BOSH connection manager connect implementation.
 
@@ -193,45 +197,34 @@ class BoshManager(Manager):
         And connection manager would not resposne to this request until there's data to send to
         client (recommended in BOSH).
         """
-        
         user = request.session['userid']
-        if 'sid' not in request.POST:
+        req = getInternalRequest(request, method)
+        if 'sid' not in req:
             # request to initialize session
             logger.debug('request create session, userid: %s, rid: %s, to: %s', \
-                             user, request.POST['rid'], request.POST['to'])
-            result = super(BoshManager, self).accept(user, request.POST)
+                             user, req['rid'], req['to'])
+            # result = super(BoshManager, self).accept(user, request)
+            result = self.accept(user, request, method)
         else:
-            sid = request.POST['sid']
-            logger.debug('new request, sid: %s, rid: %s.', sid, request.POST['rid'])
+            sid = req['sid']
+            logger.debug('new request, sid: %s, rid: %s.', sid, req['rid'])
             try:
-                session = super(BoshManager, self).get(sid)
-                result = session.recv(request.POST)
+                session = super(BoshManager, self).getSession(sid)
+                result = session.recv(request)
             except KeyError:
                 result = Terminate().create('item-not-found')
                 pass
             pass
         return result
 
-    def getByOwnerId(self, userid):
-        """ Get session by owner name. """
-        for sid in self.sessions:
-            if sid.startswith('sid-' + userid + '-'):
-                return self.sessions[sid]
-            pass
-        return None
-
-    def createSession(self, sid, request):
+    def createSession(self, sid, request, method='POST'):
 	"""
 	Create a bosh session.
 	Connection manager SHOULD response to request.
 	"""
-	if request is None:
-	    raise ValueError('connection can not be none.')
-
         try:
-            connect = Connect().create(request)
-            session = BoshSession(sid)
-            return session, session.create(sid, connect)
+            session = BoshSession()
+            return session, session.create(sid, request, method)
         except KeyError:
             return None, Terminate().create('bad-request')
     pass
@@ -242,19 +235,15 @@ class BoshSession(Session):
     """
     manager = BoshManager()
     
-    def __init__(self, sid, options=settings.SESSION_OPTIONS):
-	if sid is None or not sid.strip() or options is None:
-	    raise ValueError('parameter is invalid.')
-
+    def __init__(self, options=settings.SESSION_OPTIONS):
         self.options = {}
         # copy options.
         for option in options:
+            # logger.debug('setting options, key: %s', option)
             self.options[option] = options[option]
             pass
-        
-        self.sid = sid
+
         self.hold = [] # holding connections.
-        self.options = {} # session options
         self.lastpoll = None # last poll timestamp
         self.lastrid = None # last rid.
         self.last = None # last data sent.
@@ -297,36 +286,44 @@ class BoshSession(Session):
         # return joined queued data
         return pendings
     
-    def createInternal(self, sid, connect):
+    def createInternal(self, req):
 	"""
 	Create session and return response.
 	"""
-        self.sid = sid
+        connect = Connect().create(req)
         self.rid = connect['rid']
         self.to = connect['to']
 	self.status = SessionStatus['connected']
-	response = {
-	    'sid': self.sid,
-	    'rid': self.rid,
-	    'to': self.to,
-	    'ver': self.options['ver'],
-	    'lang': self.options['lang'],
-	    'wait': self.options['wait'],
-	    'hold': self.options['hold'],
-	    'inactivity': self.options['inactivity'],
-	    'polling': self.options['polling'],
-	    }
-        # set create time as first poll time, to prevent client connected and hang it.
-        self.lastpoll = datetime.now()
-        self.scheduleInactivityCheck()
-	return response
+        try:
+            response = {
+                'sid': self.sid,
+                'rid': self.rid,
+                'to': self.to,
+                'ver': self.options['ver'],
+                'lang': self.options['lang'],
+                'wait': self.options['wait'],
+                'hold': self.options['hold'],
+                'inactivity': self.options['inactivity'],
+                'polling': self.options['polling'],
+            }
+            # set create time as first poll time, to prevent client connected and hang it.
+            self.lastpoll = datetime.now()
+            self.scheduleInactivityCheck()
+            return response
+        except:
+            import sys, traceback
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_exception(exc_type, exc_value, exc_traceback, \
+                              limit=2, file=sys.stdout)
+            logger.debug('failed to create response.')
+            return None
 
     def scheduleInactivityCheck(self):
         """ 
         Start a timer to check if session's inactivity.
         Timer will timeout in a duration which is set in options.
         """
-        Timer(self.options.inactivity, self.checkInactivity, ()).start()
+        Timer(self.options['inactivity'], self.checkInactivity).start()
         pass
 
     def checkInactivity(self):
@@ -334,7 +331,7 @@ class BoshSession(Session):
         Check session's inactivity.
         """
         now = datetime.now()
-        if now > self.lastpoll + timedelta(self.options.inactivity) and len(self.hold) < 1:
+        if now > self.lastpoll + timedelta(self.options['inactivity']) and len(self.hold) < 1:
             # Connection manager SHOULD assume client disconnected.
             self.manager.disconnected(self)
         pass
@@ -348,7 +345,7 @@ class BoshSession(Session):
         self.pending.put(data)
 	pass
 
-    def recv(self, request):
+    def recv(self, request, method='POST'):
 	"""
 	Try poll data from connection.
         Session will trial data from request first.
@@ -358,34 +355,35 @@ class BoshSession(Session):
 
         This implementation will return a json serializable object.
 	"""
+        req = getInternalRequest(request, method)
         try:
-            rid = request['rid']
+            rid = req['rid']
         except KeyError:
             logger.debug('rid not found in request.')
             # Server will close session caused by bad request.
-            self.close('bad-request')
+            self.close(condition='bad-request')
             pass
 
-        if self.lastpoll is not None and datetime.now() < self.lastpoll + timedelta(seconds=self.options.polling):
+        if self.lastpoll is not None and datetime.now() < self.lastpoll + timedelta(seconds=self.options['polling']):
             # polling to frequently, overactivity.
-            self.close('policy-volation')
+            self.close(condition='policy-volation')
             pass
 
         self.lastpoll = datetime.now()
         # trial data from request
-        if 'data' in request:
-            self.manager.recv(request['data'])
+        if 'data' in req:
+            self.manager.recv(req['data'])
 
         if rid == self.lastrid:
             # request was resent by client on broken connection.
             # server SHOULD send last HTTP 200 and queued data, see XEP-1024 broken connection.
             return self.last
         elif rid < self.lastrid:
-            self.close('bad-request')
+            self.close(condition='bad-request')
 
         if len(self.hold) >= self.options['hold']:
             # Cant hold any connections.
-            self.close('policy-violation')
+            self.close(condition='policy-violation')
             pass
 
         # poll pending data.

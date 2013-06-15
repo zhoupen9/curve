@@ -201,7 +201,7 @@
 			this.terminator = new SessionTerminator();
 			this.status = this.Status.created;
 		},
-		
+
 		// generate a request id.
 		nextrid: function () {
 			this.rid = this.rid || (10000 + Math.round(Math.random() * 10000));
@@ -264,7 +264,7 @@
 			} else {
 				this.current = this.Requests.polling;
 			}
-			
+
 			request = request || {};
 			$[this.method](this.to, request)
 				.done(function (response) {
@@ -293,7 +293,7 @@
 
 			// decrease current requests.
 			--session.current;
-			
+
 			// client SHOULD send another request to poll incoming data immediately.
 			switch (session.current) {
 			case session.Requests.clean:
@@ -349,11 +349,11 @@
 				delete this.received;
 			}
 		},
-		
+
 		// Handle session connect done.
 		connectDone: function (session, response) {
 			var session, to = response.to;
-			
+
 			if (response.type && response.type === 'terminate') {
 				// connection failed to create due to server terminated.
 				$.debug('session failed to connect.');
@@ -361,7 +361,7 @@
 				session.cleanup();
 				return;
 			}
-			
+
 			$.debug('Connected to:', to);
 			session.status = session.Status.connected;
 			session.sid = response.sid;
@@ -370,6 +370,9 @@
 				requests: Math.max(response.requests, session.options.requests),
 				polling: response.polling || session.options.polling,
 			});
+
+			// since connection established, start polling.
+			this.send();
 		},
 
 		// Handle session connect failed.
@@ -407,7 +410,7 @@
 				$.debug('session matches:', host, ' not found.');
 			}
 		},
-		
+
 		// Try to connect to server to create a session.
 		connect: function (host) {
 			var session = new Session();

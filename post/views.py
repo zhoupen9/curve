@@ -54,9 +54,9 @@ def create_post(member):
     post = Post(id=1, title=title, createTime=now, member=member, content=content)
     # TEST CODE.
     # create notification.
-    notification = Notification.objects.createNotification(member.user, member.user, 'Post', 'new post')
+    notification = Notification.objects.create(member.user, member.user, 'Post', 'new post')
     # post notification.
-    Notification.objects.addNotification(notification)
+    Notification.objects.add(notification)
     return post
 
 @login_required

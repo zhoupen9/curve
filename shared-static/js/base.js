@@ -16,13 +16,10 @@
 		// connect to connection manager.
 		$.curve.CM.connect(connect)
 			.done(function () {
-				session = $.curve.CM.get(connect);
-				if (session.isConnected()) {
-					$.debug('start polling...');
-					session.send();
-				} else {
-					$.debug('session creation failed.');
-				}
+
+			})
+			.fail(function () {
+
 			});
 
 		// click handler for 'message' inside top bar.

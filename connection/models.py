@@ -8,13 +8,22 @@ CLOSED = 2
 
 SESSION_STATUS = (OPEN, CLOSED)
 
+def getInternalRequest(request, method):
+    """ Get internal request. """
+    if request is None or method is None:
+        raise ValueError('request and method can not be None.')
+    if not hasattr(request, method):
+        raise TypeError('request has no attribute: '+ method)
+
+    return getattr(request, method)
+
 class Session(object):
     """
     Abstract session.
     A session is a connection orient abstraction.
     Subclasses of this class must implement send() and recv().
     """
-    def create(self, sid, request):
+    def create(self, sid, request, method='POST'):
         """
         Create session.
         sid is session id.
@@ -22,14 +31,14 @@ class Session(object):
         """
         self.sid = sid
         self.status = OPEN
-        return self.createInternal(sid, request)
+        return self.createInternal(getInternalRequest(request, method))
 
-    def close(self):
+    def close(self, condition=None):
         """
         Close session.
         """
         self.status = CLOSED
-        return self.closeInternal()
+        return self.closeInternal(condition)
 
     def createInternal(self, sid, request):
         """
@@ -37,7 +46,7 @@ class Session(object):
         """
         raise NotImplementedError()
 
-    def closeInternal(self):
+    def closeInternal(self, condition=None):
         """
         Internal close session.
         """
@@ -80,15 +89,15 @@ class Manager(object):
     This package was designed to replace raw connection with 'Session',
     so managed connections are sessions indeed.
     """
-    # all sessions.
-    sessions = {}
+    sessions = {} # sessions dictionary, key: sid, value: session.
     handlers = [] # data handlers, which registered on this manager.
+    users = {} # users dictionary, key: userid, value: sid.
 
     def createSid(self, userid):
 	""" Create session id. """
 	return unicode('sid-' + str(userid), settings.ENCODING)
-
-    def createSession(self, sid, request):
+    
+    def createSession(self, sid, request, method='POST'):
 	""" 
         Create session. 
         sid is session id to create with,
@@ -99,7 +108,7 @@ class Manager(object):
         """
 	raise NotImplementedError()
 
-    def connect(self, request):
+    def connect(self, request, method='POST'):
         """ 
         Connect to connection manager. 
         Request passed in is a HTTP request.
@@ -107,7 +116,7 @@ class Manager(object):
         """
         raise NotImplementedError()
 
-    def accept(self, userid, request):
+    def accept(self, userid, request, method='POST'):
 	"""
 	Accept create request and create session for user.
 	"""
@@ -116,16 +125,17 @@ class Manager(object):
 	    logger.debug('a session bind with %s already exists.', sid)
 	    # terminate existed session.
 	    session = self.sessions[sid]
-	    session.close('other-request')
+	    session.close(condition='other-request')
 	    self.terminateSession(session)
 	    pass
 
-	session, response = self.createSession(sid, request)
+	session, response = self.createSession(sid, request, method)
         if session is not None:
             self.sessions[session.sid] = session
+            self.users[userid] = sid
 	return response
 
-    def get(self, sid):
+    def getSession(self, sid):
 	"""
 	Get session for given user.
 	"""
@@ -135,11 +145,22 @@ class Manager(object):
 	else:
             raise KeyError('session matches sid: ' + sid + ' not found.')
         pass
-
+        
+    def getUserSession(self, userid):
+        """
+        Get user's session.
+        """
+        if userid in self.users:
+            sid = self.users[userid]
+            return self.get(sid)
+        else:
+            return None
+            
     def disconnected(self, session):
         session.close()
         self.terminateSession(session)
         pass
+        
     def handleRequest(self, session, request):
 	"""
 	Handle data from client's poll request.
