@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -52,7 +52,7 @@ def create_post(member):
     post = Post(id=1, title=title, createTime=now, member=member, content=content)
     # TEST CODE.
     # create notification.
-    notification = Notification.objects.create(member.user, member.user, 'Post', 'new post')
+    notification = Notification.objects.create(member.user, member.user, '新消息', '开发者需知...')
     # post notification.
     Notification.objects.add(notification)
     return post

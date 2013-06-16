@@ -207,7 +207,7 @@ class BoshManager(Manager):
             result = self.accept(user, request, method)
         else:
             sid = req['sid']
-            logger.debug('new request, sid: %s, rid: %s.', sid, req['rid'])
+            # logger.debug('new request, sid: %s, rid: %s.', sid, req['rid'])
             try:
                 session = super(BoshManager, self).getSession(sid)
                 result = session.recv(request)
@@ -376,7 +376,7 @@ class BoshSession(Session):
 
         self.lastpoll = datetime.now()
         # trial data from request
-        if 'data' in req:
+        if 'data' in req and req['data']:
             self.manager.recv(req['data'])
 
         if rid == self.lastrid:

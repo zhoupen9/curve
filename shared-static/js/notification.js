@@ -11,21 +11,42 @@
 			'Remote',
 		],
 
-		show: function (parent, notify, duration) {
-			var that = this, html = '<li class="notification-item">'
+		show: function (parent, notify) {
+			var that = this, html = '<li class="notification-item ' + notify.type + '">'
 				+ '<div class="notification">'
 				+ '<button class="close" data-dismiss="close">&times;</button>'
-				+ '<small>' + notify.content + '</small>'
+				// + '<small>' + notify.content + '</small>'
+				+ '<div class="notification-content">' + notify.content + '</div>'
 				+ '</div>'
 				+ '</li>';
+			
 			parent.append(html);
 			this.element = parent.find('li:last');
-			this.element.fadeIn('slow');
+			this.element.find('button').last().click(function (e) {
+				if (that.timer) {
+					window.clearTimeout(that.timeout);
+				}
+				that.close();
+			});
+
+			if (notify.handler) {
+				this.element.on('click', notify.handler);
+			}
 			
-			if (duration) {
-				setTimeout(function () {
+			this.element.fadeIn('slow');
+
+			this.updateInternal(notify);
+		},
+
+		updateInternal: function (notify) {
+			var that = this;
+			
+			this.type = notify.type;
+			this.duration = notify.duration;
+			if (this.type !== 'alert' && this.duration) {
+				this.timer = window.setTimeout(function () {
 					that.close();
-				}, duration * 1000);
+				}, this.duration);
 			}
 		},
 
@@ -40,6 +61,18 @@
 					that.remove();
 				}
 			});
+		},
+
+		update: function (notify) {
+			var html = '<div class="notification-content">' + notify.content + '</div>';
+			
+			this.element.find('.notification-content').remove();
+			this.element.find('.notification').append(html);
+
+			if (this.timer) {
+				window.clearTimeout(this.timer);
+			}
+			this.updateInternal(notify);
 		}
 	};
 
@@ -47,7 +80,7 @@
 		// default notification options.
 		options: {
 			position: 'top',
-			delay: 2000, // milliseconds.
+			duration: 2000, // milliseconds.
 			animation: 'fade',
 		},
 
@@ -65,12 +98,17 @@
 		notify: function (notify) {
 			var notification = new Notification(),
 			parent = this.element.find('ol').last();
+
+			if (notify.duration === undefined) {
+				notify.duration = this.options.duration;
+			}
 			
 			if (notify.type === 'Remote') {
 				// fetch remote content.
 			} else {
-				notification.show(parent, notify, 5);
+				notification.show(parent, notify);
 			}
+			return notification;
 		}
 	});
 }(jQuery));

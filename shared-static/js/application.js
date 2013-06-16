@@ -7,8 +7,13 @@
 	// global post dialig setup.
 	// dropdown menu inside top navigate bar.
 	$(document).ready(function () {
-		var session, notifications, noti;
+		var session, notifications, noti, connectNotify, handler, html
 		connect = '/connection/connect';
+		
+		// Disable certain links in docs
+		$('section [href^=#]').click(function (e) {
+			e.preventDefault()
+		});
 
 		// enable jQuery csrf support.
 		$.csrfSetup();
@@ -18,17 +23,44 @@
 		noti = notifications.data('notification');
 
 		// connect to connection manager.
-		$.curve.CM.connect(connect)
-			.done(function () {
-				noti.notify({ type: 'info', content: 'Connected.'});
-			})
-			.fail(function () {
-				noti.notify({ type: 'alert', content: 'Failed to connect to server.'});
-			});
+		connectNotify = noti.notify({ type: 'info', content: '<span class="spinner"></span>Connecting to server...', duration: 0});
+		window.setTimeout(function () {
+			$.curve.CM.connect(connect)
+				.done(function (connection, response) {
+					connectNotify.update({ type: 'info', content: 'Connected.', duration: 2000});
+					connection.addHandler(function (data) {
+						if (typeof data === 'string') {
+							$.debug('data is string !');
+							return;
+						}
+						if (data && data.length) {
+							for (var i = 0; i < data.length; i++) {
+								html = data[i].type + ', ' + data[i].content;
+								noti.notify({ type: 'remote', content: html});
+							}
+						} else if (data) {
+							html = data.type + ', ' + data.content;
+							noti.notify({ type: 'remote', content: html});
+						}
+					});
+				})
+				.fail(function (connection, response) {
+					connectNotify.update({ type: 'alert', content: 'Failed to connect to server.'});
+				});
+			
+		}, 2000);
 
 		// click handler for 'message' inside top bar.
 		$('#message').click(function (e) {
-			noti.notify({ type: 'info', content: 'Message topbar button clicked.'});
+			noti.notify({ type: 'alert', content: 'Message topbar button clicked.'});
+		});
+
+		$('#conference').click(function (e) {
+			noti.notify({ type: 'warn', content: 'Sample warnning.'});
+		});
+
+		$('#blog').click(function (e) {
+			noti.notify({ type: 'info', content: 'Page content will update to blog.'});
 		});
 
 		// create global poster inside post dialog.

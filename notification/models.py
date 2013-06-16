@@ -61,4 +61,24 @@ class Notification(models.Model):
     sender = models.ForeignKey(User, related_name="sender")
     status = models.IntegerField()
     objects = NotificationManager()
-    __json_fields__ = ('id', 'user.id', 'type', 'content', 'createTime', 'sender.id', 'status')
+
+    def __json__(self):
+        """
+        Implement JSON_INTERFACE by return a dict.
+        """
+        json = {
+            'id': self.id,
+            'user': {
+                'name': self.user.username,
+                'id': self.user.id,
+                },
+            'type': self.type,
+            'content': self.content,
+            'createTime': str(self.createTime),
+            'sender': {
+                'name': self.sender.username,
+                'id': self.sender.id,
+                },
+            'status': self.status,
+            }
+        return json

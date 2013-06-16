@@ -140,7 +140,7 @@ class Manager(object):
 	Get session for given user.
 	"""
 	if sid in self.sessions:
-	    logger.debug('session bind with %s exists.', sid)
+	    # logger.debug('session bind with %s exists.', sid)
 	    return self.sessions[sid]
 	else:
             raise KeyError('session matches sid: ' + sid + ' not found.')

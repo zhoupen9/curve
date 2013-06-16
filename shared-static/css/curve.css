@@ -99,7 +99,13 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 }
 
 .spinner {
+	width: 14px;
+	height: 14px;
 	background-image: url(/static/img/spinner.gif);
+	background-repeat: none;
+	position: relative;
+	top: 2px;
+	display: inline-block;
 }
 
 .user-style-default {
@@ -279,6 +285,42 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 	font-size: 12px !important;
 }
 
+.nav .nav-home {
+	background-position: -170px -115px;
+	width: 21px;
+	height: 19px;
+}
+
+.nav a:hover .nav-home {
+	background-position: -144px -115px;
+	width: 21px;
+	height: 19px;
+}
+
+.nav .nav-blog {
+	background-position: -170px -115px;
+	width: 21px;
+	height: 19px;
+}
+
+.nav a:hover .nav-blog {
+	background-position: -144px -115px;
+	width: 21px;
+	height: 19px;
+}
+
+.nav .nav-conference {
+	background-position: -57px -248px;
+	width: 21px;
+	height: 19px;
+}
+
+.nav a:hover .nav-conference {
+	background-position: -85px -248px;
+	width: 21px;
+	height: 19px;
+}
+
 .nav .nav-messages {
 	background-position: -170px -115px;
 	width: 21px;
@@ -286,7 +328,7 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 }
 
 .nav a:hover .nav-messages {
-	background-position: -144px -115px;
+	background-position: -141px -115px;
 	width: 21px;
 	height: 19px;
 }
