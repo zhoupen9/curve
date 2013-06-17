@@ -1,0 +1,12 @@
+{% for blog in blogs %}
+<li class="blog-item">
+	<div class="blog">
+		<div class="blog-title">
+			{{ blog.title }}
+		</div>
+		<div class="blog-content">
+			<p>{{ blog.content }}</p>
+		</div>
+	</div>
+</li>
+{% endfor %}

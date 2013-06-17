@@ -33,7 +33,12 @@ class MemberManager(models.Manager):
 	logger.debug('member: %s created.', new_member.id)
 	return new_member
 
+    def get_member(self, userid):
+        """ Get member by id. """
+        return super(MemberManager, self).get_query_set().filter(user_id=userid)
+
     def get_lists_of_member(self, member):
+        """ Get member's lists. """
         return super(models.Manage, self).get_query_set().filter(member_id=member)
 
 class Member(models.Model):

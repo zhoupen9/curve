@@ -16,6 +16,7 @@ urlpatterns = patterns(
     url(r'^member/', include('member.urls')),
     url(r'^post/', include('post.urls')),
     url(r'^connection/', include('connection.urls')),
+    url(r'^blog/', include('blog.urls')),
     # Uncomment the admin/doc line below to enable admin documentation.
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # Uncomment the next line to enable the admin.

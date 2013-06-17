@@ -7,7 +7,7 @@
 	// global post dialig setup.
 	// dropdown menu inside top navigate bar.
 	$(document).ready(function () {
-		var session, notifications, noti, connectNotify, handler, html
+		var session, notifications, noti, connectNotify, handler, html, connection,
 		connect = '/connection/connect';
 		
 		// Disable certain links in docs
@@ -26,9 +26,10 @@
 		connectNotify = noti.notify({ type: 'info', content: '<span class="spinner"></span>Connecting to server...', duration: 0});
 		window.setTimeout(function () {
 			$.curve.CM.connect(connect)
-				.done(function (connection, response) {
+				.done(function (bosh, response) {
+					connection = bosh;
 					connectNotify.update({ type: 'info', content: 'Connected.', duration: 2000});
-					connection.addHandler(function (data) {
+					bosh.addHandler(function (data) {
 						if (typeof data === 'string') {
 							$.debug('data is string !');
 							return;
@@ -44,7 +45,7 @@
 						}
 					});
 				})
-				.fail(function (connection, response) {
+				.fail(function (bosh, response) {
 					connectNotify.update({ type: 'alert', content: 'Failed to connect to server.'});
 				});
 			
@@ -60,7 +61,8 @@
 		});
 
 		$('#blog').click(function (e) {
-			noti.notify({ type: 'info', content: 'Page content will update to blog.'});
+			e.preventDefault();
+			window.history.pushState('connection', 'Blog', '/blog');
 		});
 
 		// create global poster inside post dialog.

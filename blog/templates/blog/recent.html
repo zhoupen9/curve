@@ -1,0 +1,50 @@
+
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'blog/css/blog.css' %}" />
+{% endblock %}
+
+{% block page %}
+<div class="dashboard">
+	<ul class="nav nav-table nav-stacked">
+		<li class="active">
+			<a href="/blog">Recent</a>
+		</li>
+		<li>
+			<a href="/blog/compose">Compose</a>
+		</li>
+	</ul>
+</div>
+<div id="recent-blogs" class="content">
+	<div class="content-header">
+		<div class="header-inner">
+			<h2>Recent Blogs</h2>
+		</div>
+	</div>
+	<div class="blog-container">
+		{% for blog in blogs %}
+		<li class="blog-item">
+			<div class="blog">
+				<div class="blog-title">
+					{{ blog.title }}
+				</div>
+				<div class="blog-content">
+					<p>{{ blog.content }}</p>
+				</div>
+			</div>
+		</li>
+		{% endfor %}
+	</div>
+	<div class="stream-footer">
+		<div class="stream-loading">
+			<div class="stream-loading-inner">
+				<span id="loading-posts" class="spinner hide"></span>
+				<span id="load-posts" title="loading...">loading...</span>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
