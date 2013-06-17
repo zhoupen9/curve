@@ -1,40 +1,4 @@
-
-{% extends "base.html" %}
-
-{% load staticfiles %}
-
-{% block styles %}
-<link rel="stylesheet" type="text/css" href="{% static 'home/css/home.css' %}" />
-{% endblock %}
-
-{% block scripts %}
-<script type="text/javascript">
-$(document).ready(function () {
-	var load = $('#load-posts'), loading = $('#loading-posts');
-	load.on('click', function (e) {
-		load.toggleClass('hide');
-		loading.toggleClass('hide');
-		$.get('/connection/notify').always(function () {
-			load.toggleClass('hide');
-			loading.toggleClass('hide');
-		});
-	});
-
-	$('#activity-notify').click(function (e) {
-		var i, items = $('#stream-items'), orig = items.length;
-		$.get('/post/recent')
-		.done(function (data) {
-			items.prepend(data);
-			for (i = 0; i < orig; i++) {
-				items.children('li:nth-child(' + (i + 1) + ')').children('.post').post();
-			}
-		});
-		e.preventDefault();
-		// this.parentNode.removeChild(this);
-	});
-});
-</script>
-{% endblock %}
+{% extends ajax|yesno:"ajaxbase.html,base.html" %}
 
 {% block page %}
 <div class="dashboard">

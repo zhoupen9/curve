@@ -1,24 +1,19 @@
-
-{% extends "base.html" %}
-
-{% load staticfiles %}
-
-{% block styles %}
-<link rel="stylesheet" type="text/css" href="{% static 'blog/css/blog.css' %}" />
-{% endblock %}
-
+{% extends ajax|yesno:"ajaxbase.html,base.html" %}
+{# {% extends "ajaxbase.html" %} #}
 {% block page %}
 <div class="dashboard">
-	<ul class="nav nav-table nav-stacked">
-		<li class="active">
-			<a href="/blog">Recent</a>
-		</li>
-		<li>
-			<a href="/blog/compose">Compose</a>
-		</li>
-	</ul>
+	<div class="module">
+		<ul class="nav nav-table nav-stacked">
+			<li class="active">
+				<a href="/blog">Recent</a>
+			</li>
+			<li>
+				<a href="/blog/compose">Compose</a>
+			</li>
+		</ul>
+	</div>
 </div>
-<div id="recent-blogs" class="content">
+<div id="recent-blogs" class="content recent-blogs">
 	<div class="content-header">
 		<div class="header-inner">
 			<h2>Recent Blogs</h2>

@@ -182,13 +182,14 @@
 
 			this.status = this.Status.connecting;
 
-			$[this.method](host, request, null, 'json')
-				.done(function (data) {
-					deferred.resolve(that, data);
-				})
-				.fail(function (data) {
-					deferred.reject(that, data);
-				});
+			// $[this.method](host, request, null, 'json')
+			// 	.done(function (data) {
+			// 		deferred.resolve(that, data);
+			// 	})
+			// 	.fail(function (data) {
+			// 		deferred.reject(that, data);
+			// 	});
+			deferred.reject(that, 'disabled for debugging...');
 
 			deferred.done(this.connectDone).fail(this.connectFailed);
 			return deferred.promise();

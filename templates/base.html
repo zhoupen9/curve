@@ -10,8 +10,8 @@
 		<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}"></link>
 		<link rel="stylesheet" type="text/css" href="{% static 'css/curve.css' %}"></link>
 		<link rel="stylesheet" type="text/css" href="{% static 'css/notification.css' %}"></link>
-		{% block styles %}
-		{% endblock %}
+		<link rel="stylesheet" type="text/css" href="{% static 'home/css/home.css' %}"></link>
+		<link rel="stylesheet" type="text/css" href="{% static 'blog/css/blog.css' %}"></link>
 	</head>
 
 	<body class="user-style-default">
@@ -20,89 +20,87 @@
 			<div id="topbar" class="navbar navbar-inverse navbar-fixed-top">
 				<div class="navbar-inner">
 					<div class="container">
-						<!-- <a class="brand nav-brand" href="/about">Curve</a> -->
-						<div class="nav-collapse collapse">
-							<!-- navigation buttons. -->
+						<div id="loading" class="pushstate-spinner loading-spinner"></div>
+						<!-- navigation buttons. -->
+						<ul class="nav">
+							<li class="active">
+								<a href="/home" id="home">
+									<span>
+										<i class="nav-home"></i>
+									</span>
+									<small>Home</small>
+								</a>
+							</li>
+							<li>
+								<a href="/blog" id="blog">
+									<span>
+										<i class="nav-blog"></i>
+									</span>
+									<small>Blog</small>
+								</a>
+							</li>
+							<li>
+								<a href="/conference" id="conference">
+									<span>
+										<i class="nav-conference"></i>
+									</span>
+									<small>Conference</small>
+								</a>
+							</li>
+							<li>
+								<a href="#" id="message">
+									<span>
+										<i class="nav-messages"></i>
+									</span>
+									<small>Messages</small>
+								</a>
+							</li>
+						</ul>
+
+						<!-- put right form and dropdown menu. -->
+						<div class="pull-right">
+							<form action="/search" method="post" class="form-search">
+								{% csrf_token %}
+								<input id="search-query" type="text" class="search-input" placeholder="search"/>
+							</form>
 							<ul class="nav">
-								<li class="active">
-									<a href="/" id="home">
-										<span>
-											<i class="nav-home"></i>
+								<li class="me dropdown">
+									<a class="dropdown-toggle" href="#" data-toggle="dropdown">
+										<span class="profile-icon-wrapper">
+											<i class="profile-icon"></i>
 										</span>
-										<small>Home</small>
+										<span class="caret"></span>
 									</a>
-								</li>
-								<li>
-									<a href="/blog" id="blog">
-										<span>
-											<i class="nav-blog"></i>
-										</span>
-										<small>Blog</small>
-									</a>
-								</li>
-								<li>
-									<a href="/conference" id="conference">
-										<span>
-											<i class="nav-conference"></i>
-										</span>
-										<small>Conference</small>
-									</a>
-								</li>
-								<li>
-									<a href="#" id="message">
-										<span>
-											<i class="nav-messages"></i>
-										</span>
-										<small>Messages</small>
-									</a>
+									<ul class="dropdown-menu">
+										<li id="current-user" class="current-user" data-name="profile" data-user-id="{{ request.session.userid }}">
+											<a href="/{{ request.session.username }}" class="account-summary" data-name="profile">
+												<div class="profile-content">
+													<div class="account-group">
+														<img class="avatar size32" src="{% static 'img/profile-icons/vivalavida.jpeg' %}"/>
+														<b class="fullname">{{ request.session.username }}</b>
+														<small class="metadata">Edit profile</small>
+													</div>
+												</div>
+											</a>
+										</li>
+										<li class="divider"></li>
+										<li>
+											<a id="messages-menu" class="" href="#" data-nav="message">Messages</a>
+										</li>
+										<li class="divider"></li>
+										<li>
+											<a class="" href="/member/setting">Settings</a>
+										</li>
+										<li>
+											<a class="" href="/signout">Sign out</a>
+										</li>
+									</ul>
 								</li>
 							</ul>
-
-							<!-- put right form and dropdown menu. -->
-							<div class="pull-right">
-								<form action="/search" method="post" class="form-search">
-									{% csrf_token %}
-									<input id="search-query" type="text" class="search-input" placeholder="search"/>
-								</form>
-								<ul class="nav">
-									<li class="me dropdown">
-										<a class="dropdown-toggle" href="#" data-toggle="dropdown">
-											<span class="profile-icon-wrapper">
-												<i class="profile-icon"></i>
-											</span>
-											<span class="caret"></span>
-										</a>
-										<ul class="dropdown-menu">
-											<li id="current-user" class="current-user" data-name="profile" data-user-id="{{ request.session.userid }}">
-												<a href="/{{ request.session.username }}" class="account-summary" data-name="profile">
-													<div class="profile-content">
-														<div class="account-group">
-															<img class="avatar size32" src="{% static 'img/profile-icons/vivalavida.jpeg' %}"/>
-															<b class="fullname">{{ request.session.username }}</b>
-															<small class="metadata">Edit profile</small>
-														</div>
-													</div>
-												</a>
-											</li>
-											<li class="divider"></li>
-											<li>
-												<a id="messages-menu" class="" href="#" data-nav="message">Messages</a>
-											</li>
-											<li class="divider"></li>
-											<li>
-												<a class="" href="/member/setting">Settings</a>
-											</li>
-											<li>
-												<a class="" href="/signout">Sign out</a>
-											</li>
-										</ul>
-									</li>
-								</ul>
-								<div class="topbar-post">
-									<button type="button" id="global-post-btn" class="btn compose-btn topbar-post-btn" placeholder="Post">
-										<i class="new-post"></i>
-									</button>
-								</div>
+							<div class="topbar-post">
+								<button type="button" id="global-post-btn" class="btn compose-btn topbar-post-btn" placeholder="Post">
+									<i class="new-post"></i>
+								</button>
 							</div>
 						</div>
 					</div>
@@ -136,10 +134,8 @@
 
 		<!-- Modal overlay. -->
 		<div class="modal-overlay"></div>
+
 		<!-- Global post dialog. -->
-		<!--
-		<div class="close-model-background-target"></div>
-		-->
 		<div id="post-dlg" class="dialog draggable" style="top: 147px; left: 290px; display: none;">
 			<div class="dialog-content">
 				<div class="dialog-header">
@@ -191,7 +187,6 @@
 						</div>
 					</form>
 				</div>
-				{# <div class="dialog-footer"></div> #}
 			</div>
 		</div>
 
@@ -286,8 +281,7 @@
 		<script type="text/javascript" src="{% static 'js/bosh.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/post.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/notification.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/ajaxloader.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/application.js' %}"></script>
-		{% block scripts %}
-		{% endblock %}
 	</body>
 </html>

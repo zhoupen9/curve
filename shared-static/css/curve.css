@@ -115,6 +115,22 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 	display: inline-block;
 }
 
+.pushstate-spinner {
+	display: inline-block;
+	opacity: 0;
+	margin-top: 10px;
+	margin-left: 30px;
+	height: 16px;
+	width: 16px;
+	vertical-align: top;
+/*	-webkit-transition: all .5s ease-in-out;
+	-moz-transition: all .5s ease-in-out;
+	transition: all .5s ease-in-out;
+	-webkit-transform: scale(0);
+	-moz-transform: scale(0);
+	transform: scale(0);*/
+}
+
 .user-style-default {
 	background-image: url(/static/img/bg.png);
 }
@@ -158,6 +174,11 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 
 .clearfix {
 	clear: both;
+}
+
+.content {
+    float: right;
+    width: 522px;
 }
 
 .content-header {
@@ -293,51 +314,59 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 }
 
 .nav .nav-home {
-	background-position: -170px -115px;
-	width: 21px;
-	height: 19px;
+	background-position: -10px -20px;
+	width: 25px;
+	height: 25px;
+	float: left;
 }
 
 .nav a:hover .nav-home {
-	background-position: -144px -115px;
-	width: 21px;
-	height: 19px;
+	background-position: -10px -50px;
+	width: 25px;
+	height: 25px;
+	float: left;
 }
 
 .nav .nav-blog {
 	background-position: -170px -115px;
 	width: 21px;
 	height: 19px;
+	float: left;
 }
 
 .nav a:hover .nav-blog {
 	background-position: -144px -115px;
 	width: 21px;
 	height: 19px;
+	float: left;
 }
 
 .nav .nav-conference {
 	background-position: -57px -248px;
 	width: 21px;
 	height: 19px;
+	float: left;
 }
 
 .nav a:hover .nav-conference {
 	background-position: -85px -248px;
 	width: 21px;
 	height: 19px;
+	float: left;
 }
 
 .nav .nav-messages {
 	background-position: -170px -115px;
 	width: 21px;
 	height: 19px;
+	float: left;
 }
 
 .nav a:hover .nav-messages {
 	background-position: -141px -115px;
 	width: 21px;
 	height: 19px;
+	float: left;
 }
 
 .topbar-post .new-post {
@@ -400,9 +429,9 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 
 .profile-icon {
 	display: inline-block;
-	width: 16px;
-	height: 16px;
-	background-image: url(/static/img/ic16_gear.png);
+	width: 30px;
+	height: 30px;
+	background-position: -165px -20px;
 }
 
 .dropdown-menu li {
@@ -458,8 +487,8 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 	padding: 1px;
 	margin-top: 5px;
 	border-radius: 5px;
-	background-image: url(/static/img/sprite_bgs.png);
-	background-position: 0 -100px;
+	/*background-image: url(/static/img/sprite_bgs.png);*/
+	/*background-position: 0 -100px;*/
 }
 
 .pull-right .compose-btn {
@@ -474,8 +503,8 @@ input:focus, textarea:focus, div[contenteditable="true"]:focus {
 	-webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
 	box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
 	background-color: #2c77ba !important;
-	background-image: url(/static/img/sprite_bgs.png) !important;
-	background-repeat: repeat-x;
+	/*background-image: url(/static/img/sprite_bgs.png) !important;*/
+	/*background-repeat: repeat-x;*/
 	background-position: 0 -140px;
 }
 

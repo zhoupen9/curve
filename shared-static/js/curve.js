@@ -1,7 +1,7 @@
 /*jslint browser: true*/
 /*global $*/
 
-(function ($) {
+!(function ($) {
 	// "use strict";
 
 	var
@@ -249,6 +249,9 @@
 	Curve.prototype = {
 		// settings.
 		options: {
+			// BOSH connection manager url.
+			connectionUrl: '/connection/connect',
+			// logging level.
 			logging: {
 				level: 'debug'
 			}
@@ -324,4 +327,4 @@
 	};
 
 	$.curve = new Curve();
-}($));
+}(jQuery));

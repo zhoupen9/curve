@@ -7,7 +7,7 @@ import logging
 
 logger = logging.getLogger('curve')
 
-def home(request):
+def mainpage(request):
     """
     Main page.
     According to user's login status, render proper page,
@@ -19,7 +19,7 @@ def home(request):
     if request.user.is_authenticated():
 	logger.debug('user name: %s, email: %s.', request.user.username, request.user.email)
 	# if user already logged in, render home page.
-	return render(request, 'home/home.html', context)
+	return redirect('/home');
     else:
 	# if user did not logged in, render welcome page.
 	error = request.session.get('error', None)

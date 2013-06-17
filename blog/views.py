@@ -5,7 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from member.models import Member
 from models import Blog
+import logging
 
+logger = logging.getLogger('curve')
 
 @login_required
 def recent(request):
@@ -14,6 +16,7 @@ def recent(request):
     member = Member.objects.get_member(userid)
     context = {}
     context['blogs'] = createDummyBlogs(member, 5)
+    context['ajax'] = request.is_ajax()
     return render(request, 'blog/recent.html', context)
 
 def createDummyBlogs(member, count):
