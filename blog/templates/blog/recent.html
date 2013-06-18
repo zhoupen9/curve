@@ -2,16 +2,31 @@
 {# {% extends "ajaxbase.html" %} #}
 {% block page %}
 <div class="dashboard">
-	<div class="module">
-		<ul class="nav nav-table nav-stacked">
-			<li class="active">
-				<a href="/blog">Recent</a>
-			</li>
-			<li>
-				<a href="/blog/compose">Compose</a>
-			</li>
-		</ul>
-	</div>
+	<!--<div class="module">-->
+        <ul class="nav nav-list sidebar-nav">
+          <li class="active">
+          	<a href="/blog"><i class="sidebar-nav-icon"></i> Recent</a>
+          </li>
+          <li>
+          	<a href="/blog/new"><i class="sidebar-nav-icon"></i> Compose</a>
+          </li>
+          <li>
+          	<a href="/blog/user"><i class="sidebar-nav-icon"></i> My Blogs</a>
+          </li>
+          <li>
+          	<a href="/blog/group"><i class="sidebar-nav-icon"></i> Group Blogs</a>
+          </li>
+          <li>
+          	<a href="/blog/group"><i class="sidebar-nav-icon"></i> Group Blogs</a>
+          </li>
+          <li>
+          	<a href="/blog/group"><i class="sidebar-nav-icon"></i> Group Blogs</a>
+          </li>
+          <li>
+          	<a href="/blog/group"><i class="sidebar-nav-icon"></i> Group Blogs</a>
+          </li>
+        </ul>
+	<!--</div> -->
 </div>
 <div id="recent-blogs" class="content recent-blogs">
 	<div class="content-header">
