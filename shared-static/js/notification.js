@@ -5,36 +5,55 @@
 
 	Notification.prototype = {
 		Types: [
-			'Info',
-			'Warn',
-			'Alert',
-			'Remote',
+			'info',
+			'warn',
+			'alert',
+			'remote',
 		],
+		
+		// Notification list item class.
+		ListItemClass: 'notification-item',
+		
+		// List item element.
+		ListItem: '<li class="notification-item"></li>',
+		
+		// notification item class.
+		ItemClass: 'notification',
+		
+		// notification content class.
+		ItemContentClass: 'notification-content',
 
+		// Show notification.
 		show: function (parent, notify) {
-			var that = this, html = '<li class="notification-item ' + notify.type + '">'
-				+ '<div class="notification">'
+			var that = this, origHandler, html = '<div class="' + this.ItemClass + '">'
 				+ '<button class="close" data-dismiss="close">&times;</button>'
-				// + '<small>' + notify.content + '</small>'
-				+ '<div class="notification-content">' + notify.content + '</div>'
-				+ '</div>'
-				+ '</li>';
-			
-			parent.append(html);
-			this.element = parent.find('li:last');
-			this.element.find('button').last().click(function (e) {
-				if (that.timer) {
-					window.clearTimeout(that.timeout);
-				}
-				that.close();
-			});
+				+ '<div class="' + this.ItemContentClass + '">' + notify.content + '</div>'
+				+ '</div>';
+
+			if (parent) {
+				// insert html to parent.
+				parent.append(this.ListItem);
+				this.element = parent.find('li:last');
+				this.element.append(html);
+				this.element.toggleClass(notify.type);
+				this.element.fadeIn('slow');
+			} else if (this.element) {
+				// update element's inner html.
+				origHandler = this.element.find('button').onclick;
+				this.element.attr('class', this.ListItemClass);
+				this.element.toggleClass(notify.type);
+				this.element.html(html);
+			} else {
+				throw new Error('No parent to append, or element not exists.');
+			}
 
 			if (notify.handler) {
 				this.element.on('click', notify.handler);
 			}
-			
-			this.element.fadeIn('slow');
 
+			this.element.find('button').last().click(function (e) {
+				that.close();
+			});
 			this.updateInternal(notify);
 		},
 
@@ -44,6 +63,9 @@
 			this.type = notify.type;
 			this.duration = notify.duration;
 			if (this.type !== 'alert' && this.duration) {
+				if (this.timer) {
+					window.clearTimeout(this.timer);
+				}
 				this.timer = window.setTimeout(function () {
 					that.close();
 				}, this.duration);
@@ -52,7 +74,11 @@
 
 		close: function () {
 			var that = this.element;
-			// this.element.fadeOut('slow');
+			// clear timer.
+			if (this.timer) {
+				window.clearTimeout(this.timeout);
+			}
+			// animate to dispear.
 			this.element.animate({
 				'right': '-=250px',
 			}, {
@@ -63,16 +89,9 @@
 			});
 		},
 
+		// update notification.
 		update: function (notify) {
-			var html = '<div class="notification-content">' + notify.content + '</div>';
-			
-			this.element.find('.notification-content').remove();
-			this.element.find('.notification').append(html);
-
-			if (this.timer) {
-				window.clearTimeout(this.timer);
-			}
-			this.updateInternal(notify);
+			this.show(null, notify);
 		}
 	};
 
