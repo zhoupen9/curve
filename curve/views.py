@@ -13,20 +13,16 @@ def mainpage(request):
     According to user's login status, render proper page,
     but not change current location (meaning server do not return redirect response).
     """
-    logger.debug('>> Executing home...')
+    logger.debug('>> Executing mainpage...')
 
-    context = {}
     if request.user.is_authenticated():
 	logger.debug('user name: %s, email: %s.', request.user.username, request.user.email)
 	# if user already logged in, render home page.
 	return redirect('/home');
     else:
 	# if user did not logged in, render welcome page.
-	error = request.session.get('error', None)
-	if not error is None:
-	    context['error'] = error
-
-    return render(request, 'welcome.html', context)
+        return render(request, 'welcome.html', {})
+    pass
 
 @require_http_methods(['POST'])
 def signin(request):
@@ -41,6 +37,7 @@ def signin(request):
     password = request.POST['password']
     logger.debug('Authenticating %s...', username)
     user = authenticate(username=username, password=password)
+    request.session['last_login'] = datetime.now()
     if user is not None and user.is_active:
 	logger.debug("User authenticated and active, logging in...")
 	login(request, user)
@@ -50,10 +47,12 @@ def signin(request):
 	member = Member.objects.get(user=user)
 	request.session['userid'] = user.id
 	request.session['username'] = member.username
+        return redirect('/home')
     else:
-	request.session['error'] = "There was an error logging you in. Please Try again."
-    request.session['last_login'] = datetime.now()
-    return redirect('/')
+        logger.debug("Authenticate failed for: " + username + ".")
+        error = "There was an error logging you in. Please Try again."
+        return render(request, 'welcome.html', { 'error': error })
+    pass
 
 def signout(request):
     """
@@ -65,6 +64,6 @@ def signout(request):
 	    del request.session[key]
     # django auth logout.
     logout(request)
-    return redirect('/')
+    return render(request, 'welcome.html', {})
 
 

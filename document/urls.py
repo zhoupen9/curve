@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns(
-    'blog.views',
+    'document.views',
     url(r'^$', 'recent'),
 )

@@ -4,8 +4,6 @@ import logging
 
 logger = logging.getLogger('curve')
 
-# Create your models here.
-
 class MemberManager(models.Manager):
     """
     Member models default manager.
@@ -15,8 +13,10 @@ class MemberManager(models.Manager):
         """
         Check if username or email already exists.
         """
-        user = User.objects.filter(username=fullname).filter(email=email)
-        return user is None
+        users = User.objects.filter(username=fullname).filter(email=email)
+        if users.exists():
+            logger.debug("user with name: " + fullname + " already exists, id: " + users[0].id)
+        return not users.exists()
 
     def create_member(self, fullname, email, password):
         """
@@ -35,7 +35,7 @@ class MemberManager(models.Manager):
 
     def get_member(self, userid):
         """ Get member by id. """
-        return super(MemberManager, self).get_query_set().filter(user_id=userid)
+        return super(MemberManager, self).get_query_set().get(user_id=userid)
 
     def get_lists_of_member(self, member):
         """ Get member's lists. """

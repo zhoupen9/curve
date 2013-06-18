@@ -35,9 +35,9 @@
 				that.loadPage('/home').done(that.initHome);
 			});
 
-			$('#blog').click(function (e) {
+			$('#documents').click(function (e) {
 				e.preventDefault();
-				that.loadPage('/blog');
+				that.loadPage('/document');
 			});
 
 			// create global poster inside post dialog.

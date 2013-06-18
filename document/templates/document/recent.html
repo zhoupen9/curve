@@ -2,57 +2,59 @@
 {# {% extends "ajaxbase.html" %} #}
 {% block page %}
 <div class="dashboard">
-	<!--<div class="module">-->
+	<div class="sidebar">
         <ul class="nav nav-list sidebar-nav">
           <li class="active">
-          	<a href="/blog"><i class="sidebar-nav-icon"></i> Recent</a>
+          	<a href="/document"><i class="sidebar-nav-icon"></i> Recent</a>
           </li>
           <li>
-          	<a href="/blog/new"><i class="sidebar-nav-icon"></i> Compose</a>
+          	<a href="/document/new"><i class="sidebar-nav-icon"></i> Compose</a>
           </li>
           <li>
-          	<a href="/blog/user"><i class="sidebar-nav-icon"></i> My Blogs</a>
+          	<a href="/document/user"><i class="sidebar-nav-icon"></i> My Documents</a>
           </li>
           <li>
-          	<a href="/blog/group"><i class="sidebar-nav-icon"></i> Group Blogs</a>
-          </li>
-          <li>
-          	<a href="/blog/group"><i class="sidebar-nav-icon"></i> Group Blogs</a>
-          </li>
-          <li>
-          	<a href="/blog/group"><i class="sidebar-nav-icon"></i> Group Blogs</a>
-          </li>
-          <li>
-          	<a href="/blog/group"><i class="sidebar-nav-icon"></i> Group Blogs</a>
+          	<a href="/document/group"><i class="sidebar-nav-icon"></i> Group Documents</a>
           </li>
         </ul>
-	<!--</div> -->
+	</div>
 </div>
-<div id="recent-blogs" class="content recent-blogs">
+<div id="recent-documents" class="content recent-documents">
 	<div class="content-header">
 		<div class="header-inner">
-			<h2>Recent Blogs</h2>
+			<h2>Recent documents</h2>
 		</div>
 	</div>
-	<div class="blog-container">
-		{% for blog in blogs %}
-		<li class="blog-item">
-			<div class="blog">
-				<div class="blog-title">
-					{{ blog.title }}
+	<div class="document-container">
+		<ol class="document-items">
+			{% for document in documents %}
+			<li class="document-item">
+				<div class="document">
+					<div class="document-content">
+						<div class="module-header">
+							{% if document.member.photo %}
+							<img class="avatar size48" src="/media/profiles/{{ document.member.photo }}" alt="{{ document.member.username }}"></img>
+							{% else %}
+							<img class="avatar size48" src="/media/profiles/default-photo.jpeg" alt="{{ document.member.username }}"></img>
+							{% endif %}
+							<a href="/user/{{ document.member.user.id }}">
+								<h3>{{ document.member.username }}</h3>
+							</a>
+							<small class="metadata">@{{ document.member.username }}</small>
+						</div>
+						<p>{{ document.title }}</p>
+						<p>{{ document.content }}</p>
+					</div>
 				</div>
-				<div class="blog-content">
-					<p>{{ blog.content }}</p>
-				</div>
-			</div>
-		</li>
-		{% endfor %}
+			</li>
+			{% endfor %}
+		</ol>
 	</div>
-	<div class="stream-footer">
-		<div class="stream-loading">
-			<div class="stream-loading-inner">
-				<span id="loading-posts" class="spinner hide"></span>
-				<span id="load-posts" title="loading...">loading...</span>
+	<div class="document-footer">
+		<div class="document-loading">
+			<div class="document-loading-inner">
+				<span id="loading-documents" class="spinner hide"></span>
+				<span id="load-documents" title="loading...">loading...</span>
 			</div>
 		</div>
 	</div>
