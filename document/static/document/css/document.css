@@ -50,3 +50,30 @@
 .document:hover {
     background-color: #f5f5f5;
 }
+
+.document-end {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    background-color: #fff;
+    padding: 15px;
+}
+
+.document-footer {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-left: 1px solid rgba(0, 0, 0, .1);
+    border-right: 1px solid rgba(0, 0, 0, .1);
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
+    text-align: center;
+}
+
+
+.documents-footer p {
+    margin: 0;
+    color: #777;
+}
+
+.reader .reader-content {
+    padding: 12px;
+    background-color: #fff;
+}

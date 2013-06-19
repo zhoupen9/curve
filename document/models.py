@@ -13,9 +13,10 @@ class DocumentManager(models.Manager):
         document.save()
         return document
 
-    def recent(self, member, limit=DEFAULT_DOCUMENT_LIMIT):
+    def recent(self, userid, limit=DEFAULT_DOCUMENT_LIMIT):
         """ Get member's recent document with limited count. """
-        return super(DocumentManager, self).get_query_set().filter(member=member)[:limit]
+        querySet = super(DocumentManager, self).get_query_set().filter(member__user__id=userid)
+        return querySet[:limit], querySet.count() - limit
     pass
 
 class Document(models.Model):

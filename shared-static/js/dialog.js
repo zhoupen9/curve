@@ -15,6 +15,8 @@
 		// dialog overlay class name.
 		overlayCls: 'modal-overlay',
 
+		captionClas: 'dialog-title',
+
 		// default dialog options.
 		options: {
 			// default behavior.
@@ -47,6 +49,11 @@
 					return;
 				}
 			}
+		},
+
+		// update caption.
+		updateCaption: function (caption) {
+			this.element.find('.'.concat(this.captionCls)).html(caption);
 		},
 
 		// capture keys.

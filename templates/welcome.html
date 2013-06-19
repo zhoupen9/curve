@@ -7,11 +7,11 @@
 		<meta charset="utf-8"></meta>
 		<title>Curve</title>
 		<link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon"></link>
-		<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}"></link>
+		{# <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}"></link> #}
 		<link rel="stylesheet" type="text/css" href="{% static 'css/curve.css' %}"></link>
 		<link rel="stylesheet" type="text/css" href="{{ STATIC_PREFIX }}css/welcome.css" />
 		<script type="text/javascript" src="{% static 'js/jquery-1.9.1.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+		{# <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script> #}
 		<script type="text/javascript">
 		$(document).ready(function() {
 			if ($('.alert').length) {
@@ -43,7 +43,7 @@
 				<div class="navbar-inner">
 					<div class="container">
 						<div class="nav-collapse collapse">
-							<a class="brand nav-brand" href="/about">Curve</a>
+							<a class="curve" href="/about"><h2>Curve</h2></a>
 						</div>
 					</div>
 				</div>

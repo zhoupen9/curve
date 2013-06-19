@@ -1,0 +1,36 @@
+
+<div class="sidebar">
+	<ul class="nav nav-list sidebar-nav">
+		{% if page == 'document' %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="/document"><i class="sidebar-nav-icon"></i> Recent</a>
+		</li>
+
+		{% if page == 'compose' %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="/document/new"><i class="sidebar-nav-icon"></i> Compose</a>
+		</li>
+
+		{% if page == 'my' %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="/document/user/{{ current }}"><i class="sidebar-nav-icon"></i> My Documents</a>
+		</li>
+
+		{% if page == 'group' %}
+		<li class="active">
+		{% else %}
+		<li>
+		{% endif %}
+			<a href="/document/group"><i class="sidebar-nav-icon"></i> Group Documents</a>
+		</li>
+	</ul>
+</div>

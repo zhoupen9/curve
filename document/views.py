@@ -18,6 +18,8 @@ def recent(request):
     context = {}
     context['documents'] = createDummyDocument(member, 5)
     context['ajax'] = request.is_ajax()
+    context['current'] = userid
+    context['page'] = 'document'
     return render(request, 'document/recent.html', context)
 
 def createDummyDocument(member, count):
@@ -29,3 +31,21 @@ def createDummyDocument(member, count):
         documents.append(document)
         pass
     return documents
+
+def user_documents(request, userid):
+    """ Get member's recent documents. """
+    logger.debug('reading ' + userid + '\'s documents.')
+    documents, remains = Document.objects.recent(userid)
+    context = {}
+    context['documents'] = documents
+    context['hasMoreDocuments'] = remains > 0
+    context['page'] = 'my'
+    return render(request, 'document/mydocuments.html', context)
+
+def open(request, doc):
+    """ Open a document by its id. """
+    userid = request.session['userid']
+    member = Member.objects.get(user_id=userid)
+    context = {}
+    context['document'] = createDummyDocument(member, 1)[0]
+    return render(request, 'document/document.html', context)

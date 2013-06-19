@@ -1,0 +1,47 @@
+<div class="document-stream">
+	<ol class="document-items">
+		{% for document in documents %}
+		<li class="document-item">
+			<div class="document" data-doc-id="{{ document.id }}">
+				<div class="document-content">
+					<div class="module-header">
+						{% if document.member.photo %}
+						<img class="avatar size48" src="/media/profiles/{{ document.member.photo }}" alt="{{ document.member.username }}"></img>
+						{% else %}
+						<img class="avatar size48" src="/media/profiles/default-photo.jpeg" alt="{{ document.member.username }}"></img>
+						{% endif %}
+						<a href="/user/{{ document.member.user.id }}">
+							<h3>{{ document.member.username }}</h3>
+							<span>
+								<small class="metadata">@{{ document.member.username }}</small>
+							</span>
+						</a>
+						<small class="metadata pull-right">{{ document.createTime }}</small>
+					</div>
+					<h3>{{ document.title }}</h3>
+					<p>{{ document.content }}</p>
+				</div>
+			</div>
+		</li>
+		{% endfor %}
+	</ol>
+</div>
+
+<div class="document-footer">
+	<div class="document-end">
+		<div class="no-documents">
+			<i class="curve"></i>
+			{% if documents|length == 0 %}
+			<p>There's no any documents yet.</p>
+			{% endif %}
+		</div>
+		{% if hasMoreDocuments %}
+		<div class="document-loading">
+			<div class="document-loading-inner">
+				<span id="loading-documents" class="spinner hide"></span>
+				<span id="load-documents" title="loading...">loading...</span>
+			</div>
+		</div>
+		{% endif %}
+	</div>
+</div>

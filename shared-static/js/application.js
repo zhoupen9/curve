@@ -37,7 +37,7 @@
 
 			$('#documents').click(function (e) {
 				e.preventDefault();
-				that.loadPage('/document');
+				that.loadPage('/document').done(that.initDocuments);
 			});
 
 			// create global poster inside post dialog.
@@ -115,6 +115,19 @@
 					});
 				e.preventDefault();
 				// this.parentNode.removeChild(this);
+			});
+		},
+
+		// initialize documents.
+		// Click on documents will open reader.
+		initDocuments: function () {
+			$('.document').each(function () {
+				var dlg, obj = $(this), doc = obj.data('doc-id');
+				obj.click(function () {
+					dlg = $('#reader-dlg');
+					dlg.reader().show();
+					dlg.data('reader').openDoc(doc);
+				});
 			});
 		},
 

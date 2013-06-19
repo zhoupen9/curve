@@ -66,7 +66,7 @@
 							<ul class="nav">
 								<li class="me dropdown">
 									<a class="dropdown-toggle" href="#" data-toggle="dropdown">
-										<span class="profile-icon-wrapper">
+										<span>
 											<i class="profile-icon"></i>
 										</span>
 										<span class="caret"></span>
@@ -145,7 +145,7 @@
 					<h3 class="dialog-title">What to know or what to tell?</h3>
 				</div>
 				<div class="dialog-body">
-					<form class="post-form" method="post" action="/post/create">
+					<form class="post-form clearfix" method="post" action="/post/create">
 					{% csrf_token %}
 						<div class="post-content">
 							<div class="post-editor editor" contenteditable="true" spellcheck="true" aria-multiline="true" dir="ltr" role="textbox">
@@ -169,14 +169,11 @@
 							</div>
 							<textarea name="post-content" class="hide"></textarea>
 						</div>
-						<div class="post-toolbar clearfix">
+						<div class="post-toolbar">
 							<div class="post-thumbnail"></div>
-							<div class="post-toolbox clearfix">
+							<div class="post-toolbox">
 								<div class="file-selector">
-									<input type="button" class="btn text-input file-input" placeholder="file"></input>
-								</div>
-								<div class="code-formatter">
-									<button type="button" class="btn">code</button>
+									<input type="button" class="btn text-input file-input" placeholder="file" value="File"></input>
 								</div>
 							</div>
 							<div class="post-button">
@@ -266,9 +263,32 @@
 			</div>
 		</div>
 
+		<!-- Reahder. -->
+		<div id="reader-dlg" class="reader dialog dialog-dark draggable" style="top: 147px; left: 290px; display: none;">
+			<div class="dialog-content">
+				<div class="dialog-header">
+					<button type="button" class="dialog-btn dialog-close">
+						<i class="close-medium"></i>
+					</button>
+					<h3 class="dialog-title">Openning Document...</h3>
+				</div>
+				<div class="dialog-body">
+					<div class="reader-alert alert hide">
+						<button class="close">&times;</button>
+						<span>Document read error!</span>
+					</div>
+					<div class="reader-loading">
+						<span class="loading-spinner">Loading...</span>
+					</div>
+					<div class="reader-content">
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- Placed at the end of document so pages load faster. -->
 		<script type="text/javascript" src="{% static 'js/jquery-1.9.1.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+		{# <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script> #}
 		<script type="text/javascript" src="{% static 'js/curve.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/common.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/jquery.cookie.js' %}"></script>
@@ -281,6 +301,7 @@
 		<script type="text/javascript" src="{% static 'js/bosh.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/post.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/notification.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/reader.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/ajaxloader.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/application.js' %}"></script>
 	</body>
