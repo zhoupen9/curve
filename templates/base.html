@@ -7,7 +7,7 @@
 		<meta charset="utf-8"></meta>
 		<title>Curve</title>
 		<link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon"></link>
-		<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}"></link>
+		{# <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}"></link> #}
 		<link rel="stylesheet" type="text/css" href="{% static 'css/curve.css' %}"></link>
 		<link rel="stylesheet" type="text/css" href="{% static 'css/notification.css' %}"></link>
 		<link rel="stylesheet" type="text/css" href="{% static 'home/css/home.css' %}"></link>
@@ -71,7 +71,7 @@
 										</span>
 										<span class="caret"></span>
 									</a>
-									<ul class="dropdown-menu">
+									<ul class="dropdown-menu hide">
 										<li id="current-user" class="current-user" data-name="profile" data-user-id="{{ request.session.userid }}">
 											<a href="/{{ request.session.username }}" class="account-summary" data-name="profile">
 												<div class="profile-content">

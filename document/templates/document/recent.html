@@ -40,9 +40,10 @@
 							<a href="/user/{{ document.member.user.id }}">
 								<h3>{{ document.member.username }}</h3>
 							</a>
-							<small class="metadata">@{{ document.member.username }}</small>
+							<small>@{{ document.member.username }}</small>
+							<small class="metadata pull-right">{{ document.createTime }}</small>
 						</div>
-						<p>{{ document.title }}</p>
+						<h3>{{ document.title }}</h3>
 						<p>{{ document.content }}</p>
 					</div>
 				</div>
