@@ -373,7 +373,7 @@ i.curve {
 .navbar-inner a {
 	display: block;
 	text-decoration: none;
-	padding: 10px 5px;
+	padding: 10px 10px 10px 5px;
 }
 
 .navbar-inner {
@@ -393,11 +393,18 @@ i.curve {
 	clear: both;
 }
 
+.navbar-bottom {
+	position: relative;
+	height: 3px;
+	background-color: #17b;
+	border-bottom: 1px solid rgba(0, 0, 0, .1);
+}
 
 /* ----------------------- bootstrap navbar ----------------------------- */
 
 .navbar-inner .container {
-	position: relative;
+
+	/*position: relative;*/
 	width: 865px;
 	margin: 0 auto;
 }
@@ -681,7 +688,7 @@ i.curve {
 	background-position: -10px -20px;
 }
 
-.nav a:hover .nav-home {
+ .nav li.active>a .nav-home, .nav a:hover .nav-home {
 	background-position: -10px -50px;
 }
 
@@ -689,7 +696,7 @@ i.curve {
 	background-position: -45px -20px;
 }
 
-.nav a:hover .nav-document {
+.nav li.active>a .nav-document, .nav a:hover .nav-document {
 	background-position: -45px -50px;
 }
 
@@ -697,7 +704,7 @@ i.curve {
 	background-position: -130px -20px;
 }
 
-.nav a:hover .nav-conference {
+.nav li.active>a .nav-conference, .nav a:hover .nav-conference {
 	background-position: -130px -50px;
 }
 
@@ -705,7 +712,7 @@ i.curve {
 	background-position: -170px -112px;
 }
 
-.nav a:hover .nav-messages {
+.nav li.active>a .nav-messages, .nav a:hover .nav-messages {
 	background-position: -141px -112px;
 }
 .nav .profile-icon {
@@ -747,6 +754,7 @@ i.curve {
 	opacity: 0;
 	margin-top: 10px;
 	margin-left: 0px;
+	margin-bottom: 10px;
 	height: 16px;
 	width: 16px;
 	vertical-align: top;
@@ -769,7 +777,7 @@ i.curve {
 	position: absolute;
 	width: 165px;
 	height: 14px;
-	top: 0;
+	top: -2px;
 	right: 0;
 	z-index: 2;
 	color: #444;
@@ -822,12 +830,11 @@ i.curve {
 	padding: 1px;
 	margin-top: 5px;
 	border-radius: 5px;
-/*background-image: url(/static/img/sprite_bgs.png);*/
-/*background-position: 0 -100px;*/
 }
 
 .pull-right .compose-btn {
-	margin: 0 !important;
+	position: relative;
+	top: -2px;
 	float: left;
 	padding: 3px 5px 5px 8px;
 	font-size: 12px;
@@ -837,31 +844,28 @@ i.curve {
 	border-color: #111;
 	-webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
 	box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
-	background-color: #2c77ba !important;
-	/*background-image: url(/static/img/sprite_bgs.png) !important;*/
-	/*background-repeat: repeat-x;*/
-	background-position: 0 -140px;
+	background-color: #2c77ba;
+    background: -webkit-linear-gradient(top, #59b 0, #37b 100%);
+    background: -moz-linear-gradient(top,#59b 0,#37b 100%);
+    background: -ms-linear-gradient(top,#59b 0,#37b 100%);
+    background: -0-linear-gradient(top,#59b 0,#37b 100%);
+    filter:
+    progid:DXImageTransform.Microsoft.gradient(startColorstr='#2c77ba',endColorstr='#3377bb',GradientType=0);
 }
 
 .pull-right .compose-btn:hover, .pull-right .compose-btn:focus {
 	text-decoration: none;
-	background-position: 0 -170px;
+	background-color: #2c77ba;
+	background-image: none;
 	border-color: #000;
-	-webkit-transition: color 0.1s linear;
-	-moz-transition: color 0.1s linear;
-	-o-transition: color 0.1s linear;
-	transition: color 0.1s linear;
 }
 
 .pull-right .compose-btn:active {
-	background-position: 0 -200px;
+	background-image: none;
+	background-color: #2c77ba;
 	border-color: #000;
 	-webkit-box-shadow: inset 0 3px 6px rgba(0,0,0,.25);
 	box-shadow: inset 0 3px 6px rgba(0,0,0,.25);
-	-webkit-transition: color 0.1s linear;
-	-moz-transition: color 0.1s linear;
-	-o-transition: color 0.1s linear;
-	transition: color 0.1s linear;
 }
 
 .dropdown-menu li {

@@ -57,10 +57,9 @@
 			name = array[array.length - 1];
 			fullname = namespace + '-' + name;
 
-			// create selector for plugin.
-			$.expr[':'][fullname.toLowerCase()] = function (elem) {
-				return !!$.data(elem, fullname);
-			}
+			$.expr[':'][name] = function (elem) {
+				return !!$.data(elem, name);
+			};
 
 			// support two parameters.
 			// If caller only provides two parameters, created plugin has a
@@ -141,7 +140,7 @@
 		namespace: 'ui',
 
 		// focusable selector.
-		focusable: ['div[contenteditable=true]', 'textarea', 'input', 'button'],
+		focusable: ['div[contenteditable=true]', 'textarea', 'input', /*'button'*/],
 
 		// Create ui.
 		createui: $.noop,

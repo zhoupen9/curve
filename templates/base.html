@@ -22,9 +22,9 @@
 					<div class="container">
 						<div id="loading" class="pushstate-spinner loading-spinner"></div>
 						<!-- navigation buttons. -->
-						<ul class="nav">
+						<ul class="nav js-global-nav">
 							<li class="active">
-								<a href="/home" id="home">
+								<a class="js-nav" href="/home" id="home">
 									<span>
 										<i class="nav-home"></i>
 									</span>
@@ -32,7 +32,7 @@
 								</a>
 							</li>
 							<li>
-								<a href="/document" id="documents">
+								<a class="js-nav" href="/document" id="documents">
 									<span>
 										<i class="nav-document"></i>
 									</span>
@@ -40,7 +40,7 @@
 								</a>
 							</li>
 							<li>
-								<a href="/conference" id="conference">
+								<a class="js-nav" href="/conference" id="conference">
 									<span>
 										<i class="nav-conference"></i>
 									</span>
@@ -48,7 +48,7 @@
 								</a>
 							</li>
 							<li>
-								<a href="#" id="message">
+								<a class="js-nav" href="#" id="message">
 									<span>
 										<i class="nav-messages"></i>
 									</span>
@@ -104,8 +104,8 @@
 							</div>
 						</div>
 					</div>
+					<div class="navbar-bottom"></div>
 				</div>
-
 				<!-- notifications. -->
 				<div id="notifications" class="notifications">
 					<ol class="notification-items">
@@ -302,7 +302,6 @@
 		<script type="text/javascript" src="{% static 'js/post.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/notification.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/reader.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/ajaxloader.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/application.js' %}"></script>
 	</body>
 </html>

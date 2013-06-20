@@ -13,6 +13,9 @@
 			// setup notification.
 			this.notification = $('#notifications').notification().data('notification');
 			this.loading = $('#loading');
+			this.inits = [ this.initHome, this.initDocuments, $.noop, $.noop ];
+			// init nav bar.
+			this.initNavBar();
 		},
 
 		initClickHandlers: function () {
@@ -21,31 +24,13 @@
 			$('section [href^=#]').click(function (e) {
 				e.preventDefault()
 			});
-			// click handler for 'message' inside top bar.
-			$('#message').click(function (e) {
-				noti.notify({ type: 'alert', content: 'Message topbar button clicked.'});
-			});
-
-			$('#conference').click(function (e) {
-				noti.notify({ type: 'warn', content: 'Sample warnning.'});
-			});
-
-			$('#home').click(function (e) {
-				e.preventDefault();
-				that.loadPage('/home').done(that.initHome);
-			});
-
-			$('#documents').click(function (e) {
-				e.preventDefault();
-				that.loadPage('/document').done(that.initDocuments);
-			});
 
 			// create global poster inside post dialog.
 			$('#post-dlg').find('.dialog-body').poster();
 
 			// global post button handler.
 			$('#global-post-btn').click(function (e) {
-				$('#post-dlg').dialog(/*{ modal: false}*/).draggable().show();
+				$('#post-dlg').dialog().draggable().show();
 			});
 
 			// post dialog post button handler.
@@ -90,6 +75,34 @@
 						$(loading).css({ opacity: 0});
 					}, 2000);
 				});
+		},
+
+		// initialize navigate bar.
+		initNavBar: function () {
+			var app = this, nav = $('#topbar ul.js-global-nav'), current, link;
+			nav.switchTo = function (elem) {
+				current = nav.children('.active:first')
+				current.toggleClass('active');
+				$(elem).parent().toggleClass('active');
+			};
+
+			nav.fail = function (elem) {
+				app.notification.notify({
+					type: 'alert',
+					content: 'Failed to open: ' + $(elem).attr('href')
+				});
+			};
+			
+			$('#topbar ul>li a.js-nav').each(function (index, elem) {
+				link = $(this).ajaxlink().data('ajaxlink');
+				link.done = function ()  {
+					nav.switchTo(elem);
+					app.inits[index].call();
+				};
+				link.fail = function () {
+					nav.fail(elem);
+				};
+			});
 		},
 
 		// initialize homepage.
@@ -169,8 +182,56 @@
 					});
 			}, 2000);
 		}
-	},
+	};
 
+	// Ajax loader.
+	$.curve.component('ajaxloader', {
+		load: function (url, method) {
+			var deferred = $.Deferred();
+
+			method = method || 'get';
+			$[method](url)
+				.done(function (response) {
+					deferred.resolve(response);
+				})
+				.fail(function (jqxhr, status, error) {
+					deferred.reject(jqxhr, status, error);
+				}).
+				always(function (response, status, jqxhr) {
+					deferred.always(response, status, jqxhr);
+				});
+
+			return deferred.promise();
+		}
+	});
+
+	// Ajax link, makes links load by ajax.
+	$.curve.ui('ajaxlink', {
+		options: {
+			load: 'ajax',
+		},
+
+		createui: function () {
+			var that = this, deferred, url = this.element.attr('href'), title = this.element.html();
+
+			this.clickDelegate = function (e) {
+				if (url === window.location.pathname || url === window.location.href) {
+					$.debug('Target location is present, ignore.');
+					return false;
+				}
+
+				deferred = $.curve.application.loadPage(url, title);
+
+				$.each(['done', 'fail', 'always'], function (i, name) {
+					that[name] && deferred[name](that[name]);
+				});
+				return e.preventDefault();
+			};
+			this.element.on('click', this.clickDelegate);
+		},
+	});
+
+	// Application instance.
 	$.curve.application = new Application();
 
 	// base script to initialize global facilities includes,

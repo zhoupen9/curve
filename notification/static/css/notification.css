@@ -23,6 +23,7 @@
 	border: none;
 	-webkit-box-shadow: 0 4px 12px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.5);
 	box-shadow: 0 4px 12px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.5);
+	margin-bottom: 2px;
 }
 
 .notifications .alert {
@@ -31,6 +32,22 @@
 	/*background-color: #f2dede;*/
 	color: #fff;
 	background-color: #c44;
+}
+
+.notifications .alert button.close, .notifications .info button.close {
+	color: #ccc;
+}
+
+.notifications .alert button:hover.close, .notifications .info button:hover.close {
+	color: #fff;
+}
+
+.notifications .warn button.close {
+	color: #c88;
+}
+
+.notifications .warn button:hover.close {
+	color: #a66;
 }
 
 .notifications .warn {
@@ -47,7 +64,3 @@
 .notifications small {
 	padding: 0px;
 }
-
-/*.notification .close {
-	position: inherit !important;
-}*/
