@@ -10,30 +10,17 @@
 				display: block;
 				margin: 10px 10px;
 			}
-
-			.demo-div2 {
-				float: left;
-			}
-
-			.demo-div3 {
-				float: right;
-			}
-
-			form {
-				border: 1px solid;
-			}
-
-			form:after {
-				content: "";
-				display: table;
-				clear: both;
-			}
 		</style>
 		<script type="text/javascript" src="../shared-static/js/jquery-1.9.1.js"></script>
 		<script type="text/javascript" src="../shared-static/js/logging.js"></script>
 	</head>
 	<body>
 		<script type="text/javascript">
+			$(document).ready(function () {
+				$('#test-btn').click(function () {
+					$.debug($('#demo4').find('a[href^="/home"]').length);
+				});
+			});
 		</script>
 
 		<div>
@@ -45,7 +32,7 @@
 						<textarea id="text3"></textarea>
 					</div>
 					<div id="demo4" class="demo-div2">
-						<div>a <a href="#">link</a></div>
+						<div>a <a href="/home">link</a></div>
 						<div>text</div>
 					</div>
 				</div>

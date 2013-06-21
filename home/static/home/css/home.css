@@ -227,15 +227,7 @@
     font-size: 12px;
 }
 
-
-.stream-loading-inner {
-    padding: 18px 30px;
-    background-color: #fff;
-    border-radius: 0 0 5px 5px;
-}
-
-.stream-loading {
-    color: #777;
+.stream-footer {
     text-align: center;
     border-left: 1px solid #eee;
     border-left: 1px solid rgba(0,0,0,.1);
@@ -244,4 +236,25 @@
     border-bottom: 1px solid #eee;
     border-bottom: 1px solid rgba(0,0,0,.1);
     border-radius: 0 0 6px 6px;
+}
+
+.stream-footer .no-stream {
+    padding: 15px;
+    color: #777;
+    background-color: #fff;
+    border-radius: 0 0 5px 5px;
+}
+
+.stream-footer .no-stream p {
+    margin: auto;
+}
+
+.stream-loading-inner {
+    /*padding: 18px 30px;*/
+    border-radius: 0 0 5px 5px;
+    background-color: #fff;
+}
+
+.stream-loading {
+    color: #777;
 }

@@ -60,7 +60,13 @@
 		loadPage: function (url, title, method) {
 			var that = this;
 			method = method || 'get';
-			$(loading).css({ opacity: 1 });
+			// $(loading).css({ opacity: 1 });
+			that.loading.css({
+				opacity: 1,
+				'-webkit-transform': 'scale(1)',
+				'-moz-transform': 'scale(1)',
+				transform: 'scale(1)',
+			});
 			return $.curve.ajaxloader.load(url, method)
 				.done(function (response) {
 					window.history.pushState('connection', title, url);
@@ -72,14 +78,28 @@
 				})
 				.always(function () {
 					setTimeout(function () {
-						$(loading).css({ opacity: 0});
-					}, 2000);
+						that.loading.css({
+							opacity: 0,
+							'-webkit-transform': 'scale(0)',
+							'-moz-transform': 'scale(0)',
+							transform: 'scale(0)',
+						});
+					}, 200);
 				});
 		},
 
 		// initialize navigate bar.
 		initNavBar: function () {
-			var app = this, nav = $('#topbar ul.js-global-nav'), current, link;
+			var app = this, link, current,
+			nav = $('#topbar ul.js-global-nav'),
+			path = window.location.pathname,
+			find = nav.find('a[href^="' + path + '"]');
+
+			if (find.length) {
+				current = nav.children('.active:first');
+				current && current.toggleClass('active');
+				find.parent().toggleClass('active');
+			}
 			nav.switchTo = function (elem) {
 				current = nav.children('.active:first')
 				current.toggleClass('active');
