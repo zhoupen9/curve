@@ -1,3 +1,8 @@
+/*jslint browser: true*/
+/*global $*/
+/*global jQuery*/
+/*global JSON*/
+
 /*!
  * jQuery Cookie Plugin v1.3.1
  * https://github.com/carhartl/jquery-cookie
@@ -5,16 +10,15 @@
  * Copyright 2013 Klaus Hartl
  * Released under the MIT license
  */
-(function ($, document, undefined) {
+//(function ($, document, undefined) {
+(function ($, document) {
+    'use strict';
 
-	var pluses = /\+/g;
+	var pluses = /\+/g, config, decode, cookies, result, i, l,
+        parts, name, cookie;
 
 	function raw(s) {
 		return s;
-	}
-
-	function decoded(s) {
-		return unRfc2068(decodeURIComponent(s.replace(pluses, ' ')));
 	}
 
 	function unRfc2068(value) {
@@ -24,12 +28,16 @@
 		}
 		return value;
 	}
+    
+	function decoded(s) {
+		return unRfc2068(decodeURIComponent(s.replace(pluses, ' ')));
+	}
 
 	function fromJSON(value) {
 		return config.json ? JSON.parse(value) : value;
 	}
 
-	var config = $.cookie = function (key, value, options) {
+	config = $.cookie = function (key, value, options) {
 
 		// write
 		if (value !== undefined) {
@@ -56,13 +64,14 @@
 		}
 
 		// read
-		var decode = config.raw ? raw : decoded;
-		var cookies = document.cookie.split('; ');
-		var result = key ? null : {};
-		for (var i = 0, l = cookies.length; i < l; i++) {
-			var parts = cookies[i].split('=');
-			var name = decode(parts.shift());
-			var cookie = decode(parts.join('='));
+		decode = config.raw ? raw : decoded;
+		cookies = document.cookie.split('; ');
+		result = key ? null : {};
+        
+		for (i = 0, l = cookies.length; i < l; i += 1) {
+			parts = cookies[i].split('=');
+			name = decode(parts.shift());
+			cookie = decode(parts.join('='));
 
 			if (key && key === name) {
 				result = fromJSON(cookie);
@@ -87,4 +96,4 @@
 		return false;
 	};
 
-})(jQuery, document);
+}(jQuery, document));

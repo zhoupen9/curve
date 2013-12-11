@@ -1,6 +1,9 @@
+/*jslint browser: true*/
+/*global $ */
+/*global jQuery */
 
-!(function ($) {
-	// 'user strict';
+(function ($) {
+	'use strict';
 
 	var Application = function () {};
 
@@ -22,7 +25,7 @@
 			var that = this;
 			// Disable certain links in docs
 			$('section [href^=#]').click(function (e) {
-				e.preventDefault()
+				e.preventDefault();
 			});
 
 			// create global poster inside post dialog.
@@ -36,7 +39,7 @@
 			// post dialog post button handler.
 			$('#global-post').click(function (e) {
 				var form = $('#post-dlg > .post-form'),
-				spans = $('post-button > span');
+				    spans = $('post-button > span');
 
 				spans.toggleClass('hide');
 				$.post(form.attr('action'), form.serialize())
@@ -65,7 +68,7 @@
 				opacity: 1,
 				'-webkit-transform': 'scale(1)',
 				'-moz-transform': 'scale(1)',
-				transform: 'scale(1)',
+				transform: 'scale(1)'
 			});
 			return $.curve.ajaxloader.load(url, method)
 				.done(function (response) {
@@ -82,7 +85,7 @@
 							opacity: 0,
 							'-webkit-transform': 'scale(0)',
 							'-moz-transform': 'scale(0)',
-							transform: 'scale(0)',
+							transform: 'scale(0)'
 						});
 					}, 200);
 				});
@@ -91,17 +94,19 @@
 		// initialize navigate bar.
 		initNavBar: function () {
 			var app = this, link, current,
-			nav = $('#topbar ul.js-global-nav'),
-			path = window.location.pathname,
-			find = nav.find('a[href^="' + path + '"]');
+                nav = $('#topbar ul.js-global-nav'),
+                path = window.location.pathname,
+                find = nav.find('a[href^="' + path + '"]');
 
 			if (find.length) {
 				current = nav.children('.active:first');
-				current && current.toggleClass('active');
+				if (current) {
+                    current.toggleClass('active');
+                }
 				find.parent().toggleClass('active');
 			}
 			nav.switchTo = function (elem) {
-				current = nav.children('.active:first')
+				current = nav.children('.active:first');
 				current.toggleClass('active');
 				$(elem).parent().toggleClass('active');
 			};
@@ -115,7 +120,7 @@
 			
 			$('#topbar ul>li a.js-nav').each(function (index, elem) {
 				link = $(this).ajaxlink().data('ajaxlink');
-				link.done = function ()  {
+				link.done = function () {
 					nav.switchTo(elem);
 					app.inits[index].call();
 				};
@@ -138,11 +143,12 @@
 			});
 
 			$('#activity-notify').click(function (e) {
-				var i, items = $('#stream-items'), orig = items.length;
+				var items = $('#stream-items'), orig = items.length;
 				$.get('/post/recent')
 					.done(function (data) {
+                        var i;
 						items.prepend(data);
-						for (i = 0; i < orig; i++) {
+						for (i = 0; i < orig; i += 1) {
 							items.children('li:nth-child(' + (i + 1) + ')').children('.post').post();
 						}
 					});
@@ -167,12 +173,13 @@
 		// BOSH data handler.
 		// This method will be called when there's data received from server.
 		boshHandler: function (data) {
+            var i, html;
 			if (typeof data === 'string') {
 				$.debug('data is string !');
 				return;
 			}
 			if (data && data.length) {
-				for (var i = 0; i < data.length; i++) {
+				for (i = 0; i < data.length; i += 1) {
 					html = data[i].type + ', ' + data[i].content;
 					this.notification.notify({ type: 'remote', content: html});
 				}
@@ -195,7 +202,7 @@
 					.done(function (bosh, response) {
 						this.connection = bosh;
 						connectNotify.update({ type: 'info', content: 'Connected.', duration: 2000});
-						bosh.addHandler(that.boshHandler)
+						bosh.addHandler(that.boshHandler);
 					})
 					.fail(function (bosh, response) {
 						connectNotify.update({ type: 'alert', content: 'Failed to connect to server.'});
@@ -228,7 +235,7 @@
 	// Ajax link, makes links load by ajax.
 	$.curve.ui('ajaxlink', {
 		options: {
-			load: 'ajax',
+			load: 'ajax'
 		},
 
 		createui: function () {
@@ -243,12 +250,14 @@
 				deferred = $.curve.application.loadPage(url, title);
 
 				$.each(['done', 'fail', 'always'], function (i, name) {
-					that[name] && deferred[name](that[name]);
+					if (that[name]) {
+                        deferred[name](that[name]);
+                    }
 				});
 				return e.preventDefault();
 			};
 			this.element.on('click', this.clickDelegate);
-		},
+		}
 	});
 
 	// Application instance.

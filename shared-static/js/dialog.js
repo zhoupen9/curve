@@ -1,8 +1,8 @@
 /*jslint browser: true*/
-/*global  $*/
+/*global $, jQuery*/
 
 (function ($) {
-	// "use strict";
+	"use strict";
 
 	// Dialog ui.
 	$.curve.ui('dialog', {
@@ -42,13 +42,15 @@
 			}
 
 			// check if dialog contains any focusables, if so, set focus to the first found.
-			for (i in this.focusable) {
-				focus = this.element.find(this.focusable[i]);
-				if (focus.length) {
-					focus[0].focus();
-					return;
-				}
-			}
+            if (this.focusable && this.focusable.length) {
+                for (i = 0; i < this.focusable.length; i += 1) {
+                    focus = this.element.find(this.focusable[i]);
+                    if (focus.length) {
+                        focus[0].focus();
+                        return;
+                    }
+                }
+            }
 		},
 
 		// update caption.
@@ -76,7 +78,7 @@
 		// create dialog ui.
 		createui: function () {
 			var that = this,
-			close = this.element.find('.'.concat(this.closeCls));
+                close = this.element.find('.'.concat(this.closeCls));
 			
 			if (close.length) {
 				this.closeDelegate = function (e) {
@@ -116,4 +118,4 @@
 			// $.debug('dialog key up.');
 		}
 	});
-}($));
+}(jQuery));

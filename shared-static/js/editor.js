@@ -1,20 +1,22 @@
+/*jslint browser: true*/
+/*global $, jQuery*/
 
 (function ($) {
-	// "user strict";
+	"use strict";
 
 	// Abstract template.
 	var
-	Template = function () {},
-	// url template.
-	UrlTemplate = function () {},
-	// '@' template.
-	AtTemplate = function () {},
-	// '#' list
-	ListTemplate = function () {},
-	// Formatter.
-	Formatter = function () {},
-	// Visitor.
-	Visitor = function () {};
+        Template = function () {},
+        // url template.
+        UrlTemplate = function () {},
+        // '@' template.
+        AtTemplate = function () {},
+        // '#' list
+        ListTemplate = function () {},
+        // Formatter.
+        Formatter = function () {},
+        // Visitor.
+        Visitor = function () {};
 
 	Formatter.prototype = {
 		protocols: {
@@ -81,7 +83,7 @@
 		type: 'template',
 
 		// create template.
-		_create: function (regexp) {
+		createRegex: function (regexp) {
 			this.regexp = regexp;
 			return this;
 		},
@@ -142,7 +144,7 @@
 		// create template.
 		create: function () {
 			var regexp = new RegExp('((' + this.supportedProtocols.join('|') + '):\/\/)?(?:\\w+:\\w+@)?((?:[\\w]+)(?:\\.[\\w-]+)+)(:[0-9]+)?(\\/[\\w#!:.?+=&%@!\\-\\/]+)');
-			return this._create(regexp, this.triggerKeys);
+			return this.createRegex(regexp, this.triggerKeys);
 		},
 
 		// Apply template to text and return replaced text.
@@ -157,15 +159,15 @@
 		visit: function (node) {
 			var i, content = '';
 			switch (node.nodeType) {
-				case 1:
-				for (i = 0; i < node.childNodes.length; i++) {
+            case 1:
+				for (i = 0; i < node.childNodes.length; i += 1) {
 					content += this.visit(node.childNodes[i]);
 				}
 				break;
-				case 3:
+            case 3:
 				content += node.nodeValue;
 				break;
-				default:
+            default:
 				break;
 			}
 			return content;
@@ -189,16 +191,15 @@
 			// key down repeat delay, default 100 miliseconds.
 			delay: 100,
 			// capture keyboard by default.
-			capture: true,
+			capture: true
 		},
 
 		// templates.
-		templates: {
-		},
+		templates: [],
 
 		// create dialog UI.
 		createui: function () {
-			this.templates['url'] = new UrlTemplate().create();
+			this.templates.url = new UrlTemplate().create();
 			// textarea to record input content and prepare for submit.
 			this.content = this.element.parent().children('textarea');
 			// normalized content saver.
@@ -235,8 +236,8 @@
 		// be ambiguous, and each segment can only produce one and only one result.
 		// So template parsers work in a monopoly manner, instead of in a filter chain manner.
 		input: function (event) {
-			var i, selection, range, node, value, values, rm = [], out = '', child,
-			newnode = null, offset, pos, matched, regexp = /(\s+)/, created = [];
+			var i, j, k, selection, range, node, value, values, out = '', child,
+                newnode = null, offset, pos, matched, regexp = /(\s+)/, created = [];
 
 			this.element.trigger('change.editor');
 
@@ -253,24 +254,28 @@
 			
 			selection = window.getSelection();
 			range = selection.getRangeAt(0);
-			node = selection.anchorNode.nodeType == 3 ? selection.anchorNode.parentNode : selection.anchorNode;
+			node = selection.anchorNode.nodeType === 3 ? selection.anchorNode.parentNode : selection.anchorNode;
 			offset = range.endOffset;
 
-			for (i = 0; i < node.childNodes.length; i++) {
+			for (i = 0; i < node.childNodes.length; i += 1) {
 				child = node.childNodes[i];
-				if (child.nodeType == 3) {
+				if (child.nodeType === 3) {
 					// text node.
 					out = '';
 					values = child.nodeValue.split(regexp);
-					for (value in values) {
-						$.each(this.templates, function (prop, tmpl) {
-							newnode = tmpl.apply(values[value]);
-							return newnode == null;
-						});
-						out += newnode ? newnode : (values[value] === ' ' ? '&nbsp;' : values[value]);
+//					for (value in values) {
+                    for (j = 0; j < values.length; j += 1) {
+                        newnode = null;
+                        for (k = 0; k < this.templates.length; k += 1) {
+							newnode = this.templates[k].apply(values[j]);
+                            if (newnode !== null) {
+                                break;
+                            }
+						}
+						out += newnode || (values[value] === ' ' ? '&nbsp;' : values[value]);
 					}
 					created.push(out);
-				} else if (child.nodeType == 1) {
+				} else if (child.nodeType === 1) {
 					// element.
 					if (child.innerHTML) {
 						child.setAttribute('href', child.innerHTML);
@@ -303,7 +308,7 @@
 		// get normalized content of editor.
 		normalized: function () {
 			var that = this, content = '', parent = this.element.parent(),
-			visitor = new Visitor();
+                visitor = new Visitor();
 			
 			this.element.children('div').each(function () {
 				content += visitor.visit(this);
@@ -311,4 +316,4 @@
 			return content;
 		}
 	});
-}($));
+}(jQuery));

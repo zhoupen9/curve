@@ -1,38 +1,39 @@
+/*jslint browser: true*/
+/*global $*/
+/*global jQuery*/
+/*global console*/
 
 // jquery logging plugin.
 (function ($) {
-	// "use strict";
+	"use strict";
 	
-	var log, loggin,
-	// Logging.
-	Logging = function () {},
-	// log record.
-	Record = function () {},
-	// log.
-	Log = function () {},
-	// fomat.
-	Format = function () {},
-	
-	// log record entry.
-	Entry = function (value) {
-		if (!value) {
-			this.type = 'string';
-			this.value = '';
-		} else {
-			this.type = typeof(value);
-			this.value = value;
-		}
-		return this;
-	};
+	var log, loggin, logging,
+        // Logging.
+        Logging = function () {},
+        // log record.
+        Record = function () {},
+        // log.
+        Log = function () {},
+        // fomat.
+        Format = function () {},
+        
+        // log record entry.
+        Entry = function (value) {
+            if (!value) {
+                this.type = 'string';
+                this.value = '';
+            } else {
+                this.type = typeof (value);
+                this.value = value;
+            }
+            return this;
+        };
 
 
 	// Log record formatter.
 	Format.prototype = {
 		// supported format patterns.
 		patterns: [ '%time', '%level' ],
-
-		// format target.
-		format: $.noop,
 
 		// default format.
 		defaultFormat: '%time %level %message',
@@ -50,7 +51,7 @@
 			this.formatters = this.formatters || [];
 			format = format || this.defaultFormat;
 			segments = format.split(this.splitRegExp);
-			for (i = 0; i < segments.length; i++) {
+			for (i = 0; i < segments.length; i += 1) {
 				value = segments[i];
 				if (value.trim().length) {
 					switch (value) {
@@ -86,11 +87,11 @@
 				this.parse(this.defaultFormat);
 			}
 			
-			for (i = 0; i < record.entries.length; i++) {
+			for (i = 0; i < record.entries.length; i += 1) {
 				message.push(this.formatEntry(record.entries[i]));
 			}
 			context.message = message.join('');
-			for (i = 0; i < this.formatters.length; i++) {
+			for (i = 0; i < this.formatters.length; i += 1) {
 				formatted += this.formatters[i].call(this, context, i);
 			}
 			return formatted;
@@ -98,7 +99,7 @@
 
 		// datetime format.
 		dateFormatter: function (context) {
-			date = context.date || new Date();
+			var date = context.date || new Date();
 			return '[' + date.getMonth() + '/' + date.getDate() + '/' +
 				date.getFullYear() + ' ' + date.getHours() + ':' +
 				date.getMinutes() + ':' + date.getSeconds() + ']';
@@ -127,22 +128,27 @@
 		// format a log entry.
 		formatEntry: function (entry) {
 			var i, v, ary, type = entry.type, value = entry.value, formatted = '';
-			if (type === 'object') {
-				if (Array.isArray(value)) {
-					ary = [];
-					for (i = 0; i < value.length; i++) {
-						ary.push(this.formatEntry(new Entry(value[i])));
-					}
-					formatted += '[' + ary.join('') + ']';
-				} else {
-					formatted += value.toString();
-				}
-			} else if (type === 'string') {
+            switch (type) {
+            case 'object':
+                if (Array.isArray(value)) {
+                    ary = [];
+                    for (i = 0; i < value.length; i += 1) {
+                        ary.push(this.formatEntry(new Entry(value[i])));
+                    }
+                    formatted += '[' + ary.join('') + ']';
+                } else {
+                    formatted += value.toString();
+                }
+                break;
+			case 'string':
 				formatted += value;
-			} else if (type === 'number') {
+                break;
+			case 'number':
 				formatted += value + ',';
-			} else {
+                break;
+			default:
 				formatted += value;
+                break;
 			}
 			return formatted;
 		}
@@ -213,15 +219,16 @@
 		},
 		
 		// format log message.
-		log: function (level, arguments) {
-			var record = new Record(), index, value, formatted, context = {};
-			ary = Array.prototype.slice.call(arguments);
+		log: function (level) {
+			var index, value, formatted, context = {},
+                record = new Record(),
+                ary = Array.prototype.slice.call(arguments);
 
 			if (!this.loggable(level)) {
 				return;
 			}
 			
-			for (index = 0; index < ary.length; index++) {
+			for (index = 0; index < ary.length; index += 1) {
 				value = ary[index];
 				record.add(new Entry(value));
 			}
@@ -233,7 +240,7 @@
 				context.record = record;
 				context.date = new Date();
 				formatted = this.format.format(context);
-				for (index = 0; index < this.handlers.length; index++) {
+				for (index = 0; index < this.handlers.length; index += 1) {
 					// NOTE normally, handler should handle log record instead of formatted content.
 					this.handlers[index].call(this, formatted);
 				}
@@ -258,7 +265,7 @@
 		// convenient method for logging at "error" level.
 		error: function () {
 			this.log(Logging.prototype.levels.error, arguments);
-		}		
+		}
 	};
 
 	// Logging prototype.
@@ -292,7 +299,7 @@
 		// get logger.
 		getLogger: function (name) {
 			var log;
-			name = name ? name : 'default';
+			name = name || 'default';
 			log = this.loggers[name];
 			if (!log) {
 				log = this.addLogger(name, new Log());

@@ -2,11 +2,11 @@
 /*global  $*/
 
 (function ($) {
-	// "use strict";
-	var Keybarod = function () {};
+	"use strict";
+	var Keyboard = function () {};
 
 	// register keyboard plugin.
-	Keyboard.prototype= {
+	Keyboard.prototype = {
 		options: {
 		},
 
@@ -14,7 +14,9 @@
 
 		// capture keyboard.
 		capture: function (plugin) {
-			plugin && this.activated = plugin;
+            if (plugin) {
+                this.activated = plugin;
+            }
 		},
 
 		create: function () {
@@ -25,15 +27,21 @@
 		},
 
 		keypress: function (event) {
-			activated && activated.keypress && activated.keypress(event);
+			if (this.activated && this.activated.keypress) {
+                this.activated.keypress(event);
+            }
 		},
 
 		keydown: function (event) {
-			activated && activated.keydown && activated.keydown(event);
+			if (this.activated && this.activated.keydown) {
+                this.activated.keydown(event);
+            }
 		},
 
 		keyup: function (event) {
-			activated && activated.keyup && activated.keyup(event);
+			if (this.activated && this.activated.keyup) {
+                this.activated.keyup(event);
+            }
 		},
 
 		init: function () {

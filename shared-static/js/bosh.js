@@ -1,11 +1,13 @@
+/*jslint browser: true*/
+/*global $, jQuery*/
 
-!(function () {
-	// "use strict";
+(function () {
+	"use strict";
     // BOSH scheme was documented as an xml scheme in XEP-0124:
     // http://www.xmpp.org/extensions/xep-0124.html
 	var
-	Connection = function () {},
-	BOSHProtocol = function () {};
+        Connection = function () {},
+        BOSHProtocol = function () {};
 
 	// BOSH protocl.
 	BOSHProtocol.prototype = {
@@ -34,7 +36,7 @@
 				'remote-stream-error',
 				'see-other-uri',
 				'system-shutdown',
-				'undefined-condition',
+				'undefined-condition'
 			],
 			content: 'string',
 			from: 'string',
@@ -55,11 +57,11 @@
 			to: 'string',
 			type: [ // xs:NCName
 				'error',
-				'terminate',
+				'terminate'
 			],
 			ver: 'string',
 			wait: 'number', // unsigned short
-			lang: 'string', // xml:lang
+			lang: 'string' // xml:lang
 		},
 
 		// initial session schema.
@@ -70,20 +72,20 @@
 			'ver',
 			'hold',
 			'lang',
-			'charsets',
+			'charsets'
 		],
 
 		// request schema.
 		request: [
 			'sid',
-			'rid',
+			'rid'
 		],
 
 		// terminate schema.
 		terminate: [
 			'sid',
 			'rid',
-			'type',
+			'type'
 		],
 
 		// create BOSH request.
@@ -102,23 +104,26 @@
 			}
 
 			for (index in schema) {
-				key = schema[index]
-				type = this.schema[key];
-				// check given schema.
-				if (!type) {
-					$.debug(key, ' is not a valid attribute.');
-					throw new Erorr(key + ' is not a valid attribute.');
-				}
-				// check if data conforms to given schema.
-				if (!data[key]) {
-					$.debug('missing attribute:', key);
-					throw new Error('Missing attribute: ' + key);
-				}
-				// check if data type conforms to BOSH schema.
-				if (typeof(data[key]) !== type) {
-					$.debug(key, ' has invalid value type.');
-					throw new Error(key + ' has invalid value type.');
-				}
+                if (schema.hasOwnProperty(index)) {
+                    
+                    key = schema[index];
+                    type = this.schema[key];
+                    // check given schema.
+                    if (!type) {
+                        $.debug(key, ' is not a valid attribute.');
+                        throw new TypeError(key + ' is not a valid attribute.');
+                    }
+                    // check if data conforms to given schema.
+                    if (!data[key]) {
+                        $.debug('missing attribute:', key);
+                        throw new TypeError('Missing attribute: ' + key);
+                    }
+                    // check if data type conforms to BOSH schema.
+                    if (typeof (data[key]) !== type) {
+                        $.debug(key, ' has invalid value type.');
+                        throw new TypeError(key + ' has invalid value type.');
+                    }
+                }
 			}
 			return data;
 		}
@@ -135,20 +140,20 @@
 			created: 0,
 			connecting: 1,
 			connected: 2,
-			disconnected: 3,
+			disconnected: 3
 		},
 
 		// requests.
 		Requests: {
 			clean: 0, // no active connections.
-			polling: 1, // polling from server.
+			polling: 1 // polling from server.
 		},
 
 		// default options.
 		options: {
 			wait: 60, // max time to wait in seconds.
 			requests: 2,
-			polling: 30, // by default, client doe not perform pure polling.
+			polling: 30 // by default, client doe not perform pure polling.
 		},
 
 		// create session.
@@ -164,31 +169,25 @@
 		// generate a request id.
 		nextrid: function () {
 			this.rid = this.rid || (10000 + Math.round(Math.random() * 10000));
-			return ++this.rid;
+			this.rid += 1;
+            return this.rid;
 		},
 
 		// Connect to host.
 		connect: function (host) {
 			var that = this, deferred = $.Deferred(),
-			request = this.protocol.create(this.protocol.initialize, {
-				to: host,
-				rid: this.nextrid(),
-				wait: this.options.wait,
-				hold: this.options.hold,
-				ver: this.options.ver,
-				lang: this.options.lang,
-				charsets: this.options.charsets
-			});
+                request = this.protocol.create(this.protocol.initialize, {
+                    to: host,
+                    rid: this.nextrid(),
+                    wait: this.options.wait,
+                    hold: this.options.hold,
+                    ver: this.options.ver,
+                    lang: this.options.lang,
+                    charsets: this.options.charsets
+                });
 
 			this.status = this.Status.connecting;
 
-			// $[this.method](host, request, null, 'json')
-			// 	.done(function (data) {
-			// 		deferred.resolve(that, data);
-			// 	})
-			// 	.fail(function (data) {
-			// 		deferred.reject(that, data);
-			// 	});
 			deferred.reject(that, 'disabled for debugging...');
 
 			deferred.done(this.connectDone).fail(this.connectFailed);
@@ -198,7 +197,9 @@
 		// Add a data handler.
 		// When connection received data, handler will be notified.
 		addHandler: function (handler) {
-			handler && this.handlers.indexOf(handler) === -1 && this.handlers.push(handler);
+			if (handler && this.handlers.indexOf(handler) === -1) {
+                this.handlers.push(handler);
+            }
 		},
 
 		// If session is currently connected.
@@ -209,13 +210,13 @@
 		// send data to BOSH connection manager.
 		send: function (data) {
 			var that = this,
-			deferred = $.Deferred(),
-			data = data || {},
-			request = this.protocol.create(this.protocol.request, {
-				sid: this.sid,
-				rid: this.nextrid(),
-				data: data
-			});
+                deferred = $.Deferred(),
+                dt = data || {},
+                request = this.protocol.create(this.protocol.request, {
+                    sid: this.sid,
+                    rid: this.nextrid(),
+                    data: dt
+                });
 
 			if (!this.isConnected()) {
 				throw new Error('Connection is net connected.');
@@ -230,7 +231,7 @@
 					return deferred.reject('pending');
 				} else {
 					// increase current requests.
-					++this.current;
+					this.current += 1;
 				}
 			} else {
 				this.current = this.Requests.polling;
@@ -261,13 +262,13 @@
 				// Potensial problem, if connection is receiving data,
 				// and a new handler added, that handler may results differently,
 				// it may or may not receive data in this transition.
-				for (i = 0; i < connection.handlers.length; i++) {
+				for (i = 0; i < connection.handlers.length; i += 1) {
 					connection.handlers[i].call(connection, response);
 				}
 			}
 
 			// decrease current requests.
-			--connection.current;
+			connection.current -= 1;
 
 			// client SHOULD send another request to poll incoming data immediately.
 			switch (connection.current) {
@@ -280,7 +281,6 @@
 				connection.send(request || {});
 				break;
 			case connection.Requests.polling:
-			default:
 				// if connection is currently polling. do nothing.
 				break;
 			}
@@ -298,7 +298,7 @@
 			if (!this.isConnected()) {
 				throw new Error('connection is not connected.');
 			}
-			return this.received && this.received.pop()
+			return this.received && this.received.pop();
 		},
 
 		// Close connection, sent terminate request to server.
@@ -327,7 +327,7 @@
 
 		// Handle connection connect done.
 		connectDone: function (connection, response) {
-			var connection, to = response.to;
+			var to = response.to;
 
 			if (response.type && response.type === 'terminate') {
 				// connection failed to create due to server terminated.
@@ -343,7 +343,7 @@
 			$.extend(connection.options, {
 				wait: Math.min(response.wait, connection.options.wait),
 				requests: Math.max(response.requests, connection.options.requests),
-				polling: response.polling || connection.options.polling,
+				polling: response.polling || connection.options.polling
 			});
 
 			// since connection established, start polling.
@@ -369,18 +369,19 @@
 			charsets: 'UTF-8',
 			wait: 60,
 			requests: 2,
-			polling: 30,
+			polling: 30
 		},
+        
+        connections: [],
 
 		// create component.
 		create: function () {
-			this.connections = [];
 		},
 
 		// Get connection.
 		get: function (host) {
-			if (host in this.connections) {
-				return this.connections[host];
+            if (this.connections.hasOwnProperty(host)) {
+                return this.connections[host];
 			} else {
 				$.debug('connection matches:', host, ' not found.');
 			}
@@ -412,4 +413,4 @@
 			}
 		}
 	});
-}($));
+}(jQuery));

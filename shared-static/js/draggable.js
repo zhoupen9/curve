@@ -2,7 +2,7 @@
 /*global $*/
 
 (function ($) {
-	// "use strict";
+	"use strict";
 
 	// Helper to record element's start drag point and position element to new position.
 	var Helper = function (elem, delay, distance) {
@@ -26,7 +26,7 @@
 		
 		// Check if distance met.
 		distanceMet: function (event) {
-			if (this.lastX == undefined || this.lastY == undefined) {
+			if (this.lastX === undefined || this.lastY === undefined) {
 				return true;
 			}
 			return this.distance && (Math.abs(this.lastX - event.pageX) + Math.abs(this.lastY - event.pageY)) > this.distance;
@@ -39,7 +39,8 @@
 				return false;
 			}
 
-			x = event.pageX - this.offsetX, y = event.pageY - this.offsetY;
+			x = event.pageX - this.offsetX;
+            y = event.pageY - this.offsetY;
 			this.element.css({"left": x + "px", "top": y + "px"});
 			this.lastX = event.pageX;
 			this.lastY = event.pageY;
@@ -153,7 +154,7 @@
 				return e.preventDefault();
 			}
 			$.warn('mouse moving while drag not active.');
-			return !dragging;
+			return !this.dragging;
 		},
 		
 		// Handle mouse up on document.

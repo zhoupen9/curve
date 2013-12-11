@@ -1,14 +1,14 @@
 /*jslint browser: true*/
-/*global $*/
+/*global $, jQuery*/
 
-!(function ($) {
-	// "use strict";
+(function ($) {
+	"use strict";
 
 	var
-	Plugin = function () {},
-	UI = function () {},
-	Component = function () {},
-	Curve = function () {};
+        Plugin = function () {},
+        UI = function () {},
+        Component = function () {},
+        Curve = function () {};
 
 	// Base plugin.
 	// Plugin is an abstraction for dynmatically add/modify/remove functionalities.
@@ -47,7 +47,7 @@
 		// @param base base plugin type or base plugin object.
 		// @param proto plugin prototype.
 		plugin: function (name, base, proto) {
-			var Constructor, proxyPrototype = {}, fullname, namespace, array;
+			var Constructor, Base, proxyPrototype = {}, fullname, namespace, array;
 			if (!name || typeof name !== 'string' || name.trim() === '') {
 				return $.error("Plugin must declare a name(string).");
 			}
@@ -70,7 +70,8 @@
 			}
 
 			if ($.isFunction(base) || typeof base !== 'object') {
-				base = new base();
+                Base = base;
+				base = new Base();
 			}
 
 			// create new constructor for plugin.
@@ -81,7 +82,7 @@
 			// @param elem jquery element.
 			Constructor = function (collection, options, elem) {
 				if (!this.create) {
-					return new constructor(collection, options, elem);
+					return new Constructor(collection, options, elem);
 				}
 				// ensure constructor called with arguments.
 				if (arguments.length) {
@@ -109,7 +110,7 @@
 			});
 
 			// create construtor's prototype using proxy prototype.
-			Constructor.prototype = $.extend({}, base, proxyPrototype);
+			Constructor.prototype = $.extend({}, Base, proxyPrototype);
 
 			// create bridge to jquery, because Jquery('selector') always return a collection,
 			// plugin system need to hack into this collection to create hooks, so here pass this
@@ -127,9 +128,9 @@
 					}
 				});
 				return that;
-			}
+			};
 		}
-	}
+	};
 
 	// UI base plugin.
 	// UI is declared from within an announymous function, so that it can NOT be accessed
@@ -140,7 +141,7 @@
 		namespace: 'ui',
 
 		// focusable selector.
-		focusable: ['div[contenteditable=true]', 'textarea', 'input', /*'button'*/],
+		focusable: ['div[contenteditable=true]', 'textarea', 'input' /*, 'button'*/],
 
 		// Create ui.
 		createui: $.noop,
@@ -171,7 +172,7 @@
 					return that.show();
 				};
 				// instance show callbacks.
-				this.showCallbacks = $.Callbacks(),
+				this.showCallbacks = $.Callbacks();
 				this.showCallbacks.add(callback);
 			}
 			// initialzie ui.
@@ -188,7 +189,9 @@
 				if (!that.visible()) {
 					// call original show.
 					that.origShow.apply(collection, arguments);
-					that.showCallbacks && that.showCallbacks.fire();
+					if (that.showCallbacks) {
+                        that.showCallbacks.fire();
+                    }
 				}
 				return collection;
 			};
@@ -241,7 +244,7 @@
 		// initiallize.
 		init: $.noop,
 		// destroy component.
-		destroy: $.noop,
+		destroy: $.noop
 	};
 
 	// Cureve prototype.
@@ -286,7 +289,7 @@
 			}
 			
 			if (options) {
-				$.each(options, function (prop, vlaue) {
+				$.each(options, function (prop, value) {
 					this.setting(prop, value);
 				});
 			}
@@ -299,7 +302,7 @@
 		// E.g. call $('#some_id').dilaog(); after registered 'ui.dialog' plugin, will
 		// apply Plugin.plugin(name, new Plugin() /* which is default. */, proto).
 		plugin: function (name, proto) {
-			var base = new Plugin();
+			var plugin = new Plugin();
 			$.debugg('Register plugin:', name);
 			// FIXME save registered plugin.
 			plugin.plugin(name, plugin, proto);
@@ -307,7 +310,7 @@
 		},
 
 		// Shortcut for register an UI plugin which has a parent class UI.
-		ui: function (name, proto)	{
+		ui: function (name, proto) {
 			var ui = new UI(), fullname = ui.namespace.concat('.').concat(name);
 			$.debug('Register ui plugin:', fullname);
 			ui.plugin(fullname, ui, proto);
