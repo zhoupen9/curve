@@ -1,6 +1,8 @@
+/*jslint browser: true*/
+/*global console, $, jQuery*/
 
-!(function ($) {
-
+(function ($) {
+    'use strict';
 	var Notification = function () {};
 
 	Notification.prototype = {
@@ -8,7 +10,7 @@
 			'info',
 			'warn',
 			'alert',
-			'remote',
+			'remote'
 		],
 		
 		// Notification list item class.
@@ -80,7 +82,7 @@
 			}
 			// animate to dispear.
 			this.element.animate({
-				'right': '-=250px',
+				'right': '-=250px'
 			}, {
 				duration: 200,
 				always: function () {
@@ -100,7 +102,7 @@
 		options: {
 			position: 'top',
 			duration: 2000, // milliseconds.
-			animation: 'fade',
+			animation: 'fade'
 		},
 
 		// all notifications.
@@ -115,8 +117,9 @@
 		// Add a notification.
 		// If type is 'Remote', then content will be a valid URL.
 		notify: function (notify) {
-			var notification = new Notification(),
-			parent = this.element.find('ol').last();
+			var
+                notification = new Notification(),
+                parent = this.element.find('ol').last();
 
 			if (notify.duration === undefined) {
 				notify.duration = this.options.duration;
@@ -124,6 +127,7 @@
 			
 			if (notify.type === 'Remote') {
 				// fetch remote content.
+                console.log('fetching remote...');
 			} else {
 				notification.show(parent, notify);
 			}

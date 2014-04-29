@@ -1,5 +1,8 @@
+/*jslint browser: true*/
+/*global $, jQuery*/
 
-!(function ($) {
+(function ($) {
+    'use strict';
 	var Reader = function () {};
 
 	$.curve.ui('reader', {

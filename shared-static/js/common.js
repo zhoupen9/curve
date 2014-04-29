@@ -1,6 +1,9 @@
+/*jslint browser: true*/
+/*global $ */
+/*global jQuery */
 
-!(function ($) {
-	// 'user strict';
+(function ($) {
+	'use strict';
 	var utils = $.utils || {};
 
 	$.extend(utils, {
@@ -31,7 +34,7 @@
 			if (!name || this.isEmptyValue(name)) {
 				return false;
 			}
-			for (i = 0; i < classes.length; i++) {
+			for (i = 0; i < classes.length; i += 1) {
 				if (classes[i] === name) {
 					return true;
 				}

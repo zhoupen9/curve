@@ -1,5 +1,9 @@
+/*jslint browser: true*/
+/*global $*/
+/*global jQuery*/
 
 (function ($) {
+    'use strict';
 	// // Post.
 	// var Post = function () {
 	// };
@@ -59,14 +63,14 @@
 			}
 			// start loading contents.
 			// if (!postid) {
-			// 	$.debug('Failed find post id.');
-			// 	return false;
+			// $.debug('Failed find post id.');
+			// return false;
 			// }
 
 			// $.get('/post/' + postid)
-			// 	.done(function (data) {
-			// 		elem.
-			// 	});
+			// .done(function (data) {
+			// elem.
+			// });
 		},
 
 		insertInlineReply: function (element, post) {

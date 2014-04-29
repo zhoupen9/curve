@@ -1,12 +1,14 @@
+/*jslint browser: true*/
+/*global $ */
+/*global jQuery */
 
-!(function () {
-
-	var Session = function () {},
-	Manager = function () {};
+(function ($) {
+    'use strict';
+	var Session = function () {}, Manager = function () {};
 
 	Session.prototype = {
 		send: $.noop,
-		recv: $.noop,
+		recv: $.noop
 	};
 
 	Manager.prototype = {
@@ -21,4 +23,4 @@
 	};
 
 	$.curve.session = new Session();
-}($));
+}(jQuery));
