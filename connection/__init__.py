@@ -1,8 +1,8 @@
 
-from models import Session
+from connection.models import Session
 from importlib import import_module
 
-import settings
+import connection.settings
 
 SESSION_CLASS_FULL = settings.SESSION
 SESSION_PACKAGE = '.'.join(SESSION_CLASS_FULL.split('.')[:-1])

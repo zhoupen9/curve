@@ -51,7 +51,7 @@ def register(request):
         # create member.
         member = Member.objects.create_member(fullname, email, password)
         # automatically login when signup.
-	user = authenticate(username=fullname, password=password)
+        user = authenticate(username=fullname, password=password)
         if user is not None:
             login(request, user)
             request.session['userid'] = user.id

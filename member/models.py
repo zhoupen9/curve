@@ -27,11 +27,11 @@ class MemberManager(models.Manager):
         if user is not None:
             logger.debug('user: %s created.', fullname)
 
-	new_member = Member(user=user, username=fullname)
-	new_member.save()
+        new_member = Member(user=user, username=fullname)
+        new_member.save()
 
-	logger.debug('member: %s created.', new_member.id)
-	return new_member
+        logger.debug('member: %s created.', new_member.id)
+        return new_member
 
     def get_member(self, userid):
         """ Get member by id. """
@@ -75,7 +75,7 @@ class MemberShip(models.Model):
     member = models.ForeignKey(Member)
     group = models.ForeignKey(MemberGroup)
     date_joined = models.DateField()
-    
+
 class Profile(models.Model):
     """
     Member's individual profile.

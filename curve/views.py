@@ -16,11 +16,11 @@ def mainpage(request):
     logger.debug('>> Executing mainpage...')
 
     if request.user.is_authenticated():
-	logger.debug('user name: %s, email: %s.', request.user.username, request.user.email)
-	# if user already logged in, render home page.
-	return redirect('/home');
+        logger.debug('user name: %s, email: %s.', request.user.username, request.user.email)
+        # if user already logged in, render home page.
+        return redirect('/home');
     else:
-	# if user did not logged in, render welcome page.
+        # if user did not logged in, render welcome page.
         return render(request, 'welcome.html', {})
     pass
 
@@ -39,14 +39,14 @@ def signin(request):
     user = authenticate(username=username, password=password)
     request.session['last_login'] = datetime.now()
     if user is not None and user.is_active:
-	logger.debug("User authenticated and active, logging in...")
-	login(request, user)
-	# Set Session Expiry to 0 if user clicks "Remember Me"
-	if not request.POST.get('rem', None):
-	    request.session.set_expiry(0)
-	member = Member.objects.get(user=user)
-	request.session['userid'] = user.id
-	request.session['username'] = member.username
+        logger.debug("User authenticated and active, logging in...")
+        login(request, user)
+        # Set Session Expiry to 0 if user clicks "Remember Me"
+        if not request.POST.get('rem', None):
+            request.session.set_expiry(0)
+        member = Member.objects.get(user=user)
+        request.session['userid'] = user.id
+        request.session['username'] = member.username
         return redirect('/home')
     else:
         logger.debug("Authenticate failed for: " + username + ".")
@@ -60,10 +60,8 @@ def signout(request):
     Remove remembered from session, and redirect to main page.
     """
     for key in ['userid', 'username', 'error']:
-	if key in request.session:
-	    del request.session[key]
+        if key in request.session:
+            del request.session[key]
     # django auth logout.
     logout(request)
     return render(request, 'welcome.html', {})
-
-

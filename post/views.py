@@ -7,7 +7,7 @@ from curve.utils import SimpleJSON
 from member.models import Member
 from notification.models import Notification
 from datetime import datetime
-from models import Post
+from post.models import Post
 
 import logging
 

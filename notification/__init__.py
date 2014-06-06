@@ -1,6 +1,6 @@
-from models import Notification
+from notification.models import Notification
 from importlib import import_module
-import settings
+import notification.settings
 
 DELIVERY_CLASS_FULL = settings.DELIVERY
 DELIVERY_PACKAGE = '.'.join(DELIVERY_CLASS_FULL.split('.')[:-1])

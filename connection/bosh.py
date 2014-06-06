@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
-from Queue import Queue as Pending, Empty
+from queue import Queue as Pending, Empty
 from threading import Timer
 
 from notification.models import Delivery
-from models import Session, Manager, Handler, getInternalRequest
+from connection.models import Session, Manager, Handler, getInternalRequest
 
 import logging
-import settings
+#import connection.settings
 
 logger = logging.getLogger('curve')
 
@@ -16,88 +16,88 @@ class Schema(object):
     http://www.xmpp.org/extensions/xep-0124.html
     """
     attributes = {
-	'accept': str,
-	'ack': int, # positive integer
-	'authid': str,
-	'charsets': str, # xs:NMTOKENS
-	'condition': ( # xs:NCName
-	    'bad-request',
-	    'host-gone',
-	    'host-unkonwn',
-	    'improper-addressing',
-	    'internal-server-error',
-	    'item-not-found',
-	    'other-request',
-	    'policy-violation',
-	    'remote-connection-failed',
-	    'remote-stream-error',
-	    'see-other-uri',
-	    'system-shutdown',
-	    'undefined-condition',
-	    ),
-	'content': str,
-	'from': str,
-	'hold': int, # unsigned byte
-	'inactivity': int, # unsigned short
-	'key': str,
-	'maxpause': int, # unsigned short
-	'newkey': str,
-	'pause': int, # unsigned short
-	'polling': int, # unsigned short
-	'report': int, # positive integer
-	'requests': int, # unsigned byte
-	'rid': int, # positive integer
-	'route': str,
-	'sid': str,
-	'stream': str,
-	'time': int, # unsigned short
-	'to': str,
-	'type': ( # xs:NCName
-	    'error',
-	    'terminate',
-	    ),
-	'ver': str,
-	'wait': int, # unsigned short
-	'lang': str, # xml:lang
-	}
+        'accept': str,
+        'ack': int, # positive integer
+        'authid': str,
+        'charsets': str, # xs:NMTOKENS
+        'condition': ( # xs:NCName
+            'bad-request',
+            'host-gone',
+            'host-unkonwn',
+            'improper-addressing',
+            'internal-server-error',
+            'item-not-found',
+            'other-request',
+            'policy-violation',
+            'remote-connection-failed',
+            'remote-stream-error',
+            'see-other-uri',
+            'system-shutdown',
+            'undefined-condition',
+            ),
+        'content': str,
+        'from': str,
+        'hold': int, # unsigned byte
+        'inactivity': int, # unsigned short
+        'key': str,
+        'maxpause': int, # unsigned short
+        'newkey': str,
+        'pause': int, # unsigned short
+        'polling': int, # unsigned short
+        'report': int, # positive integer
+        'requests': int, # unsigned byte
+        'rid': int, # positive integer
+        'route': str,
+        'sid': str,
+        'stream': str,
+        'time': int, # unsigned short
+        'to': str,
+        'type': ( # xs:NCName
+            'error',
+            'terminate',
+            ),
+        'ver': str,
+        'wait': int, # unsigned short
+        'lang': str, # xml:lang
+        }
 
     def check(self):
-	""" Check if instance conforms to its schema. """
-	if not hasattr(self, 'schema'):
-	    raise TypeError('schema not found.')
+        """ Check if instance conforms to its schema. """
+        if not hasattr(self, 'schema'):
+            raise TypeError('schema not found.')
 
-	if self.schema is None:
-	    raise ValueError('schema is None.')
+        if self.schema is None:
+            raise ValueError('schema is None.')
 
-	for name in self.schema:
-	    if name not in self.attributes:
-		raise ValueError('invalid schema.')
-	    value = self.schema[name]
-	    if value is None:
-		raise ValueError('schema item:' + name + ' has no value.')
-	    checkType = self.attributes[name]
-	    checkType = type(checkType) == 'type' or 'string'
-	    if type(value) != checkType:
-		raise TypeError('schema item: ' + name + ' has invalid value type.')
-	    pass
-	pass
+        for name in self.schema:
+            if name not in self.attributes:
+                raise ValueError('invalid schema.')
+            value = self.schema[name]
+            if value is None:
+                raise ValueError('schema item:' + name + ' has no value.')
+            checkType = self.attributes[name]
+            checkType = type(checkType) == 'type' or 'string'
+            if type(value) != checkType:
+                raise TypeError('schema item: ' + name + ' has invalid value type.')
+            pass
+        pass
     pass
 
 class Terminate(Schema):
     """ Server terminate session. """
     schema = [
-	'type',
-	'condition', # optional
-	]
+        'type',
+        'condition', # optional
+        ]
 
     def create(self, condition=None):
-	""" Create server terminate response. """
-	response = {
-	    'type': 'terminate'
-	    }
-	if condition is not None:
-	    response['condition'] = condition
-	return response
+        """ Create server terminate response. """
+        response = {
+            'type': 'terminate'
+            }
+        if condition is not None:
+            response['condition'] = condition
+        return response
     pass
 
 class Connect(object):
@@ -133,24 +133,24 @@ class ConnectResponse(object):
     BOSH session initial request response.
     """
     schema = [
-	'sid',
-	'wait',
-	'ver',
-	'polling',
-	'inactivity',
-	'requests',
-	'hold',
-	'to'
-	]
+        'sid',
+        'wait',
+        'ver',
+        'polling',
+        'inactivity',
+        'requests',
+        'hold',
+        'to'
+        ]
 
     def create(self, sid, rid, to):
         """ Create connect response. """
-	response = {
-	    'sid': sid,
-	    'rid': rid,
-	    'to': to,
-	    }
-	return response
+        response = {
+            'sid': sid,
+            'rid': rid,
+            'to': to,
+            }
+        return response
     pass
 
 # session status.
@@ -192,7 +192,7 @@ class BoshManager(Manager):
 
         If request contains session id, key 'sid' in request.POST, the rquest is intented
         to initizlied session, otherwise the request is a data transition.
-    
+
         If request contains data which client sent to server, connection manager should handle it.
         And connection manager would not resposne to this request until there's data to send to
         client (recommended in BOSH).
@@ -218,10 +218,10 @@ class BoshManager(Manager):
         return result
 
     def createSession(self, sid, request, method='POST'):
-	"""
-	Create a bosh session.
-	Connection manager SHOULD response to request.
-	"""
+        """
+        Create a bosh session.
+        Connection manager SHOULD response to request.
+        """
         try:
             session = BoshSession()
             return session, session.create(sid, request, method)
@@ -234,8 +234,8 @@ class BoshSession(Session):
     BOSH session implementation.
     """
     manager = BoshManager()
-    
-    def __init__(self, options=settings.SESSION_OPTIONS):
+
+    def __init__(self, options):
         self.options = {}
         # copy options.
         for option in options:
@@ -250,7 +250,7 @@ class BoshSession(Session):
         self.inactive = None # most recent inactive timestamp.
         self.pending = Pending() # pending data queue, they will be pushed to client in a future request.
         self.timer = None # timer
-	pass
+        pass
 
     def pollInternal(self):
         """
@@ -271,7 +271,7 @@ class BoshSession(Session):
                 logger.debug('poll timeout in %d seconds.', wait)
                 return self.timeout()
             pass
-        
+
         # got head of queue, check rest of queue without blocking.
         while True:
             try:
@@ -286,15 +286,15 @@ class BoshSession(Session):
             pass
         # return joined queued data
         return pendings
-    
+
     def createInternal(self, req):
-	"""
-	Create session and return response.
-	"""
+        """
+        Create session and return response.
+        """
         connect = Connect().create(req)
         self.rid = connect['rid']
         self.to = connect['to']
-	self.status = SessionStatus['connected']
+        self.status = SessionStatus['connected']
         try:
             response = {
                 'sid': self.sid,
@@ -320,7 +320,7 @@ class BoshSession(Session):
             return None
 
     def scheduleInactivityCheck(self):
-        """ 
+        """
         Start a timer to check if session's inactivity.
         Timer will timeout in a duration which is set in options.
         """
@@ -338,28 +338,28 @@ class BoshSession(Session):
             self.manager.disconnected(self)
             pass
         del self.timer
-        self.timer = None    
+        self.timer = None
         pass
-    
+
     def send(self, data):
-	"""
-	Try to send data in session.
+        """
+        Try to send data in session.
         This method simply put data in queue, if there's any connections holding,
         the head of those hold conntions will unblock.
-	"""
+        """
         self.pending.put(data)
-	pass
+        pass
 
     def recv(self, request, method='POST'):
-	"""
-	Try poll data from connection.
+        """
+        Try poll data from connection.
         Session will trial data from request first.
         And then push queued data back to request if present, otherwise hold this connection
-        until there's data ready to push to client or encountered a timeout (meaning there's 
+        until there's data ready to push to client or encountered a timeout (meaning there's
         no data in the duration of wait time.
 
         This implementation will return a json serializable object.
-	"""
+        """
         req = getInternalRequest(request, method)
         try:
             rid = req['rid']
@@ -404,16 +404,16 @@ class BoshSession(Session):
             self.scheduleInactivityCheck()
             pass
         return polled
-    
+
     def closeInternal(self, condition=None):
-	""" Close BOSH session. """
+        """ Close BOSH session. """
         if self.timer:
             self.timer.cancel()
-	self.status = SessionStatus['disconnected']
+        self.status = SessionStatus['disconnected']
         try:
             connection = self.hold.pop()
             terminate = Terminate().create(condition)
-	    connection.send(terminate)
+            connection.send(terminate)
             # When close session, all holding connection should be closed gracefully.
             while not self.hold.empty():
                 try:
@@ -432,20 +432,20 @@ class BoshSession(Session):
         When session timeouted, response an empty response to client.
         """
         return {}
-    
+
     pass
 
 class BoshDelivery(Delivery):
     """ Bosh delivery employee BOSH to send notification. """
     def delivery(self, notification):
-	""" Delivery notification. """
+        """ Delivery notification. """
         user = notification.user
-	if user is None:
-	    logger.debug('Delivery has no target, discard.')
-	    return
-	session = BoshSession.manager.getUserSession(user.id)
-	if session is not None:
-	    # target is online
-	    session.send(notification)
-	pass
+        if user is None:
+            logger.debug('Delivery has no target, discard.')
+            return
+        session = BoshSession.manager.getUserSession(user.id)
+        if session is not None:
+            # target is online
+            session.send(notification)
+        pass
     pass

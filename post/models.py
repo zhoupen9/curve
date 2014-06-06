@@ -16,36 +16,36 @@ class PostManager(models.Manager):
     Post manager.
     """
     def get_posts_by_tag(self, tag, limit=DEFAULT_POST_LIMIT):
-	"""
-	Get posts which contains tag with a count limit.
-	If limit parameter is not provided, this method will return default limited count.
-	"""
-	return super(PostManager, self).get_query_set().filter(tags__contains=tag)[:limit]
+        """
+        Get posts which contains tag with a count limit.
+        If limit parameter is not provided, this method will return default limited count.
+        """
+        return super(PostManager, self).get_query_set().filter(tags__contains=tag)[:limit]
 
     def get_posts_by_author(self, author, limit=DEFAULT_POST_LIMIT):
-	"""
-	Get posts which has an author is exectly the given author.
-	If limit parameter is not provided, this method will return default limited count.
-	"""
-	return super(PostManager, self).get_query_set().filter(member=author)[:limit]
+        """
+        Get posts which has an author is exectly the given author.
+        If limit parameter is not provided, this method will return default limited count.
+        """
+        return super(PostManager, self).get_query_set().filter(member=author)[:limit]
 
     def get_posts_mentioned(self, member, limit=DEFAULT_POST_LIMIT):
-	"""
-	Get posts which mentioned given member.
-	If limit parameter is not provided, this method will return default limited count.
-	"""
-	return super(PostManager, self).get_query_set().filter(mention_ats__contains=member)
+        """
+        Get posts which mentioned given member.
+        If limit parameter is not provided, this method will return default limited count.
+        """
+        return super(PostManager, self).get_query_set().filter(mention_ats__contains=member)
 
     def create_post(self, author, title, content, create_time=datetime.now()):
-	"""
-	Create a new post.
-	This method checks if all tags provided exist, if not so create them.
-	and also check if members or lists mentioned in the content.
-	"""
-	post = Post(member=author, title=title, content=content, createTime=create_time)
-	# TODO setup mentions.
-	post.save()
-	return post
+        """
+        Create a new post.
+        This method checks if all tags provided exist, if not so create them.
+        and also check if members or lists mentioned in the content.
+        """
+        post = Post(member=author, title=title, content=content, createTime=create_time)
+        # TODO setup mentions.
+        post.save()
+        return post
 
 class Tag(models.Model):
     """
@@ -77,8 +77,8 @@ class Post(models.Model):
     objects = PostManager()
 
     class Meta:
-	""" Post meta. Provides default ordering by create time."""
-	ordering = ['createTime']
+        """ Post meta. Provides default ordering by create time."""
+        ordering = ['createTime']
 
 class Mention(models.Model):
     """
@@ -89,7 +89,7 @@ class Mention(models.Model):
     member = models.ForeignKey(Member)
     date_mentioned = models.DateField()
     class Meta:
-	ordering = ['date_mentioned']
+        ordering = ['date_mentioned']
 
 class ListMention(models.Model):
     """
@@ -100,5 +100,4 @@ class ListMention(models.Model):
     member_list = models.ForeignKey(MemberList)
     date_mentioned = models.DateField()
     class Meta:
-	ordering = ['date_mentioned']
-
+        ordering = ['date_mentioned']

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 # from django.http import HttpResponse
 from django.shortcuts import render
 from member.models import Member
-from models import Document
+from document.models import Document
 import logging
 
 logger = logging.getLogger('curve')
